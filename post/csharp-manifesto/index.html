@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>The C# Improvement Manifesto - Divan Visagie</title>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="description" content="The C# Improvement Manifesto - Thoughts on possible improvements to the C# language">
+  <meta property="og:description" content="The C# Improvement Manifesto - Thoughts on possible improvements to the C# language" />
+  <meta property="og:title" content="The C# Improvement Manifesto" />
+  <meta name="twitter:title" content="The C# Improvement Manifesto" />
+  <meta name="author" content="Divan Visagie" />
+  <link href='/favicon.ico' rel='icon' type='image/x-icon' />
+  <meta property="og:image" content="https://dvisagie.com / favicon.ico" />
+  <meta name="twitter:image" content="https://dvisagie.com / favicon.ico" />
+  <meta name="twitter:card" content="summary" />
+  <meta property="og:url" content="/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Divan Visagie" />
+
+  <meta name="generator" content="Custom" />
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="/css/highlight.min.css" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;300;400;500&family=Roboto+Mono:ital,wght@0,400;1,300&display=swap"
+    rel="stylesheet">
+
+  <script type="application/javascript">
+    var doNotTrack = false;
+    if (!doNotTrack) {
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) }; ga.l = +new Date;
+      ga('create', 'UA-140923268-1', 'auto');
+
+      ga('send', 'pageview');
+    }
+  </script>
+
+  <script async src='https://www.google-analytics.com/analytics.js'></script>
+
+</head>
+
+<body>
+  <nav>
+    <div>
+      <h1>
+        <a href="/">Divan <span class="full">Visagie<span></a>
+      </h1>
+
+      <div class="links">
+        <h2>
+          <a href="/">Posts</a>
+        </h2>
+        <h2>
+          <a href="/about">About</a>
+        </h2>
+        <div id="darkmode-button">
+          <div class="black"></div>
+          <div class="white"></div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="content">
+    
+<div class="post-content">
+    <h1 class="title"> The C# Improvement Manifesto </h1>
+<h2 class="subtitle">Thoughts on possible improvements to the C# language</h2>
+<span class="date">2021-04-01</span>
+<p>C# is a rapidly evolving language used across large portions of the business world to write all sorts of applications that the average consumer will never see or care about, like Bing. From its inception C# has served as a vehicle to trick .Net programmers into learning new things, like how its mere existence taught the Visual Basic crowd to effectively learn Java.</p>
+<p>This initial success lead to Microsoft viewing the language as a tool to assist people who still ride their mountain bikes with training wheels on (but with no helmet) at the age of 35.</p>
+<p>For example while others in the industry decided to adopt things like <a href="https://en.wikipedia.org/wiki/Java_Persistence_API">standard persistence apis</a>, Microsoft had to use their control over the language to <a href="https://www.entityframeworktutorial.net/Querying-with-EDM.aspx">trick C# programmers</a> into thinking that they were still writing sql injection vulnerabilities.</p>
+<p>All of these changes over the years have lead to a language with many facets that, because it evolved over time, has in some cases become inconsistent. This manifesto is a suggestion of improvements that can be made to the language to improve its readability and usefulness and potentially open it up to use on more runtime environments.</p>
+<h1>Syntax</h1>
+<h2>Function Names</h2>
+<p>In C# the naming convention causes both functions and classes to start with a capital letter, this makes it hard to determine if we are talking about a function or a type, especially if we are not reading the code in an IDE. We suggest renaming functions and methods to start with a lowercase letter so that they can be distinguished from classes and types. These changes should also happen in core libraries to bring them into line with how people should write C#.</p>
+<p><strong>Remove</strong></p>
+<pre><code class="hljs language-csharp"><span class="hljs-function"><span class="hljs-keyword">public</span> Int32 <span class="hljs-title">Sum</span>(<span class="hljs-params">Int32 x, Int32 y</span>)</span>
+{
+	<span class="hljs-keyword">return</span> x + y;
+}
+</code></pre>
+<p><strong>Add</strong></p>
+<pre><code class="hljs language-java">
+<span class="hljs-function"><span class="hljs-keyword">public</span> Int32 <span class="hljs-title">sum</span><span class="hljs-params">(Int32 x, Int32 y)</span> 
+</span>{
+	<span class="hljs-keyword">return</span> x + y;
+}
+</code></pre>
+<h2>Type Names</h2>
+<p>Lowercase type names imply primitive types, however in C# these types are actually objects so <code><span class="hljs-built_in">string</span></code> is interchangeable with <code><span class="hljs-keyword">String</span></code>. As part of the movement to align type names, all types that are objects should start with capital letters.</p>
+<p><strong>Remove</strong></p>
+<pre><code class="hljs language-csharp"><span class="hljs-built_in">string</span>
+<span class="hljs-built_in">int</span> 
+<span class="hljs-built_in">decimal</span>
+</code></pre>
+<p><strong>Add</strong></p>
+<pre><code class="hljs language-java">String
+Integer
+Decimal
+</code></pre>
+<h2>Imports</h2>
+<p>C# makes use of both <strong>using statements</strong> and <strong>using directives</strong>, while the <strong>using statement</strong> is used to correctly ensure object disposal, the <strong>using directive</strong> imports things. We suggest removing this confusion by calling the one that imports things: <strong>import</strong> (revolutionary I know)<strong>.</strong></p>
+<p><strong>Remove</strong></p>
+<pre><code class="hljs language-csharp"><span class="hljs-keyword">using</span> NUnit.Framework;
+</code></pre>
+<p><strong>Add</strong></p>
+<pre><code class="hljs language-java">
+<span class="hljs-keyword">import</span> nUnit.framework;
+</code></pre>
+<h2>Namespaces</h2>
+<p>Namespaces are a great way to organise classes into separate packages, however we feel that packaging related code should be metadata that doesn't interfere with the indentation of the body of the code. The current namespace syntax adds unnecessary indentation and an extra code block, we suggest instead simply adding a package declaration at the top of the file.</p>
+<p><strong>Remove</strong></p>
+<pre><code class="hljs language-csharp"><span class="hljs-keyword">namespace</span> <span class="hljs-title">NUnitTestProject1</span>
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Tests</span>
+    {
+        <span class="hljs-comment">// ... Methods ...</span>
+    }
+}
+</code></pre>
+<p><strong>Add</strong></p>
+<pre><code class="hljs language-java"><span class="hljs-keyword">package</span> NUnitTestProject1;
+
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Tests</span>
+</span>{
+   <span class="hljs-comment">// ... Methods ...</span>
+}
+</code></pre>
+<h2>Lambdas</h2>
+<p>Lambdas or &quot;Arrow functions&quot; (because you should totally name a syntax based on how it looks and not what it does), are extremely useful but the &quot;Fat Arrow&quot; <code>=&gt;</code> can very easily be confused with a comparison check like <code><span class="hljs-meta">&gt;</span><span class="bash">=</span></code>, we suggest replacing <code>=&gt;</code> with <code>-&gt;</code></p>
+<p><strong>Remove</strong></p>
+<pre><code class="hljs language-csharp">(x,y) =&gt; x + y
+</code></pre>
+<p><strong>Add</strong></p>
+<pre><code class="hljs language-java">(x,y) -&gt; x + y
+</code></pre>
+<h2>Linq</h2>
+<p>Although it was effective in tricking programmers into thinking they were creating sql injection vulnerabilities, we feel that linq needs to change. As part of the implementation of the manifesto persistence will no longer be handled by linq but will follow a standard persistence API. With regard to collections, these functions will be renamed to be in line with every other language ever... seriously Microsoft!</p>
+<p>In addition, the requirement to convert the collection to a stream will be introduced, this way we can make it explicit how many times the collection is being looped through, instead of having every programmer on the team run their own test when a debate ensures from a pull request. We estimate that this will save companies that use C# roughly $7 Billion a year</p>
+<p><strong>Remove</strong></p>
+<pre><code class="hljs language-csharp">.Where()
+.Select()
+.Aggregate()
+</code></pre>
+<p><strong>Add</strong></p>
+<pre><code class="hljs language-java">.stream()
+.filter()
+.map()
+.reduce()
+</code></pre>
+<h2>Attributes</h2>
+<p>The word attributes starts with <code><span class="hljs-keyword">at</span></code> which is what <code><span class="hljs-meta">@</span></code> is, so attributes should start with it. This would also make C# attributes syntactically compatible with Java which is in line with the compilation goals of this manifesto, see the Compilation section for more.</p>
+<p><strong>Remove</strong></p>
+<pre><code class="hljs language-csharp">[<span class="hljs-meta">Attribute</span>]
+</code></pre>
+<p><strong>Add</strong></p>
+<pre><code class="hljs language-java"><span class="hljs-meta">@Attribute</span>
+</code></pre>
+<h1>Compilation</h1>
+<p>We believe that with the above suggested changes applied, a C# program could very easily be compiled to target the Java Runtime Environment, as well as have full library compatibility with Java. This could have many benefits which include:</p>
+<ul>
+<li>The Xamarin Android codebase could be drastically reduced as no compatibility layer would be needed.</li>
+<li>The .Net Core web libraries could finally stabilise their API since they will no longer have to keep rebuilding Spring from the ground up.</li>
+<li>The CLR would also be Java compatible, allowing all versions of Minecraft to merge into a single codebase.</li>
+<li>It would make Microsoft Blazor feel <strong>even more</strong> like Java Applets 2.0</li>
+</ul>
+
+</div>
+
+  </div>
+
+  <footer>
+    Divan Visagie • Copyright 2019-21 • <a href="mailto:me@dvisagie.com">me@dvisagie.com</a> • <span><a
+        href="/podcast">Podcast</a><span></span>
+  </footer>
+
+  <script src="/js/index.js"></script>
+</body>
+
+</html>
