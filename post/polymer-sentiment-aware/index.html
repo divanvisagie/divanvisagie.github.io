@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Building a sentiment aware Polymer input control - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="Building a sentiment aware Polymer input control - A tale of a UI experiment and using CoreNLP in Scala" />
+    <meta property="og:description" content="Building a sentiment aware Polymer input control - A tale of a UI experiment and using CoreNLP in Scala" />
+    <meta property="og:title" content="Building a sentiment aware Polymer input control" />
+    <meta name="twitter:title" content="Building a sentiment aware Polymer input control" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com/post/polymer-sentiment-aware/polymer-sentiment-xkcd.png" />
+    <meta name="twitter:image" content="https://divanv.com/post/polymer-sentiment-aware/polymer-sentiment-xkcd.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;300;400;500&family=Roboto+Mono:ital,wght@0,400;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-WZVBVPWY66"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+
+      gtag('config', 'G-WZVBVPWY66')
+    </script>
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+          <div id="darkmode-button">
+            <div class="black"></div>
+            <div class="white"></div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><div class="post-content"><h1 class="title">Building a sentiment aware Polymer input control</h1>
+<h2 class="subtitle">A tale of a UI experiment and using CoreNLP in Scala</h2>
+<span class="date">2017-10-01</span>
+<p>If you scroll through your Twitter feed sometimes you may see a lot of negativity or tweets that make you ask yourself “Did this person read this before they posted?”. This made me think of the times I might have done this, and whether or not I would have posted so many negative tweets if I knew that most of them had a negative sentiment.</p>
+<p>This of course brought to mind a <a href="https://xkcd.com/481/">relevant xkcd comic</a>:</p>
+<p><img src="polymer-sentiment-xkcd.png" alt="XKCD Comic"></p>
+<blockquote>
+<p>Relevant xkcd https://xkcd.com/481/</p>
+</blockquote>
+<p>Instead of a virus though, I thought to build a custom input control that would passively warn the user by changing color.</p>
+<h2>The design</h2>
+<p>The intention of the control isn’t to stop people from saying certain things, so the control never blocks the user from doing what they want. It just tells the user what kind of sentiment they are conveying. This may cause people to rethink their wording, or even help non native speakers of a language better construct what they are trying to say when communicating.</p>
+<p>So how would we implement it?</p>
+<p>I have been using a lot of <a href="https://www.polymer-project.org/">Polymer</a> lately so my mind has been in the world of reusable components. I liked the idea of someone using a component that fit in with the other Material Design paper elements, but being able to pass in whatever url they need in order to get a sentiment between -1 and 1, 0 being neutral. This leaves the user of the element to determine how that final sentiment is decided.</p>
+<p>In the end, the element it turned out like this:</p>
+<p><img src="polymer-sentiment-input-ice.png" alt="Picture of control"></p>
+<p>When I started out with the experiment. The first thing I wanted to know was what I would get back from sentiment APIs. I wanted to build a small back end for this control to prove the concept and make sure that it’s actually viable. I knew that I would want to test it against Stanford’s <a href="https://stanfordnlp.github.io/CoreNLP/">CoreNLP</a> eventually, because I wanted this to be viable without sending your data to a third party However, for starters I just wanted to see the thing work. Knowing that the easiest way to use CoreNLP is through it’s native Java API, I used that as the excuse to use Scala.</p>
+<h2>Getting numbers in return for words</h2>
+<p>I created an akka-http app with a single endpoint: “/sentiment”. I decided that the first goal was a working demo, and that CoreNLP was not number 1 on my priority list. So at this point I decided to just get a number back from the Google API. I luckily landed on the <a href="https://cloud.google.com/natural-language/docs/quickstart-client-libraries">Quickstarts</a> section of the documentation which not only provides a Java example of exactly what I wanted. But also provided the dependency line for sbt:</p>
+<pre><code class="hljs language-scala">libraryDependencies += <span class="hljs-string">&quot;com.google.cloud&quot;</span> % <span class="hljs-string">&quot;google-cloud-language&quot;</span> % <span class="hljs-string">&quot;0.24.0-beta&quot;</span>
+</code></pre>
+<p>A nice touch.</p>
+<p>All I needed to do was augment the code so that it took in the body of my HTTP POST and I would have a working <code>/sentiment</code> endpoint.</p>
+<p>Once I had the result I wanted, building the Polymer element was easy. I just bound the text value of the input box to the body of the post and let the debounce of iron-ajax do the work in figuring out whether or not it should send the request.</p>
+<p>The full code of the control below. Pretty simple stuff.</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;import&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;bower_components/polymer/polymer-element.html&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;import&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;bower_components/paper-input/paper-textarea.html&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;import&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;bower_components/iron-ajax/iron-ajax.html&quot;</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">dom-module</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;sentiment-aware-input&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="language-css">
+      <span class="hljs-selector-pseudo">:host</span> {
+        <span class="hljs-attribute">display</span>: block;
+      }
+      <span class="hljs-selector-class">.negative</span> {
+        <span class="hljs-attr">--paper-input-container-color</span>: <span class="hljs-number">#cc0000</span>;
+        <span class="hljs-attr">--paper-input-container-focus-color</span>: <span class="hljs-number">#cc0000</span>;
+      }
+      <span class="hljs-selector-class">.positive</span> {
+        <span class="hljs-attr">--paper-input-container-color</span>:<span class="hljs-number">#00B600</span>;
+        <span class="hljs-attr">--paper-input-container-focus-color</span>: <span class="hljs-number">#00B600</span>;
+      }
+    </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">paper-textarea</span> <span class="hljs-attr">class</span>$=<span class="hljs-string">&quot;[[getClass(sentiment)]]&quot;</span> <span class="hljs-attr">label</span>=<span class="hljs-string">&quot;Input Area&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;{{text}}&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">paper-textarea</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">iron-ajax</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;ajax&quot;</span>
+      <span class="hljs-attr">url</span>=<span class="hljs-string">&quot;[[url]]&quot;</span>
+      <span class="hljs-attr">method</span>=<span class="hljs-string">&quot;post&quot;</span>
+      <span class="hljs-attr">body</span>=<span class="hljs-string">&quot;[[text]]&quot;</span>
+      <span class="hljs-attr">content-type</span>=<span class="hljs-string">&quot;text/plain; charset=UTF-8&quot;</span>
+      <span class="hljs-attr">handle-as</span>=<span class="hljs-string">&quot;text&quot;</span>
+      <span class="hljs-attr">on-response</span>=<span class="hljs-string">&quot;handleResponse&quot;</span>
+      <span class="hljs-attr">debounce-duration</span>=<span class="hljs-string">&quot;500&quot;</span>
+      <span class="hljs-attr">auto</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">iron-ajax</span>&gt;</span>
+
+  <span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+
+  
+  <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript">
+    <span class="hljs-comment">/**
+     * `sentiment-aware-input`
+     * A sentiment aware input
+     *
+     * <span class="hljs-doctag">@customElement</span>
+     * <span class="hljs-doctag">@polymer</span>
+     * <span class="hljs-doctag">@demo</span> demo/index.html
+     */</span>
+    <span class="hljs-keyword">class</span> <span class="hljs-title class_">SentimentAwareInput</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">Polymer.Element</span> {
+      <span class="hljs-keyword">static</span> <span class="hljs-keyword">get</span> <span class="hljs-title function_">is</span>() { <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;sentiment-aware-input&#x27;</span>; }
+      <span class="hljs-keyword">static</span> <span class="hljs-keyword">get</span> <span class="hljs-title function_">properties</span>() {
+        <span class="hljs-keyword">return</span> {
+          <span class="hljs-attr">text</span>: {
+            <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+            <span class="hljs-attr">notify</span>: <span class="hljs-literal">true</span>,
+            <span class="hljs-attr">value</span>: <span class="hljs-string">&quot;&quot;</span>,
+          },
+          <span class="hljs-attr">sentiment</span>: {
+            <span class="hljs-attr">type</span>: <span class="hljs-title class_">Number</span>,
+            <span class="hljs-attr">notify</span>: <span class="hljs-literal">true</span>,
+            <span class="hljs-attr">value</span>: <span class="hljs-number">0.0</span>
+          },
+          <span class="hljs-attr">url</span>: {
+            <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+            <span class="hljs-attr">notify</span>: <span class="hljs-literal">true</span>
+          }
+        };
+      }
+      <span class="hljs-title function_">getClass</span>(<span class="hljs-params">sentiment</span>) {
+        <span class="hljs-keyword">if</span> (sentiment &lt; <span class="hljs-number">0</span>) {
+          <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;negative&#x27;</span>
+        } 
+        <span class="hljs-keyword">if</span> (sentiment &gt; <span class="hljs-number">0</span>) {
+          <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;positive&#x27;</span>
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;&#x27;</span>
+      }
+      <span class="hljs-title function_">handleResponse</span>(<span class="hljs-params">e, request</span>) {
+        <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">set</span>(<span class="hljs-string">&quot;sentiment&quot;</span>, <span class="hljs-built_in">parseFloat</span>(e.<span class="hljs-property">detail</span>.<span class="hljs-property">response</span>))
+      }
+    }
+    <span class="hljs-variable language_">window</span>.<span class="hljs-property">customElements</span>.<span class="hljs-title function_">define</span>(<span class="hljs-title class_">SentimentAwareInput</span>.<span class="hljs-property">is</span>, <span class="hljs-title class_">SentimentAwareInput</span>);
+  </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dom-module</span>&gt;</span>
+</code></pre>
+<p>In terms of minimum specs, the app was done at this point. And this is where the Ice Cream examples came from.</p>
+<p><img src="polymer-sentiment-input-ice-red.png" alt="Picture of control with red State">
+<img src="polymer-sentiment-input-ice-grey.png" alt="Picture of control with grey State">
+<img src="polymer-sentiment-input-ice-green.png" alt="Picture of control with green State"></p>
+<h2>Introducing CoreNLP to the mix</h2>
+<p>CoreNLPs sentiment functionality is pretty young, finding actual code snippets was a little difficult. So I relied a lot on related Stack Overflow questions for examples, and for anyone who wants to import the library in sbt, here’s what you need to add:</p>
+<pre><code class="hljs language-scala"><span class="hljs-string">&quot;edu.stanford.nlp&quot;</span> % <span class="hljs-string">&quot;stanford-corenlp&quot;</span> % <span class="hljs-string">&quot;3.8.0&quot;</span>,
+<span class="hljs-string">&quot;edu.stanford.nlp&quot;</span> % <span class="hljs-string">&quot;stanford-corenlp&quot;</span> % <span class="hljs-string">&quot;3.8.0&quot;</span> classifier <span class="hljs-string">&quot;models&quot;</span>,
+<span class="hljs-string">&quot;edu.stanford.nlp&quot;</span> % <span class="hljs-string">&quot;stanford-parser&quot;</span> % <span class="hljs-string">&quot;3.8.0&quot;</span>
+</code></pre>
+<p>Once added I got to work writing a function that would get me the same sorts of values I was getting back from the Google API, but there were two problems. First, CoreNLP analyses one sentence at a time and returns the sentiment for each individually, the other issue is that instead of a number, CoreNLP returns a string. I decided to use Scala’s pattern matching to solve this problem by simply counting the string that occurred most and then mapping the sentiment to either -1 , 0 or 1. I decided on a hard mapping because I did not need the precision that Google’s API gave me for this particular purpose.</p>
+<pre><code class="hljs language-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sentimentCounter</span></span>(list: <span class="hljs-type">List</span>[<span class="hljs-type">String</span>]): <span class="hljs-type">List</span>[<span class="hljs-type">Int</span>] = {
+	list.foldLeft(<span class="hljs-type">List</span>[<span class="hljs-type">Int</span>](<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>))((acc, item) =&gt; {
+		item <span class="hljs-keyword">match</span> {
+			<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;Positive&quot;</span> =&gt; <span class="hljs-type">List</span>(acc.head + <span class="hljs-number">1</span>, acc(<span class="hljs-number">1</span>), acc(<span class="hljs-number">2</span>))
+			<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;Very positive&quot;</span> =&gt; <span class="hljs-type">List</span>(acc.head + <span class="hljs-number">2</span>, acc(<span class="hljs-number">1</span>), acc(<span class="hljs-number">2</span>))
+			<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;Negative&quot;</span> =&gt; <span class="hljs-type">List</span>(acc.head, acc(<span class="hljs-number">1</span>) + <span class="hljs-number">1</span>, acc(<span class="hljs-number">2</span>))
+			<span class="hljs-keyword">case</span> _ =&gt; <span class="hljs-type">List</span>(acc.head, acc(<span class="hljs-number">1</span>), acc(<span class="hljs-number">2</span>) + <span class="hljs-number">1</span>)
+		}
+	})
+}
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">analyzeWithCoreNLP</span></span>(text: <span class="hljs-type">String</span>): <span class="hljs-type">Double</span> = {
+	<span class="hljs-keyword">if</span> (text.isEmpty) <span class="hljs-keyword">return</span> <span class="hljs-number">0.0</span>
+
+	<span class="hljs-keyword">val</span> props = <span class="hljs-keyword">new</span> <span class="hljs-type">Properties</span>()
+	props.setProperty(<span class="hljs-string">&quot;annotators&quot;</span>,<span class="hljs-string">&quot;tokenize, ssplit, pos, lemma, parse, sentiment&quot;</span>)
+	<span class="hljs-keyword">val</span> pipeline = <span class="hljs-keyword">new</span> <span class="hljs-type">StanfordCoreNLP</span>(props)
+
+	<span class="hljs-keyword">val</span> annotation = pipeline.process(text)
+	<span class="hljs-keyword">val</span> sentences = annotation.get(classOf[<span class="hljs-type">CoreAnnotations</span>.<span class="hljs-type">SentencesAnnotation</span>])
+
+	<span class="hljs-keyword">val</span> sentimentStringValuesBuf = scala.collection.mutable.<span class="hljs-type">ArrayBuffer</span>.empty[<span class="hljs-type">String</span>]
+	sentences.forEach { sentence =&gt;
+		<span class="hljs-keyword">val</span> sentiment = sentence.get(classOf[<span class="hljs-type">SentimentCoreAnnotations</span>.<span class="hljs-type">SentimentClass</span>])
+		sentimentStringValuesBuf += sentiment
+	}
+
+	indexOfHighest(sentimentCounter(sentimentStringValuesBuf.toList)) <span class="hljs-keyword">match</span> {
+		<span class="hljs-keyword">case</span> <span class="hljs-number">0</span> =&gt; <span class="hljs-number">1.0</span>
+		<span class="hljs-keyword">case</span> <span class="hljs-number">1</span> =&gt; <span class="hljs-number">-1.0</span>
+		<span class="hljs-keyword">case</span> <span class="hljs-number">2</span> =&gt; <span class="hljs-number">0.0</span>
+	}
+}
+</code></pre>
+<p>One thing to note here is that at this point CoreNLP was trying to log stuff and couldn’t, I had to bring in slf4j before it started to work</p>
+<pre><code class="hljs language-scala"><span class="hljs-string">&quot;org.slf4j&quot;</span> % <span class="hljs-string">&quot;slf4j-simple&quot;</span> % <span class="hljs-string">&quot;1.6.4&quot;</span>,
+</code></pre>
+<p>Once I got that working I split up the API into the endpoints <code>/google</code> and <code>/stanford</code>. This enabled me to manually test if I was getting similar results from both implementations.</p>
+<h2>The results</h2>
+<p>Google is obviously more accurate, it analyses entire documents, not just sentences. So in long form it probably has something more sophisticated than my simple pattern matchers, but for most of the kind of things I could come up with, CoreNLP held up. Especially for review text which the internal neural net is actually trained on.</p>
+<p>What I’m really happy about is that the concept of the control seems to work, and it also works across different core implementations of the sentiment analysis. It’s also a good reminder that you can actually implement machine learning powered features in every day code without going deep into it’s inner workings and I hope to see these sorts of features pop up in more places because of that.</p>
+<p>Going forward, the next step would be for me to extract the element from my <a href="https://github.com/divanvisagie/sentiment-aware-input">GitHub project</a> into something separate that can be published on <a href="https://www.webcomponents.org/">webcomponents.org</a> and iron out any kinks that it may have. I also had fun using CoreNLP and I’m interested to try out some of it’s other features.</p>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-21 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/podcast">Podcast</a></span>
+    </footer>
+
+    <script src="/js/index.js"></script>
+  </body>
+</html>

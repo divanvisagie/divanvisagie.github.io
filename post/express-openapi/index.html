@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Adding OpenAPI to an Express app - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="Adding OpenAPI to an Express app - Documenting your Node.js express API with OpenAPI/Swagger" />
+    <meta property="og:description" content="Adding OpenAPI to an Express app - Documenting your Node.js express API with OpenAPI/Swagger" />
+    <meta property="og:title" content="Adding OpenAPI to an Express app" />
+    <meta name="twitter:title" content="Adding OpenAPI to an Express app" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com/post/express-openapi/screen1.png" />
+    <meta name="twitter:image" content="https://divanv.com/post/express-openapi/screen1.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;300;400;500&family=Roboto+Mono:ital,wght@0,400;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-WZVBVPWY66"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+
+      gtag('config', 'G-WZVBVPWY66')
+    </script>
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+          <div id="darkmode-button">
+            <div class="black"></div>
+            <div class="white"></div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><div class="post-content"><h1 class="title">Adding OpenAPI to an Express app</h1>
+<h2 class="subtitle">Documenting your Node.js express API with OpenAPI/Swagger</h2>
+<span class="date">2020-09-27</span>
+<p>While there are many options for using Swagger/OpenAPI with express some of them require that you use an entire framework, while others like to enforce strange structures that quite frankly feel like they interfere with your independant descisions way too much.</p>
+<p>In this tutorial I will cover what I think is the easiest way to <a href="https://divanv.com/post/open-api/">add documentation to your API</a>.</p>
+<p>First let's put together a simple express app that simply returns the object <code>{greeting: <span class="hljs-string">&#x27;Hello World&#x27;</span>}</code>.</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express&#x27;</span>)
+<span class="hljs-keyword">const</span> app = <span class="hljs-title function_">express</span>()
+<span class="hljs-keyword">const</span> port = <span class="hljs-number">8080</span>
+
+app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+  res.<span class="hljs-title function_">json</span>({
+    <span class="hljs-attr">greeting</span>: <span class="hljs-string">&#x27;Hello World&#x27;</span>,
+  })
+})
+
+app.<span class="hljs-title function_">listen</span>(port, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`listening on http://localhost:<span class="hljs-subst">${port}</span>`</span>)
+})
+</code></pre>
+<p>We can test it by browsing to <a href="http://localhost:8080">http://localhost:8080</a>.</p>
+<p>Right, so now that we have an existing API lets add swagger documentation to it. We will be using <code><span class="hljs-meta">@wesleytodd</span>/openapi</code>. Which is a candidate for actually becomin @express/openapi some time in the future. Lets install it now using it's current name though.</p>
+<pre><code class="hljs language-bash">npm i @wesleytodd/openapi
+</code></pre>
+<p>In order to use the library we must first import it</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> openapi = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;@wesleytodd/openapi&#x27;</span>)
+</code></pre>
+<p>Then before the endpoint we declare our openapi definition</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// ...</span>
+<span class="hljs-keyword">const</span> oapi = <span class="hljs-title function_">openapi</span>({
+  <span class="hljs-attr">openapi</span>: <span class="hljs-string">&#x27;3.0.0&#x27;</span>,
+  <span class="hljs-attr">info</span>: {
+    <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;Express App&#x27;</span>,
+    <span class="hljs-attr">description</span>: <span class="hljs-string">&#x27;Generated docs from an express api&#x27;</span>,
+    <span class="hljs-attr">version</span>: <span class="hljs-string">&#x27;1.0.0&#x27;</span>,
+  },
+})
+<span class="hljs-comment">// ...</span>
+</code></pre>
+<p>With our definition loaded we now import it as an express middleware with <code><span class="hljs-keyword">app</span>.<span class="hljs-keyword">use</span>(...)</code>.</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// ...</span>
+app.<span class="hljs-title function_">use</span>(oapi)
+<span class="hljs-comment">// ...</span>
+</code></pre>
+<p>You will now be able to access your openAPI definition at <a href="http://localhost:8080/openapi.json">http://localhost:8080/openapi.json</a>.</p>
+<p>However you will notice that this only contains our base definition and no information about our endpoint:</p>
+<pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;openapi&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;3.0.0&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;info&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;title&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Express App&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1.0.0&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Generated docs from an express api&quot;</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;paths&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span><span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>In order to generate documentation for our endpoints we need to insert the relevant documentation information, this again makes use of the middleware API. A nice feature about the way it is done here is that the documentation structure is in JSON and maps directly to the way a normal Swagger/OpenAPI json file would look. This means that you can refer to the <a href="https://swagger.io/specification/">official openapi documentation</a> and don't have to rely on the library abstractions being correctly documented.</p>
+<p>Our get endpoint now becomes:</p>
+<pre><code class="hljs language-js">app.<span class="hljs-title function_">get</span>(
+  <span class="hljs-string">&#x27;/&#x27;</span>,
+  oapi.<span class="hljs-title function_">path</span>({
+    <span class="hljs-attr">tags</span>: [<span class="hljs-string">&#x27;Hello&#x27;</span>],
+    <span class="hljs-attr">summary</span>: <span class="hljs-string">&#x27;Get Hello&#x27;</span>,
+    <span class="hljs-attr">description</span>: <span class="hljs-string">&#x27;Test Endpoint that returns the greeting object&#x27;</span>,
+    <span class="hljs-attr">responses</span>: {
+      <span class="hljs-number">200</span>: {
+        <span class="hljs-attr">description</span>: <span class="hljs-string">&#x27;Successful&#x27;</span>,
+        <span class="hljs-attr">content</span>: {
+          <span class="hljs-string">&#x27;application/json&#x27;</span>: {
+            <span class="hljs-attr">schema</span>: {
+              <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;object&#x27;</span>,
+              <span class="hljs-attr">properties</span>: {
+                <span class="hljs-attr">hello</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;string&#x27;</span> },
+              },
+            },
+          },
+        },
+      },
+    },
+  }),
+  <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    res.<span class="hljs-title function_">json</span>({
+      <span class="hljs-attr">hello</span>: <span class="hljs-string">&#x27;world&#x27;</span>,
+    })
+  }
+)
+</code></pre>
+<p>With this change in place, the library now has enough information to generate the full documentation of our API browsing to <a href="http://localhost:8080/openapi.json">http://localhost:8080/openapi.json</a> will now return the following.</p>
+<pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;openapi&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;3.0.0&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;info&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;title&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Express App&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1.0.0&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Generated docs from an express api&quot;</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;paths&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;/&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;get&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;tags&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Hello&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;summary&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Get Hello&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Test Endpoint that returns the greeting object&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;responses&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">&quot;200&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+            <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Successful&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;content&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+              <span class="hljs-attr">&quot;application/json&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                <span class="hljs-attr">&quot;schema&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                  <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;object&quot;</span><span class="hljs-punctuation">,</span>
+                  <span class="hljs-attr">&quot;properties&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                    <span class="hljs-attr">&quot;hello&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                      <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;string&quot;</span>
+                    <span class="hljs-punctuation">}</span>
+                  <span class="hljs-punctuation">}</span>
+                <span class="hljs-punctuation">}</span>
+              <span class="hljs-punctuation">}</span>
+            <span class="hljs-punctuation">}</span>
+          <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span>
+      <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Having this documentation in JSON format can be super useful, you can even import it onto postman as a collection, however <code><span class="hljs-meta">@wesleytodd</span>/openapi</code> also provides easy integration with SwaggerUI. Simply add <code>openapi.swaggerui</code> at any endpoint you desire, here I have chosen to put mine at the <code>/docs</code> route.</p>
+<pre><code class="hljs language-js">app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&#x27;/docs&#x27;</span>, oapi.<span class="hljs-property">swaggerui</span>)
+</code></pre>
+<p>And that's it, we have documented an express API in what in my opinion is the clearest and least complicated way, you can now view and test your endpoints at <a href="http://localhost:8080/docs/">http://localhost:8080/docs/</a>.</p>
+<p><img src="screen1.png" alt="Screenshot of swagger api docs page"></p>
+<p>Just in case you aren't quite sure where some of the code goes, here is a copy of the full API:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express&#x27;</span>)
+<span class="hljs-keyword">const</span> openapi = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;@wesleytodd/openapi&#x27;</span>)
+
+<span class="hljs-keyword">const</span> app = <span class="hljs-title function_">express</span>()
+
+<span class="hljs-keyword">const</span> oapi = <span class="hljs-title function_">openapi</span>({
+  <span class="hljs-attr">openapi</span>: <span class="hljs-string">&#x27;3.0.0&#x27;</span>,
+  <span class="hljs-attr">info</span>: {
+    <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;Express App&#x27;</span>,
+    <span class="hljs-attr">description</span>: <span class="hljs-string">&#x27;Generated docs from an express api&#x27;</span>,
+    <span class="hljs-attr">version</span>: <span class="hljs-string">&#x27;1.0.0&#x27;</span>,
+  },
+})
+
+app.<span class="hljs-title function_">use</span>(oapi)
+app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&#x27;/docs&#x27;</span>, oapi.<span class="hljs-property">swaggerui</span>)
+
+app.<span class="hljs-title function_">get</span>(
+  <span class="hljs-string">&#x27;/&#x27;</span>,
+  oapi.<span class="hljs-title function_">path</span>({
+    <span class="hljs-attr">tags</span>: [<span class="hljs-string">&#x27;Hello&#x27;</span>],
+    <span class="hljs-attr">summary</span>: <span class="hljs-string">&#x27;Get Hello&#x27;</span>,
+    <span class="hljs-attr">description</span>: <span class="hljs-string">&#x27;Test Endpoint that returns the greeting object&#x27;</span>,
+    <span class="hljs-attr">responses</span>: {
+      <span class="hljs-number">200</span>: {
+        <span class="hljs-attr">description</span>: <span class="hljs-string">&#x27;Successful&#x27;</span>,
+        <span class="hljs-attr">content</span>: {
+          <span class="hljs-string">&#x27;application/json&#x27;</span>: {
+            <span class="hljs-attr">schema</span>: {
+              <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;object&#x27;</span>,
+              <span class="hljs-attr">properties</span>: {
+                <span class="hljs-attr">hello</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;string&#x27;</span> },
+              },
+            },
+          },
+        },
+      },
+    },
+  }),
+  <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    res.<span class="hljs-title function_">json</span>({
+      <span class="hljs-attr">hello</span>: <span class="hljs-string">&#x27;world&#x27;</span>,
+    })
+  }
+)
+
+<span class="hljs-keyword">const</span> port = <span class="hljs-number">8080</span>
+app.<span class="hljs-title function_">listen</span>(port, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`listening at http://localhost:<span class="hljs-subst">${port}</span>`</span>)
+})
+</code></pre>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-21 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/podcast">Podcast</a></span>
+    </footer>
+
+    <script src="/js/index.js"></script>
+  </body>
+</html>

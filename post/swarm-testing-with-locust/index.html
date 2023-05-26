@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Swarm testing with Locust.io for the first time - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="Swarm testing with Locust.io for the first time - A beginners guide" />
+    <meta property="og:description" content="Swarm testing with Locust.io for the first time - A beginners guide" />
+    <meta property="og:title" content="Swarm testing with Locust.io for the first time" />
+    <meta name="twitter:title" content="Swarm testing with Locust.io for the first time" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com/post/swarm-testing-with-locust/locust-head.png" />
+    <meta name="twitter:image" content="https://divanv.com/post/swarm-testing-with-locust/locust-head.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;300;400;500&family=Roboto+Mono:ital,wght@0,400;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-WZVBVPWY66"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+
+      gtag('config', 'G-WZVBVPWY66')
+    </script>
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+          <div id="darkmode-button">
+            <div class="black"></div>
+            <div class="white"></div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><img class="post-header" alt = "An image displayed as a header before the article for decorative purposes." src="locust-head.png" ></img >
+<div class="post-content"><h1 class="title">Swarm testing with Locust.io for the first time</h1>
+<h2 class="subtitle">A beginners guide</h2>
+<span class="date">2018-10-01</span>
+<p>When you build services for the web you want to make sure they don’t fall over completely when <a href="http://www.whatisfailwhale.info/">too many users</a> hit your system all at one time. What you want, is to be able to simulate that load spike before it happens in production.</p>
+<p>I have used <a href="https://artillery.io/">artillery.io</a> in the past to get this done, and there are many other services that will test basic load, but I wanted to find a go-to tool that I could learn to rely on that felt like it was not too complicated and was more developer friendly than GUI based alternatives that simply record your traffic while browsing a website.</p>
+<p>It’s not surprising then that when shopping around for a simple, easy to use code based tool that something written in Python <a href="https://www.thoughtworks.com/radar/tools/locust">blips on the radar</a>. Locust seemed to fit the profile of what I was looking for well, so I decided to hop right in and test it out.</p>
+<p>The plan was to simply create a test app and then point Locust at it, nothing fancy, just all on my local machine. I like doing this when I try out a tool because it let’s me back out before too much investment yet gives me a sense of how it works and potential pain points.</p>
+<h2>The Server</h2>
+<p>I decided that since I would be writing the tests in Python I would whip up a the test service in the same language. A microframework seemed like the perfect tool for that so it was <a href="http://flask.pocoo.org/">Flask</a> to the rescue.</p>
+<p>Locust simulates users hitting the site, so I decided on a simple flow of login and browse to index.</p>
+<p>Below is my super secure server implementation using flask, a lightweight solution indeed! Though I wouldn’t want to roll anything like this into production any time soon.</p>
+<pre><code class="hljs language-py"><span class="hljs-keyword">from</span> flask <span class="hljs-keyword">import</span> Flask, request, abort
+app = Flask(__name__)
+token = <span class="hljs-string">&#x27;a-very-real-token&#x27;</span>
+
+<span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/login&#x27;</span>, methods = [<span class="hljs-string">&#x27;POST&#x27;</span>]</span>)</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">login</span>():
+    <span class="hljs-keyword">return</span> token
+
+<span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/&#x27;</span></span>)</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">hello</span>():
+    token = request.headers.get(<span class="hljs-string">&#x27;Authorization&#x27;</span>)
+    <span class="hljs-keyword">if</span> token != token:
+        abort(<span class="hljs-number">401</span>)
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&#x27;Found token <span class="hljs-subst">{token}</span>&#x27;</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;Hello Locust!&#x27;</span>
+</code></pre>
+<p>I ran a single instance to test against simply using the dev server: <code><span class="hljs-attr">FLASK_APP</span>=server.py flask run</code></p>
+<h2>The Test</h2>
+<p>The next thing to do was to create a <a href="https://docs.locust.io/en/latest/writing-a-locustfile.html">locustfile</a> to define the user behaviour that we would be testing. The <a href="https://docs.locust.io/en/latest/quickstart.html">quick start guide</a> was a good place to start, but I make some modifications to store my super secure token.</p>
+<pre><code class="hljs language-py"><span class="hljs-keyword">from</span> locust <span class="hljs-keyword">import</span> HttpLocust, TaskSet, task
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">login</span>(<span class="hljs-params">l</span>):
+    response = l.client.post(<span class="hljs-string">&#x27;/login&#x27;</span>)
+    token = response.content
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&#x27;Got token from login: <span class="hljs-subst">{token}</span>&#x27;</span>)
+    <span class="hljs-keyword">return</span> token
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">MyTaskSet</span>(<span class="hljs-title class_ inherited__">TaskSet</span>):
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">on_start</span>(<span class="hljs-params">self</span>):
+        self.token = login(self)
+
+<span class="hljs-meta">    @task</span>
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">my_task</span>(<span class="hljs-params">self</span>):
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&#x27;executing with token: <span class="hljs-subst">{self.token}</span>&#x27;</span>)
+        headers = {
+            <span class="hljs-string">&#x27;Authorization&#x27;</span>: self.token
+        }
+        self.client.get(<span class="hljs-string">&#x27;/&#x27;</span>, headers = headers)
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">MyLocust</span>(<span class="hljs-title class_ inherited__">HttpLocust</span>):
+    task_set = MyTaskSet
+    min_wait = <span class="hljs-number">5000</span>
+    max_wait = <span class="hljs-number">1500</span>
+</code></pre>
+<p>Once I got that right (it took more attempts than I would like to admit), it was a matter of running locust against my endpoint with: <code>locust --host=http:<span class="hljs-regexp">//</span>localhost:<span class="hljs-number">5000</span></code></p>
+<p>After that, browsing to http://localhost:8089 gave me the following interface where I could set up my simulation.</p>
+<p><img src="locust-swarm-setup.png" alt="Screensot of Locust startup page"></p>
+<p>Once you get up and going the interface is quite simple, providing details on average and median request speeds, exceptions, failures, charts, and the option to download the stats you have gathered in CSV form.</p>
+<p><img src="locust-swarm-results.png" alt="Locust Swarm Results"></p>
+<p><img src="locust-swarm-graph.png" alt="Locust Swarm Graph"></p>
+<p><img src="locust-swarm-calls.png" alt="Locust Swarm Calls"></p>
+<p>For me personally, this is enough, in practise If I needed more data, I would want to be gathering it from the instrumentation in the actual service I am testing.</p>
+<p>The next step is to test more than a simple server, like something running in a cluster, but I think the technology has proven itself here enough to see what it can do and how simple it is to set up, and for me also proves that being able to use a neat scripting language like Python can really help get your job done.</p>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-21 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/podcast">Podcast</a></span>
+    </footer>
+
+    <script src="/js/index.js"></script>
+  </body>
+</html>

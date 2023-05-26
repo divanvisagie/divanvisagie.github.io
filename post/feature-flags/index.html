@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Gettings started with Feature Flags and Progressive Delivery - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="Gettings started with Feature Flags and Progressive Delivery - An introduction with examples using Unleash" />
+    <meta property="og:description" content="Gettings started with Feature Flags and Progressive Delivery - An introduction with examples using Unleash" />
+    <meta property="og:title" content="Gettings started with Feature Flags and Progressive Delivery" />
+    <meta name="twitter:title" content="Gettings started with Feature Flags and Progressive Delivery" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com/post/feature-flags/feature-flag-header.jpeg" />
+    <meta name="twitter:image" content="https://divanv.com/post/feature-flags/feature-flag-header.jpeg" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;300;400;500&family=Roboto+Mono:ital,wght@0,400;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-WZVBVPWY66"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+
+      gtag('config', 'G-WZVBVPWY66')
+    </script>
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+          <div id="darkmode-button">
+            <div class="black"></div>
+            <div class="white"></div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><img class="post-header" alt = "An image displayed as a header before the article for decorative purposes." src="feature-flag-header.jpeg" ></img >
+<div class="post-content"><h1 class="title">Gettings started with Feature Flags and Progressive Delivery</h1>
+<h2 class="subtitle">An introduction with examples using Unleash</h2>
+<span class="date">2020-01-10</span>
+<p>In it's simplest form. A feature flag is an if statement. Lets take the example of an endpoint that returns the string <code><span class="hljs-string">&quot;Hello World&quot;</span></code> when the user browses to <a href="http://locahost:8000/greeting">/greeting</a>:</p>
+<pre><code class="hljs language-ts">app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/greeting&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    res.<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;Hello Hello&#x27;</span>)
+})
+</code></pre>
+<p>Now lets suppose that we deploy this useful functionality to production, but after a few weeks, we get the idea that maybe we want to change it to greet the user directly by including their name from the database. Now, we could simply change this functionality and deploy a new version:</p>
+<pre><code class="hljs language-ts">app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/greeting&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    <span class="hljs-keyword">let</span> user = <span class="hljs-title function_">getUserDetails</span>(req)
+    res.<span class="hljs-title function_">send</span>(<span class="hljs-string">`Hello <span class="hljs-subst">${user.name}</span>`</span>)
+})
+</code></pre>
+<p>However this version will roll out to everyone at the same time and if anything goes wrong, for example there may be a bug in <code><span class="hljs-function"><span class="hljs-title">getUserDetails</span><span class="hljs-params">()</span></span></code>, we would then have to roll back our entire release. This may seem minor given this simple example, but in the real world we may be releasing multiple features in a single release and the rollback will affect all of those changes too, this happens because we now have a feature <em>Rollout</em> that is tightly coupled with the <em>Deployment</em>.</p>
+<p>What we want to do is decouple Rollout and deployment. A better way would be for us to perform a check on a configurable variable so that we could choose to switch between features and allow us to roll back simply by changing the value of the configuration for that feature:</p>
+<pre><code class="hljs language-ts">app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/greeting&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (config.<span class="hljs-title function_">getBool</span>(<span class="hljs-string">&#x27;greet-by-name-feature&#x27;</span>)) {
+        <span class="hljs-keyword">let</span> user = <span class="hljs-title function_">getUserDetails</span>(req)
+        <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">send</span>(<span class="hljs-string">`Hello <span class="hljs-subst">${user.name}</span>`</span>)
+    }
+    res.<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;Hello World&#x27;</span>)
+})
+</code></pre>
+<p>And that, is what I meant when I said that a feature flag in it's simplest form is an if statement. Its simply a check to see if the new code should be executed, and if it isn't then the old code runs as normal.</p>
+<h2>Managing flags</h2>
+<p>The feature flag we implemented here allows us to roll out and roll back without redeploying our application, but there are risks. Depending on how our <code>config.<span class="hljs-built_in">getBool</span>()</code> funciton works, we may need to restart the application to cause the value to change, or the value may live inside a config file that we would have to remote into the production server to change, which in a microservices architecture could be near impossible to get right.</p>
+<p>Ideally we would want to have a centralised  management system for these flags so that we can respond more rapidly if we need to roll back a feature. While there isn't necessarily anything wrong with rolling your own feature flag system, it is a domain on it's own that requires many considerations and can cost you valuable time... and even money.</p>
+<p>One particular example is from a comp... well former company called Knight Capital, who's <a href="https://dougseven.com/2014/04/17/knightmare-a-devops-cautionary-tale">reuse of a feature flag</a> caused an 8 year old bit of code to run unexpectedly; ultimately ending in the company's demise.</p>
+<p>If you need any more convincing about using a proper flag management system, check out: <a href="https://youtu.be/r7VI5x2XKXw">Feature Toggles: The Good, The Bad, and The Ugly with Andy Davies</a>.</p>
+<blockquote>
+<p>I highly recommend watching this talk as it points out the serious potential pitfalls that come with using feature flags</p>
+</blockquote>
+<h2>Choosing a feature flag system</h2>
+<p>There are several very viable options when it comes to feature flag management systems, but two of them really stand out to me:</p>
+<ul>
+<li>LaunchDarkly</li>
+<li>Unleash</li>
+</ul>
+<p><em>LaunchDarkly</em> is a very full featured <a href="https://en.wikipedia.org/wiki/Software_as_a_service">SAAS</a> solution, and also caters for A/B testing and experimentation. One of my favourite features which I discovered while using it was that it will actually mark a flag as no longer used, which serves as a great notification that it's time to clean up that check in your code. LaunchDarkly is however a paid for product and may be overkill for a lot of projects that have much more basic needs.</p>
+<p><em>Unleash</em> is a much more lightweight, open source self-hosted solution that also has a (less prohibitively expensive for a normal human being) SAAS component called <a href="https://www.unleash-hosted.com">Unleash Hosted</a>. To me it's biggest benifit is the fact that I can package an instance for development by simply adding it to a <code>docker-compose.yml</code> file in the respective project, and it's for this reason I chose I will be using it in the code examples in the rest of this post.</p>
+<h2>Using Unleash</h2>
+<p>You can choose to either use Unleash as a cloud service or run your own instance.
+To run unleash in your project. Simply add the following to your docker-compose.yml</p>
+<pre><code class="hljs language-yaml"><span class="hljs-attr">version:</span> <span class="hljs-string">&#x27;3&#x27;</span>
+<span class="hljs-attr">services:</span>
+  <span class="hljs-attr">unleash:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">unleashorg/unleash-server:3.1</span>
+    <span class="hljs-attr">ports:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;4242:4242&quot;</span>
+    <span class="hljs-attr">environment:</span>
+      <span class="hljs-attr">DATABASE_URL:</span> <span class="hljs-string">postgres://postgres:unleash@db/postgres</span>
+    <span class="hljs-attr">depends_on:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">db</span>
+  <span class="hljs-attr">db:</span>
+    <span class="hljs-attr">expose:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;5432&quot;</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">postgres:10-alpine</span>
+</code></pre>
+<p>After running the command <code><span class="hljs-attribute">docker-compose up</span></code> you will now have access to an Unleash interface at <a href="http://localhost:4242/">http://localhost:4242/</a>.</p>
+<p>Let's take our earlier greeting example and convert it to use unleash.</p>
+<blockquote>
+<p>Please note that while the code portions are a Node.JS example written in TypeScript, unleash supports multiple languages, If you need exact code, refer to <a href="https://unleash.github.io/docs/client_sdk">Unleash's documentation</a> for the respective library.</p>
+</blockquote>
+<p>Click the add button:</p>
+<p><img src="addflag.png" alt="Add Flag Button"></p>
+<p>We can then create the flag in unleash with the same name <em>'greet-by-name-feature'</em>, for now, use the default activation strategy and click update.</p>
+<p><img src="create-greet-by-name-feature.png" alt="Create greet by name feature screen"></p>
+<p>In the code we will now have to import and initialise the unleash client library, pointing it at the correct url for our running Unleash instance.</p>
+<pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> {initialize, isEnabled} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;unleash-client&#x27;</span>
+
+<span class="hljs-keyword">const</span> instance = <span class="hljs-title function_">initialize</span>({
+    <span class="hljs-attr">url</span>: <span class="hljs-string">&#x27;http://localhost:4242/api&#x27;</span>,
+    <span class="hljs-attr">appName</span>: <span class="hljs-string">&#x27;node-unleash-example&#x27;</span>,
+    <span class="hljs-attr">instanceId</span>: <span class="hljs-string">&#x27;my-server-instance&#x27;</span>,
+})
+</code></pre>
+<p>We then can simply replace our config check with the <code><span class="hljs-attribute">isEnabled</span></code> function made available by the client library</p>
+<pre><code class="hljs language-ts">app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/greeting&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (<span class="hljs-title function_">isEnabled</span>(<span class="hljs-string">&#x27;greet-by-name-feature&#x27;</span>)) {
+        <span class="hljs-keyword">let</span> user = <span class="hljs-title function_">getUserDetails</span>(req)
+        <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">send</span>(<span class="hljs-string">`Hello <span class="hljs-subst">${user.name}</span>`</span>)
+    }
+    res.<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;Hello World&#x27;</span>)
+})
+</code></pre>
+<p>Now toggling between our old and new code is as simple as the flick of a switch. Here I ran this infinite loop in the shell to call the endpoint and then flicked the switch to change the value.</p>
+<pre><code class="hljs language-sh"><span class="hljs-keyword">while</span> <span class="hljs-literal">true</span>; <span class="hljs-keyword">do</span> curl http://localhost:8000/greeting; <span class="hljs-built_in">echo</span> <span class="hljs-string">&#x27;&#x27;</span>; <span class="hljs-built_in">sleep</span> 2; <span class="hljs-keyword">done</span>
+</code></pre>
+<p>And got the following results.
+<img src="toggle1.gif" alt="In Action"></p>
+<p>As you can see the change isn't quite immediate, this is due to the fact that the unleash client is periodically updating the value so that not every call to your api will double the amount of traffic on your network. I have however seen it happen a lot faster than in this gif when I experimented with unleash in C#, as can be seen in this tweet:</p>
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Playing with Unleash in dotnet, was a very simple setup. <a href="https://t.co/pZwJz9Lijz">pic.twitter.com/pZwJz9Lijz</a></p>&mdash; Divan Visagie (@DivanVisagie) <a href="https://twitter.com/DivanVisagie/status/1198301409298530306?ref_src=twsrc%5Etfw">November 23, 2019</a></blockquote> 
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<h1>Progressive delivery</h1>
+<p>As you have seen so far, feature flags on their own can be valuable because they decouple rollout from deployment, we can easily switch between our old and new code simply by changing a value in our configuration. However, there is still risk, switching on a feature switches it on for everybody and that means breaking changes will affect all the users of our application.</p>
+<p>What if instead we were to roll out changes to a small subset of users first? That way we could reduce the impact of a breaking change, or even target only live test users. This concept is called <a href="https://searchitoperations.techtarget.com/definition/progressive-delivery">Progressive Delivery</a>.</p>
+<p>Unleash allows progressive delivery by letting you add a context to your <code><span class="hljs-attribute">isEnabled</span></code> call and lets you use different activation strategies that will return a different value depending on the properties you provided in the context.</p>
+<p>As an example I am going to delete the default activation strategy for our greeting feature and replace it with a <code><span class="hljs-attribute">userWithId</span></code> strategy and add the UserId 1 to the list of allowed Ids. This will mean that our new feature will only be turned on for a user with the ID of 1.</p>
+<p><img src="activation-strat.jpg" alt="Activation strategy screenshot"></p>
+<p>Up until now I haven't really revealed the <code><span class="hljs-function"><span class="hljs-title">getUserDetails</span><span class="hljs-params">()</span></span></code> function, since it was really just a stub that returned a fake name for example purposes, so far our API had no need for any real user code to get it's job done, now however we will use this function to also provide the unleash context. We will implement users simply by adding a 'UserId' header to our request, that way we can easily test if our rollout strategy works by passing in a header in our curl request eg: <code><span class="hljs-attribute">curl</span> localhost:<span class="hljs-number">8000</span>/greeting -H <span class="hljs-string">&quot;UserId: 2&quot;</span></code></p>
+<pre><code class="hljs language-ts"><span class="hljs-keyword">function</span> <span class="hljs-title function_">getUserDetails</span>(<span class="hljs-params">req: Request</span>) {
+    <span class="hljs-keyword">const</span> userId  = req.<span class="hljs-title function_">header</span>(<span class="hljs-string">&#x27;UserId&#x27;</span>)
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(req.<span class="hljs-property">headers</span>)
+
+    <span class="hljs-keyword">const</span> unleashContext = {
+        userId
+    }
+
+    <span class="hljs-keyword">return</span> {
+       <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;FakeUser&#x27;</span>,
+       unleashContext
+    } 
+}
+</code></pre>
+<p>Next let's change our greeting endpoint, the getUserDetails call will have to move to the top of the handler function since we now need to get the context for the <code><span class="hljs-function"><span class="hljs-title">isEnabled</span><span class="hljs-params">()</span></span></code> call, we then simply pass in the context as a second paramater to said function:</p>
+<pre><code class="hljs language-ts">app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/greeting&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> user = <span class="hljs-title function_">getUserDetails</span>(req)
+    <span class="hljs-keyword">if</span> (<span class="hljs-title function_">isEnabled</span>(<span class="hljs-string">&#x27;greet-by-name-feature&#x27;</span>, user.<span class="hljs-property">unleashContext</span>)) {
+        <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">send</span>(<span class="hljs-string">`Hello <span class="hljs-subst">${user.name}</span>`</span>)
+    }
+    res.<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;Hello World&#x27;</span>)
+})
+</code></pre>
+<p>Now, calling the endpoint with a UserId of 1 should result in the new feature being displayed, while any other user will still be running the good old <em>Hello World</em> greeting.</p>
+<p><img src="activation-strat-example.jpg" alt="Activation strategy result"></p>
+<p>And it was successful! We rolled out exclusively to user 1 without affecting anyone else, we are also able to see metrics on how many requests an hour are served our new feature vs the old feature, this can come in handy when it's time to decide to remove the flags from your code.</p>
+<p>When you do this make sure to archive the flag in unleash, which will then never again let you create a flag with the same name, preventing any potential checking code you left behind from being unintentionally reactivated.</p>
+<p>Unleash has many other activation strategies when it comes to Progressive Delivery and should serve most use cases, we have only really scratched the surface here. However if you have more complex needs It might be a sign that you are looking for something with a more advanced feature set like LaunchDarkly, which allows very find grained control over users and user segments.</p>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-21 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/podcast">Podcast</a></span>
+    </footer>
+
+    <script src="/js/index.js"></script>
+  </body>
+</html>

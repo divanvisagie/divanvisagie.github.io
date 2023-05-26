@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Making better technology decisions - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="Making better technology decisions - Facing the interminable news feed" />
+    <meta property="og:description" content="Making better technology decisions - Facing the interminable news feed" />
+    <meta property="og:title" content="Making better technology decisions" />
+    <meta name="twitter:title" content="Making better technology decisions" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com/post/better-tech-decisions/tech-decisions.jpg" />
+    <meta name="twitter:image" content="https://divanv.com/post/better-tech-decisions/tech-decisions.jpg" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;300;400;500&family=Roboto+Mono:ital,wght@0,400;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-WZVBVPWY66"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+
+      gtag('config', 'G-WZVBVPWY66')
+    </script>
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+          <div id="darkmode-button">
+            <div class="black"></div>
+            <div class="white"></div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><img class="post-header" alt = "An image displayed as a header before the article for decorative purposes." src="tech-decisions.jpg" ></img >
+<div class="post-content"><h1 class="title">Making better technology decisions</h1>
+<h2 class="subtitle">Facing the interminable news feed</h2>
+<span class="date">2017-06-15</span>
+<p>Don’t reinvent the wheel! Build on the shoulders of giants! These terms have been irreversibly planted into our heads, and for good reason, but in an industry that is continually producing new options and opinions , it can be difficult to decide who’s shoulders to stand on.</p>
+<p>It’s not just tools and frameworks either. There are many processes, philosophies and the definitions of “Good code”; All streaming past the eyes of developers leading them to conclude that “The industry is moving quickly</p>
+<h2>Moving Where?</h2>
+<p>But, moving where? Moving seems to imply direction. It implies that the latest solution is the best way to tackle all problems.</p>
+<p>Software solutions don’t work like that, we have many different types of problems and even more perfectly acceptable ways to solve them. Yes there is an explosion of functional programming on hackernews at the moment, but let’s not forget that LISP arrived in 1958.</p>
+<p>The best Ideas , don’t arrive in chronological order.</p>
+<p>Ask yourself, Is this your data center?</p>
+<p><img src="google-data-center.jpeg" alt="Picture of Google Data Center"></p>
+<blockquote>
+<p>Not your Data Center</p>
+</blockquote>
+<p>Is it four stories high? Google developed MapReduce to run on this sort of hardware, an entire building. Yet they also own Firebase, because they know that sometimes all you need to do is store a JSON object.</p>
+<h2>Noise is not signal</h2>
+<p>Another trap we can fall into when following the news cycle is, mistaking lots of chatter for technological value.</p>
+<p>If you follow the typical tech news cycle, you would assume that the most popular, most used JavaScript framework is React. Used by everybody from Netflix to it’s illegal torrent based cousin.</p>
+<p>But let’s take this as an example. What happens when we try to find some evidence supporting this?</p>
+<p>It was difficult to find objective data to start with, Google results on this topic mainly return Buzzfeed style list articles.</p>
+<p>So I turned to the only people who seem to bother collecting data on this sort of thing. I looked at the results of the 2016 Stack Overflow survey. I had some talking points on the 2017 results, but the data had changed by the next time I went to the site, so I deemed it as unstable, and have reverted back to the long term support version.</p>
+<p><img src="tech-decisions-lang-stats.png" alt="Tech decision language stats"></p>
+<p>The results for the most loved technology show that React is indeed loved by people, and that would explain why there are so many blog posts, tweets and talks covering it, but it sits among programming languages, the top being a fairly new language not very well known for being used in production.</p>
+<p><img src="tech-decisions-lang-stats-2.png" alt="Tech decision language stats"></p>
+<p>Suspicions are confirmed when we look at the most popular tech data , which shows that Angular is the absolute king of JavaScript frameworks. React only has half the users that Angular does and falls out of the top 10 list for full stack developers.</p>
+<p>Just because something has a lot of buzz around it, doesn’t mean it’s the best tool for the job.</p>
+<h2>Consider the team</h2>
+<p>Finally, you need to consider your team.</p>
+<p>Just because a framework, process or paradigm made another team more productive doesn’t mean that your team will benefit from it.</p>
+<p>Again I will use JavasScript frameworks an example, because they seem to be more fickle, and I also know that these frameworks are aimed at thinking that’s promoted by a certain skill set. For instance , Angular was aimed at people used to doing development in Java or C#, while Ember was aimed more at the Ruby developer.</p>
+<p>It may be better to choose technologies that build on the same concepts that your team is already fluent in, instead of making a complete switch to something that doesn’t quite match your current stack and contributes more to the fatigue of context switching.</p>
+<h2>Conclusion</h2>
+<p>It’s very easy to get caught up in the storm of news , excitement and developer advocate bombardment. But when it comes to making decisions that you and your team have to live with, you should remember:</p>
+<ul>
+<li>Other people’s solutions don’t always match yours</li>
+<li>The best tool for the Job is probably not the most hyped toy</li>
+<li>Consider the team, choose technologies that fit well with your current stack and skill set</li>
+</ul>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-21 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/podcast">Podcast</a></span>
+    </footer>
+
+    <script src="/js/index.js"></script>
+  </body>
+</html>

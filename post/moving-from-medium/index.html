@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Moving from Medium - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="Moving from Medium - Does it make sense?" />
+    <meta property="og:description" content="Moving from Medium - Does it make sense?" />
+    <meta property="og:title" content="Moving from Medium" />
+    <meta name="twitter:title" content="Moving from Medium" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com/post/moving-from-medium/moving-from-medium.jpeg" />
+    <meta name="twitter:image" content="https://divanv.com/post/moving-from-medium/moving-from-medium.jpeg" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;300;400;500&family=Roboto+Mono:ital,wght@0,400;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-WZVBVPWY66"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+
+      gtag('config', 'G-WZVBVPWY66')
+    </script>
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+          <div id="darkmode-button">
+            <div class="black"></div>
+            <div class="white"></div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><img class="post-header" alt = "An image displayed as a header before the article for decorative purposes." src="moving-from-medium.jpeg" ></img >
+<div class="post-content"><h1 class="title">Moving from Medium</h1>
+<h2 class="subtitle">Does it make sense?</h2>
+<span class="date">2019-06-03</span>
+<blockquote>
+<p><strong>Update:</strong>
+While this site is still clearly no longer medium based, I have moved on from Hugo and have instead gone for my own implementation of a Markdown -&gt; HTML converter</p>
+</blockquote>
+<p>For a few years now my blog has primarily been on the <a href="medium.com">Medium</a> platform, and for good reason. The platform provided a clean interface with a nice easy to use editor and supports cool things like notes, highlights and allowing editors to give their two cents on an unpublished article. The main draw however is that it's a popular platform and the theory is that it would draw more views by simply being on medium or having better SEO or whatever. I have very little knowledge of SEO in fact, that's kind of the point. I wouldn't need to, it would all be handled for me. Right?</p>
+<p>Now if you hang around <a href="news.ycombinator.com">Hackernews</a> you may have seen quite a few angry people moving off the platform due to the interface starting to become, eh... not so clean and paywalls popping up. Now I don't have anything in particular against a business tying to have an actual business model, but I was dissapointed at the banner that now took up valuable vertical screen real-estate for users who are not logged in and other things becoming cluttered. That in itself isn't really good enough reason to leave though, there is also the ease of use, the fact that I don't have to maintain my own site, and the all that traffic related stuff... or is it?</p>
+<h1>Reconsidering the benefits</h1>
+<p>Even if the reason people were leaving Medium fairly loudly was different to my needs, it did drive me to rethink things. Was it giving me the benefits I thought? Is it meeting my needs in terms of workflow, or how rapidly I could blog? And finally, how much of the traffic was because I was on Medium?</p>
+<h2>Workflow</h2>
+<p>The workflow is a bit tedious, given the content I produce. I have a lot of code snippets and on Medium that means either using a screenshot image, having no syntax highlighting or using <a href="https://github.com">GitHub</a> gists. I usually settle for gists since it renders the best, but that's a lot of work managing multiple gists per article, it would be great to just have markdown and paste the code right there and have it neatly highlighted.</p>
+<pre><code class="hljs language-go">fmt.Print(<span class="hljs-string">&quot;Where is my MARKDOWN??&quot;</span>)
+</code></pre>
+<p>Markdown would certainly help when it came to actually typing out the content, and this would also mean all the content would live in the same place and have version control, something that could prove useful for technical articles that may require a content update once in a while. Markdown can also form as a raw &quot;Source&quot; if you will, not being locked to a platform yet being simple and editable.</p>
+<h2>Traffic</h2>
+<p>The other argument I had was traffic. Surely medium was driving traffic to my posts?</p>
+<p>So I took a look at my <a href="https://divanv.com/post/building-a-desktop-ui-in-go/">most popular</a> post and found that only 10% of the traffic comes from inside Medium itself, the rest comes from either Google searches, places I posted links, or direct shares when people found the content useful.</p>
+<p><img src="moving-to-medium-1.png" alt="Screenshot of Medium Traffic Stats"></p>
+<p>To me 10% is a worthy sacrifice for feeling more at home in markdown and possibly producing more content and thus making up for lost views. Plus the point of me counting views isn't because I want some sort of benefit but rather because I live in the hopes that my content is useful and therefore I want it to be visible... and searchable.</p>
+<p>Searchablity is a large driver of traffic for this kind of content and that brings me to the part I don't know. Will my traffic suffer if I host my own content? As I mentioned I know nothing SEO.</p>
+<blockquote>
+<p><img src="jon-knows-nothing.gif" alt="You know nothing Jon Snow gif">
+You know nothing SEO</p>
+</blockquote>
+<p>And that brings me to this very site you are reading this on, it's an experiment to see if the traffic I get is affected, and whether or not I am even worried if there is a change. I have ported over my most popular Medium article to see if it will eventually catch up when it comes to search driven traffic and also intend to import stuff from platforms I have long ago let go stale.</p>
+<p>This my own static content hosted by GitLab and using <a href="https://gohugo.io/">Hugo</a>. For me the tool is simple to use and it was very easy to set up comments and analytics and best of all, my posts are in markdown. I personally feel like I have better control of my workflow now, but time will tell if this works out, I still think it's worth jumping in and seeing if it all works out.</p>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-21 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/podcast">Podcast</a></span>
+    </footer>
+
+    <script src="/js/index.js"></script>
+  </body>
+</html>

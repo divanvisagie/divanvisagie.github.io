@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>A single binary SPA using Go - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="A single binary SPA using Go - Using statik and echo with to serve up a single binary React app" />
+    <meta property="og:description" content="A single binary SPA using Go - Using statik and echo with to serve up a single binary React app" />
+    <meta property="og:title" content="A single binary SPA using Go" />
+    <meta name="twitter:title" content="A single binary SPA using Go" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com/post/single-binary-spa-go/go-spa-head.png" />
+    <meta name="twitter:image" content="https://divanv.com/post/single-binary-spa-go/go-spa-head.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;300;400;500&family=Roboto+Mono:ital,wght@0,400;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-WZVBVPWY66"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+
+      gtag('config', 'G-WZVBVPWY66')
+    </script>
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+          <div id="darkmode-button">
+            <div class="black"></div>
+            <div class="white"></div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><div class="post-content"><h1 class="title">A single binary SPA using Go</h1>
+<h2 class="subtitle">Using statik and echo with to serve up a single binary React app</h2>
+<span class="date">2019-02-24</span>
+<p><img src="go-spa-head.png" alt="Header Image"></p>
+<p>I think one of the most elegant things that Go does is output a single portable binary. So when building a full web application, it would be nice to keep the output just as simple.</p>
+<p>Luckily, I wasn’t alone in this thought, and a neat little tool called <a href="https://github.com/rakyll/statik">statik</a> exists to do just that.</p>
+<p>The library itself supplies sufficient documentation to get it working just for simply serving the application via Go’s http library, but, using it in a practical sense probably means that you want to use a framework like echo for things like endpoints and websockets. Here I will cover getting statik to serve files using the <a href="https://echo.labstack.com/">echo</a> framework.</p>
+<h2>Creating the React App</h2>
+<p>In this project I decided to follow some <a href="https://github.com/golang-standards/project-layout">golang-standards</a> and opt to put the react project in <code>./web</code>. This was fairly simple with <a href="https://github.com/facebook/create-react-app">create-react-app</a>:</p>
+<pre><code class="hljs language-sh">create-react-app web
+</code></pre>
+<p>We are going to need to install dependencies and build our react app for serving, so let’s run the following in the <code>./web</code> directory</p>
+<pre><code class="hljs language-sh">yarn
+yarn build
+</code></pre>
+<p><code><span class="hljs-attribute">create-react-app</span></code> creates this app as a git repository, so in order to not have issues with the parent repository, we should delete the .git inside the web folder.</p>
+<pre><code class="hljs language-sh"><span class="hljs-built_in">rm</span> -rf .git
+</code></pre>
+<h2>Packaging the frontend</h2>
+<p>Before we forget, let’s get back to the root directory of our project.</p>
+<p>The next step would be to package the frontend into a go file, this part is done by the <code><span class="hljs-attribute">statik</span></code> tool, so, time to go get that (pun intended):</p>
+<pre><code class="hljs language-sh">go get github.com/rakyll/statik
+</code></pre>
+<p>Now we could run the statik command to package the app, but there are some things that we are going to have to repeat every time some changes are made to the React app:</p>
+<pre><code class="hljs language-sh"><span class="hljs-built_in">cd</span> web &amp;&amp; yarn &amp;&amp; yarn build &amp;&amp; <span class="hljs-built_in">cd</span> ..
+statik -src=./web/build
+</code></pre>
+<p>Repeating tasks should always be scripted, that’s your job as a software developer, so I think this is the perfect time to introduce a Makefile.</p>
+<pre><code class="hljs language-makefile"><span class="hljs-section">.ONESHELL:</span>
+<span class="hljs-meta"><span class="hljs-keyword">.PHONY</span>: statik</span>
+
+<span class="hljs-section">statik:</span>
+	cd web &amp;&amp; yarn build
+	statik -src=./web/build
+
+<span class="hljs-section">clean:</span>
+	rm -rf ./statik
+</code></pre>
+<p>Now running <code><span class="hljs-attribute">make statik</span></code> will build our react app and then generate our statik Go file, this will become increasingly useful as we update our app.</p>
+<h2>Serving the frontend</h2>
+<p>Now that we have our packaged frontend, we need to serve it. Let’s create a main.go file:</p>
+<pre><code class="hljs language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;net/http&quot;</span>
+
+	_ <span class="hljs-string">&quot;github.com/divanvisagie/sbspa/statik&quot;</span>
+	<span class="hljs-string">&quot;github.com/labstack/echo&quot;</span>
+	<span class="hljs-string">&quot;github.com/rakyll/statik/fs&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	e := echo.New()
+	addr := <span class="hljs-string">&quot;:8080&quot;</span>
+
+	statikFS, err := fs.New()
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		e.Logger.Fatal(err)
+	}
+
+	h := http.FileServer(statikFS)
+
+	e.GET(<span class="hljs-string">&quot;/*&quot;</span>, echo.WrapHandler(http.StripPrefix(<span class="hljs-string">&quot;/&quot;</span>, h)))
+
+	e.Logger.Fatal(e.Start(addr))
+}
+</code></pre>
+<p>There are some important things to note here.</p>
+<p>In the imports you will see we are importing our packaged app with its fully qualified path:</p>
+<pre><code class="hljs language-go">_ <span class="hljs-string">&quot;github.com/divanvisagie/sbspa/statik&quot;</span>
+</code></pre>
+<p>This is then used by <code>“github.com<span class="hljs-regexp">/rakyll/</span>statik/fs”</code> for serving up the files simply by having the same package name.</p>
+<p>The other is that for echo, we use the WrapHandler function since statik is designed for the built in HTTP library in Go and not special framework handlers. Luckily, echo is sane enough to provide us access to its underlying implementation.</p>
+<pre><code class="hljs language-go">e.GET(<span class="hljs-string">&quot;/*&quot;</span>, echo.WrapHandler(http.StripPrefix(<span class="hljs-string">&quot;/&quot;</span>, h)))
+</code></pre>
+<p>After this line you could can build up a normal echo server with routes and even websockets to back your app. Something I have done successfully but will not cover here since I think the <a href="https://echo.labstack.com/guide">documentation</a> of the library is quite sufficient.</p>
+<p>Now, If we run</p>
+<pre><code class="hljs language-sh">go run main.go
+</code></pre>
+<p>We should get the following result on http://localhost:8080 :</p>
+<p><img src="go-spa-out.png" alt="Go SPA Output"></p>
+<h2>Outputting the binary</h2>
+<p>Finally we want to output our binary so that we can send our React virus to friends, enemies, docker containers, and whomever else finds opening random executables to be a good idea.</p>
+<pre><code class="hljs language-makefile"><span class="hljs-section">.ONESHELL:</span>
+<span class="hljs-meta"><span class="hljs-keyword">.PHONY</span>: statik all</span>
+
+<span class="hljs-section">all:</span>
+	<span class="hljs-variable">$(MAKE)</span> statik
+	go build -o app ./main.go
+
+
+<span class="hljs-section">statik:</span>
+	cd web &amp;&amp; yarn build
+	statik -src=./web/build
+
+<span class="hljs-section">clean:</span>
+	rm -rf ./statik
+</code></pre>
+<p>Now simply running <code><span class="hljs-attribute">make</span></code> will give us the binary: <code><span class="hljs-attribute">app</span></code>.
+<img src="go-spa-echo.png" alt="Go-spa-Echo"></p>
+<h2>Conclusion</h2>
+<p>But Divan? This only allows me to run my React app on the OS I built it on, what if I want to run it on my x86 plan 9 machine?.
+Fear not, this thing is written in Go, of course there is a tool for that. Enter <a href="https://github.com/mitchellh/gox">Gox</a>!
+Okay, that was a bit of a joke… sort of. I never really got plan 9 builds working, but I did get it to build for all of these architectures, and Gox does support plan 9:</p>
+<p><img src="go-spa-targets.png" alt="Go SPA Targets"></p>
+<p>I do however think that tools like Gox and <a href="https://github.com/goreleaser/goreleaser">Goreleaser</a> demonstrate just why packaging an app like this is such a powerful concept. It opens up a lot of different strategies to deploy apps in the strangest ways on the strangest devices in a very simple format.</p>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-21 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/podcast">Podcast</a></span>
+    </footer>
+
+    <script src="/js/index.js"></script>
+  </body>
+</html>

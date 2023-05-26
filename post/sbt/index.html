@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Sbt heiroglyphs and multi-projects explained - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="Sbt heiroglyphs and multi-projects explained - A starter guide to understanding what an sbt file is actually saying" />
+    <meta property="og:description" content="Sbt heiroglyphs and multi-projects explained - A starter guide to understanding what an sbt file is actually saying" />
+    <meta property="og:title" content="Sbt heiroglyphs and multi-projects explained" />
+    <meta name="twitter:title" content="Sbt heiroglyphs and multi-projects explained" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com/post/sbt/sbt-logo.png" />
+    <meta name="twitter:image" content="https://divanv.com/post/sbt/sbt-logo.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;300;400;500&family=Roboto+Mono:ital,wght@0,400;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-WZVBVPWY66"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+
+      gtag('config', 'G-WZVBVPWY66')
+    </script>
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+          <div id="darkmode-button">
+            <div class="black"></div>
+            <div class="white"></div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><div class="post-content"><h1 class="title">Sbt heiroglyphs and multi-projects explained</h1>
+<h2 class="subtitle">A starter guide to understanding what an sbt file is actually saying</h2>
+<span class="date">2016-06-24</span>
+<p><img src="sbt-logo.png" alt="SBT Logo"></p>
+<p>When you get started with Scala one of the first things you are going to come across is sbt, Scala’s very own build tool. When I started using Scala, I just generated projects via <em>Activator</em> and ran the basic <em>test</em> and <em>run</em> commands in sbt. When things get serious though, you need to add some libraries.</p>
+<p>So you open up the <em>build.sbt</em> file and are greeted with things that look like madness: the <code><span class="hljs-symbol">:=</span></code>, <code><span class="hljs-addition">+=</span></code> and <code><span class="hljs-meta">%</span><span class="hljs-meta">%</span></code> . You think to yourself &quot;I just started this thing and now I’m doing category theory!&quot;. Don’t worry, this is not category theory, that only comes in later when you start doing monadic light-bending builds. These operators are just how sbt deals with settings. Let’s take a look at the basic build settings of the <em>minimal-scala</em> project that Activator spits out and focus on the symbols used in the basic default <a href="http://www.scala-sbt.org/0.13/docs/Basic-Def.html">build definition</a> which builds a single project in the <em>src/</em> directory.</p>
+<pre><code class="hljs language-scala">name := <span class="hljs-string">&quot;&quot;&quot;minimal-scala&quot;&quot;&quot;</span>version := <span class="hljs-string">&quot;1.0&quot;</span>scalaVersion := <span class="hljs-string">&quot;2.11.7&quot;</span><span class="hljs-comment">// Change this to another test framework if you prefer</span>
+libraryDependencies += <span class="hljs-string">&quot;org.scalatest&quot;</span> %% <span class="hljs-string">&quot;scalatest&quot;</span> % <span class="hljs-string">&quot;2.2.4&quot;</span> % <span class="hljs-string">&quot;test&quot;</span>
+</code></pre>
+<p>The symbols in here work like this:</p>
+<p><code><span class="hljs-symbol">:=</span></code> Tells sbt we are assigning a setting to the key in the build definition</p>
+<p><code><span class="hljs-addition">+=</span></code> Appends rather than assigns , as some keys are sequences. This is a really good idea , as in general most projects have more than one library dependency. There are other ways to append keys as well , such as <code><span class="hljs-literal">++</span><span class="hljs-comment">=</span></code> which will add a sequence to a key:</p>
+<pre><code class="hljs language-scala">libraryDependencies ++= <span class="hljs-type">Seq</span>( 
+  <span class="hljs-string">&quot;com.twitter&quot;</span> %% <span class="hljs-string">&quot;finagle-core&quot;</span> % <span class="hljs-string">&quot;6.34.0&quot;</span>, 
+  <span class="hljs-string">&quot;com.twitter&quot;</span> %%  
+  <span class="hljs-string">&quot;finagle-stats&quot;</span> % <span class="hljs-string">&quot;6.34.0&quot;</span>, 
+  <span class="hljs-string">&quot;com.twitter&quot;</span> % <span class="hljs-string">&quot;finagle-thrift_2.11&quot;</span> % <span class="hljs-string">&quot;6.34.0&quot;</span>, 
+  <span class="hljs-string">&quot;org.apache.thrift&quot;</span> % <span class="hljs-string">&quot;libthrift&quot;</span> % <span class="hljs-string">&quot;0.9.0&quot;</span> % <span class="hljs-string">&quot;compile&quot;</span> 
+)
+</code></pre>
+<p><code><span class="hljs-comment">%</span></code> and <code><span class="hljs-meta">%</span><span class="hljs-meta">%</span></code> get a little tricky , they define the ids and versions of each library in the sequence, but it’s safe to say that:</p>
+<pre><code class="hljs language-scala"><span class="hljs-string">&quot;org.scala-tools&quot;</span> % <span class="hljs-string">&quot;scala-stm_2.11.1&quot;</span> % <span class="hljs-string">&quot;0.3&quot;</span>
+</code></pre>
+<p>Is the equivalent of</p>
+<pre><code class="hljs language-scala"><span class="hljs-string">&quot;org.scala-tools&quot;</span> %% <span class="hljs-string">&quot;scala-stm&quot;</span> % <span class="hljs-string">&quot;0.3&quot;</span>
+</code></pre>
+<p>So effectively the extra <code><span class="hljs-meta">%</span><span class="hljs-meta">%</span></code> means it figures out what Scala version you are on. You can read more on library dependencies in the <a href="http://www.scala-sbt.org/0.13/docs/Library-Dependencies.html">docs</a>.</p>
+<p>That actually covers it for the heiroglyphs , they are really not too bad once you understand their meaning, and this simple setup can get your Scala project running, testing and managing your dependencies.</p>
+<h1>The multi project build</h1>
+<p>So far, we have covered a simple build that , as I mentioned, builds stuff in src/. Sooner or later however you are going to run into a situation where you want to have multiple build definitions for projects that sit in different directories.</p>
+<p>Enter the Multi project build! In one of these builds, each project lives in its own base directory and builds its own jar.</p>
+<p><img src="jarofdirt.jpeg" alt="Captain Jack Sparrow holding a jar of dirt"></p>
+<p>Sbt can define a project by defining a <code><span class="hljs-keyword">lazy</span> <span class="hljs-keyword">val</span></code> of type <code><span class="hljs-keyword">Project</span></code></p>
+<pre><code class="hljs language-scala"><span class="hljs-keyword">lazy</span> <span class="hljs-keyword">val</span> utes = project.in(file(<span class="hljs-string">&quot;util&quot;</span>))
+</code></pre>
+<p>The name of the <code><span class="hljs-attribute">val</span></code> will be the name when we refer to the project in sbt, so in the case above, <em>sbt utes/compile</em> will compile the util project</p>
+<p>Twitter’s <a href="https://github.com/twitter/finatra-activator-thrift-seed">finatra-activator-thrift-seed</a> is a nice <a href="https://github.com/twitter/finatra-activator-thrift-seed/blob/master/build.sbt">example</a> of these in practise, so we will use it as an example to work through.</p>
+<p>First let’s look at the <em>baseSettings</em>:</p>
+<pre><code class="hljs language-scala"><span class="hljs-keyword">lazy</span> <span class="hljs-keyword">val</span> baseSettings = <span class="hljs-type">Seq</span>(
+  version := <span class="hljs-string">&quot;1.0.0-SNAPSHOT&quot;</span>,
+  scalaVersion := <span class="hljs-string">&quot;2.11.7&quot;</span>,
+  ivyScala := <span class="hljs-comment">// ivy stuff,</span>
+  libraryDependencies ++= <span class="hljs-type">Seq</span>(
+    <span class="hljs-comment">// libs</span>
+  ),
+  resolvers ++= <span class="hljs-type">Seq</span>(
+    <span class="hljs-type">Resolver</span>.sonatypeRepo(<span class="hljs-string">&quot;releases&quot;</span>),
+    <span class="hljs-string">&quot;Twitter Maven&quot;</span> at <span class="hljs-string">&quot;https://maven.twttr.com&quot;</span>
+  ),
+  fork in run := <span class="hljs-literal">true</span>
+)
+</code></pre>
+<p>This is a list of common settings that is shared across the subsequent projects, this means we don’t have to repeat libraries or any other settings that may apply to all of the projects in the build file.</p>
+<p>Now, lets take a look at the <em>root</em> project:</p>
+<pre><code class="hljs language-scala"><span class="hljs-keyword">lazy</span> <span class="hljs-keyword">val</span> root = (project in file(<span class="hljs-string">&quot;.&quot;</span>)).
+  settings(
+    name := <span class="hljs-string">&quot;activator-thrift-seed&quot;</span>,
+    organization := <span class="hljs-string">&quot;com.example&quot;</span>,
+    moduleName := <span class="hljs-string">&quot;activator-thrift-seed&quot;</span>
+  ).
+  aggregate(
+    idl,
+    server)
+</code></pre>
+<p>Here, the <em>aggregate</em> method will aggregate the projects, treating them as one, so when you run <em>sbt compile</em> for example, both <strong>idl</strong> and <strong>server</strong> projects will compiled.</p>
+<p>Next lets take a look at the <em>idl</em> project:</p>
+<pre><code class="hljs language-scala"><span class="hljs-keyword">lazy</span> <span class="hljs-keyword">val</span> idl = (project in file(<span class="hljs-string">&quot;idl&quot;</span>)).
+  settings(baseSettings).
+  settings(
+    name := <span class="hljs-string">&quot;thrift-idl&quot;</span>,
+    moduleName := <span class="hljs-string">&quot;thrift-idl&quot;</span>,
+    scroogeThriftDependencies in <span class="hljs-type">Compile</span> := <span class="hljs-type">Seq</span>(
+      <span class="hljs-string">&quot;finatra-thrift_2.11&quot;</span>
+    ),
+    libraryDependencies ++= <span class="hljs-type">Seq</span>(
+      <span class="hljs-string">&quot;com.twitter.finatra&quot;</span> %% <span class="hljs-string">&quot;finatra-thrift&quot;</span> % versions.finatra
+    )
+  )
+</code></pre>
+<p>This one is quite normal, the only thing to notice here is the <em>settings(baseSettings)</em>, which is how we tell this project it needs to pull in those base settings from earlier, other than that the second settings block is just the normal single project style configuration we saw earlier in the article.</p>
+<p>Finally let’s take a look at the <em>server</em> project:</p>
+<pre><code class="hljs language-scala"><span class="hljs-keyword">lazy</span> <span class="hljs-keyword">val</span> server = (project in file(<span class="hljs-string">&quot;server&quot;</span>)).
+  settings(baseSettings).
+  settings(
+    name := <span class="hljs-string">&quot;thrift-server&quot;</span>,
+    moduleName := <span class="hljs-string">&quot;thrift-server&quot;</span>,
+    libraryDependencies ++= <span class="hljs-type">Seq</span>(
+      <span class="hljs-comment">// libs</span>
+    )
+  ).
+  dependsOn(idl)
+</code></pre>
+<p>This is the same as the <em>idl</em> project but has a <em>dependsOn</em> method, which creates an ordering between the two projects , as <em>server</em> requires <em>idl</em> to build first. Running <em>sbt server/compile</em> will build the dependency before the server, this is great in this case where <em>server</em> relies on files that come from the <em>idl</em> build.</p>
+<p>Great, you can now understand and theoretically implement multi-projects. If you want to learn more about them sbt has provided <a href="http://www.scala-sbt.org/0.13/docs/Multi-Project.html">this doc</a>.</p>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-21 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/podcast">Podcast</a></span>
+    </footer>
+
+    <script src="/js/index.js"></script>
+  </body>
+</html>
