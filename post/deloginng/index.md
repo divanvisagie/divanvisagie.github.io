@@ -12,7 +12,7 @@ The other day, I had a problem where I thought simply attaching a debugger would
 
 Using the debugger though turned into an exercise in futility. I ended up bikeshedding getting the debugger to work. Initially, I thought it was my Vim setup causing the issue, but after trying both VSCode and the native Node inspector with no success, it felt like the pain was not worth the convenience of pausing the program mid-execution.
 
-One major issue with symbol-based debugging is that debug symbols can get out of line with the actual running code, particularly during development. There were times when I set a breakpoint on a specific line, only for the debugger to place it elsewhere entirely. This inconsistency made me realize that the pain was often not worth the supposed convenience. Not to mention, even for a simple language getting a working debug configuration can be a chore of pointing configurations at the correct files, and inTypeScript, that extends to customisations around the build platform you are using.
+One major issue with symbol-based debugging is that debug symbols can get out of line with the actual running code, particularly during development. There were times when I set a breakpoint on a specific line, only for the debugger to place it elsewhere entirely. This inconsistency made me realize that the pain was often not worth the supposed convenience. Not to mention, even for a simple language getting a working debug configuration can be a chore of pointing configurations at the correct files, and in TypeScript, that extends to customisations around the build platform you are using.
 
 I concluded that simply logging the output would be a better approach.
 

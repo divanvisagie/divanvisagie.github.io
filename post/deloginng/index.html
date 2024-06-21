@@ -76,7 +76,7 @@
 <h2>The Challenges of Symbol-Based Debugging</h2>
 <p>The other day, I had a problem where I thought simply attaching a debugger would help me gain insight into the state of a variable in memory. I hoped to capture what a JSON value looked like at that state. Sure, I could have logged it, but I wasn't writing logs to file locally, and dealing with cleaning embedded color codes seemed like a hassle. While there are existing tools for this, they don't allow for streaming logs either. So you sit there waiting for the buffer to fill before you see anything printed on the screen.</p>
 <p>Using the debugger though turned into an exercise in futility. I ended up bikeshedding getting the debugger to work. Initially, I thought it was my Vim setup causing the issue, but after trying both VSCode and the native Node inspector with no success, it felt like the pain was not worth the convenience of pausing the program mid-execution.</p>
-<p>One major issue with symbol-based debugging is that debug symbols can get out of line with the actual running code, particularly during development. There were times when I set a breakpoint on a specific line, only for the debugger to place it elsewhere entirely. This inconsistency made me realize that the pain was often not worth the supposed convenience. Not to mention, even for a simple language getting a working debug configuration can be a chore of pointing configurations at the correct files, and inTypeScript, that extends to customisations around the build platform you are using.</p>
+<p>One major issue with symbol-based debugging is that debug symbols can get out of line with the actual running code, particularly during development. There were times when I set a breakpoint on a specific line, only for the debugger to place it elsewhere entirely. This inconsistency made me realize that the pain was often not worth the supposed convenience. Not to mention, even for a simple language getting a working debug configuration can be a chore of pointing configurations at the correct files, and in TypeScript, that extends to customisations around the build platform you are using.</p>
 <p>I concluded that simply logging the output would be a better approach.</p>
 <h2>Who Needs Symbols When You Have Logs?</h2>
 <p>Screw it—I’ll make my own symbols with logs!</p>
@@ -180,7 +180,7 @@ vim.api.nvim_create_autocmd(<span class="hljs-string">&#x27;FileType&#x27;</span
 </div>
 
     <footer>
-      Divan Visagie • Copyright 2019-21 •
+      Divan Visagie • Copyright 2019-24 •
       <a href="mailto:me@divanv.com">me@divanv.com</a> •
       <span><a href="/podcast">Podcast</a></span>
     </footer>
