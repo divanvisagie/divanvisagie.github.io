@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>De-logging - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="De-logging - Print log debugging can have tools too" />
+    <meta property="og:description" content="De-logging - Print log debugging can have tools too" />
+    <meta property="og:title" content="De-logging" />
+    <meta name="twitter:title" content="De-logging" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com / favicon.ico" />
+    <meta name="twitter:image" content="https://divanv.com / favicon.ico" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;300;400;500&family=Roboto+Mono:ital,wght@0,400;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-WZVBVPWY66"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+
+      gtag('config', 'G-WZVBVPWY66')
+    </script>
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+          <div id="darkmode-button">
+            <div class="black"></div>
+            <div class="white"></div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><div class="post-content"><h1 class="title">De-logging</h1>
+<h2 class="subtitle">Print log debugging can have tools too</h2>
+<span class="date">2024-06-21</span>
+<p>It's a common trope in web development to say, &quot;I just use console.log,&quot; especially for those who started development outside the domain of paid-for IDEs. Some people will tell you that you should be using a debugger all the time. It's a simple tool that you can attach to a process and pause mid-execution to see what's happening inside. And yes, it is a powerful tool—when it works...</p>
+<p>There is, however, an argument against using a debugger, particularly in the context of live issues that are difficult to replicate in a local environment. This is often the case in desktop and game programming, but it also rings true in web development. Logs can be invaluable, especially in production environments where it's impossible to replicate full traffic load locally. Using the same logging tools in development as in production can give you consistent results and make solving issues much more straightforward.</p>
+<h2>The Challenges of Symbol-Based Debugging</h2>
+<p>The other day, I had a problem where I thought simply attaching a debugger would help me gain insight into the state of a variable in memory. I hoped to capture what a JSON value looked like at that state. Sure, I could have logged it, but I wasn't writing logs to file locally, and dealing with cleaning embedded color codes seemed like a hassle. While there are existing tools for this, they don't allow for streaming logs either. So you sit there waiting for the buffer to fill before you see anything printed on the screen.</p>
+<p>Using the debugger though turned into an exercise in futility. I ended up bikeshedding getting the debugger to work. Initially, I thought it was my Vim setup causing the issue, but after trying both VSCode and the native Node inspector with no success, it felt like the pain was not worth the convenience of pausing the program mid-execution.</p>
+<p>One major issue with symbol-based debugging is that debug symbols can get out of line with the actual running code, particularly during development. There were times when I set a breakpoint on a specific line, only for the debugger to place it elsewhere entirely. This inconsistency made me realize that the pain was often not worth the supposed convenience. Not to mention, even for a simple language getting a working debug configuration can be a chore of pointing configurations at the correct files, and inTypeScript, that extends to customisations around the build platform you are using.</p>
+<p>I concluded that simply logging the output would be a better approach.</p>
+<h2>Who Needs Symbols When You Have Logs?</h2>
+<p>Screw it—I’ll make my own symbols with logs!</p>
+<p>The main thing I want from a debugger is the ability to pause the program and inspect its state at that moment. While logs can certainly provide this, they are often long and cumbersome. Modern command-line tools also pollute the output with ANSI color codes, complicating the search through the logs. Despite these challenges, the goal remains the same: making logs useful and easily searchable.</p>
+<h2>Logging Tools</h2>
+<p>To address some of these challenges, I built a range of tools that enhance the logging experience, making it more like using a debugger but with the added advantages of being lightweight and available in production.</p>
+<h3>nocol</h3>
+<p>One of the first tools I developed is called <strong>nocol</strong>. Written in C, this command-line utility strips colors from streaming output, eliminating those pesky ANSI color codes. Unlike other tools like <code>a<span class="hljs-symbol">nsi2</span>txt</code>, nocol streams logs instantly. This avoids the long pauses typical of tools that buffer before writing to <code><span class="hljs-built_in">tee</span></code> or other destinations. Perfect for real-time log processing, nocol is great for piping logs from services and program runners like Cargo or Yarn, which generate colored outputs. Having logs stripped of color in real-time is invaluable for easier searching within NeoVim or other text editors. You can find nocol here: <a href="https://github.com/divanvisagie/nocol">https://github.com/divanvisagie/nocol</a>.</p>
+<h3>delog</h3>
+<p>Another tool I've built is <strong>delog</strong>. This tool executes a command and pauses whenever an output line contains the keyword &quot;BREAK.&quot; This is particularly useful for creating manual breakpoints in your logs and allows for a debugger-like pause using mere console outputs. delog can be found here: <a href="https://github.com/divanvisagie/delog">https://github.com/divanvisagie/delog</a>.</p>
+<h3>Enhancing NeoVim with Quickfix Lists</h3>
+<p>At this pont I was all in on making sure I don't go insan enext time I try to do something simple like look at a value. So it was time for text editor integraiton, so I can jump to the code that logged something.</p>
+<p>Vim and NeoVim have a feature called the quickfix list, a list of errors that you can quickly jump to in your code. This feature is immensely useful and simple, since it merely requires that the output from a tool follows a particular format. To leverage this, I created a custom configuration that appends any quickfix formated selected text to the quickfix list:</p>
+<pre><code class="hljs language-lua"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">GetVisualSelection</span><span class="hljs-params">()</span></span>
+  <span class="hljs-keyword">local</span> start_pos = vim.fn.getpos(<span class="hljs-string">&quot;&#x27;&lt;&quot;</span>)
+  <span class="hljs-keyword">local</span> end_pos = vim.fn.getpos(<span class="hljs-string">&quot;&#x27;&gt;&quot;</span>)
+
+  <span class="hljs-keyword">local</span> start_line = start_pos[<span class="hljs-number">2</span>]
+  <span class="hljs-keyword">local</span> start_col = start_pos[<span class="hljs-number">3</span>]
+  <span class="hljs-keyword">local</span> end_line = end_pos[<span class="hljs-number">2</span>]
+  <span class="hljs-keyword">local</span> end_col = end_pos[<span class="hljs-number">3</span>]
+
+  <span class="hljs-keyword">if</span> start_line == end_line <span class="hljs-keyword">then</span>
+    <span class="hljs-keyword">return</span> vim.fn.getline(start_line):<span class="hljs-built_in">sub</span>(start_col, end_col)
+  <span class="hljs-keyword">else</span>
+    <span class="hljs-keyword">local</span> <span class="hljs-built_in">lines</span> = vim.fn.getline(start_line, end_line)
+    <span class="hljs-built_in">lines</span>[<span class="hljs-number">1</span>] = <span class="hljs-built_in">lines</span>[<span class="hljs-number">1</span>]:<span class="hljs-built_in">sub</span>(start_col, <span class="hljs-number">-1</span>)
+    <span class="hljs-built_in">lines</span>[#<span class="hljs-built_in">lines</span>] = <span class="hljs-built_in">lines</span>[#<span class="hljs-built_in">lines</span>]:<span class="hljs-built_in">sub</span>(<span class="hljs-number">1</span>, end_col)
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">table</span>.<span class="hljs-built_in">concat</span>(<span class="hljs-built_in">lines</span>, <span class="hljs-string">&quot;\n&quot;</span>)
+  <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">end</span>
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">AddSelectionToQuickfix</span><span class="hljs-params">()</span></span>
+  <span class="hljs-keyword">local</span> line = GetVisualSelection()
+  <span class="hljs-built_in">print</span>(line)
+
+  <span class="hljs-keyword">local</span> filename = <span class="hljs-string">&#x27;&#x27;</span>
+  <span class="hljs-keyword">local</span> line_num = <span class="hljs-number">0</span>
+  <span class="hljs-keyword">local</span> body = <span class="hljs-string">&#x27;&#x27;</span>
+
+  <span class="hljs-keyword">local</span> parts = vim.fn.split(line, <span class="hljs-string">&#x27;[: ]&#x27;</span>)
+
+  <span class="hljs-keyword">for</span> part_idx, part <span class="hljs-keyword">in</span> <span class="hljs-built_in">ipairs</span>(parts) <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">if</span> part_idx == <span class="hljs-number">1</span> <span class="hljs-keyword">then</span>
+      filename = part
+    <span class="hljs-keyword">end</span>
+    <span class="hljs-keyword">if</span> part_idx == <span class="hljs-number">2</span> <span class="hljs-keyword">then</span>
+      line_num = <span class="hljs-built_in">tonumber</span>(part)
+    <span class="hljs-keyword">end</span>
+    <span class="hljs-keyword">if</span> part_idx &gt; <span class="hljs-number">2</span> <span class="hljs-keyword">then</span>
+        body = body .. part
+    <span class="hljs-keyword">end</span>
+  <span class="hljs-keyword">end</span>
+
+  <span class="hljs-keyword">local</span> qf_list = {}
+  <span class="hljs-built_in">table</span>.<span class="hljs-built_in">insert</span>(qf_list, {
+    filename = filename,
+    lnum = line_num,
+    col = <span class="hljs-number">1</span>,
+    text = body
+  })
+
+  vim.fn.setqflist(qf_list, <span class="hljs-string">&#x27;a&#x27;</span>)
+  <span class="hljs-keyword">if</span> vim.fn.empty(vim.fn.getqflist()) == <span class="hljs-number">0</span> <span class="hljs-keyword">then</span>
+      vim.cmd(<span class="hljs-string">&#x27;copen&#x27;</span>)
+  <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">end</span>
+
+vim.api.nvim_set_keymap(<span class="hljs-string">&#x27;v&#x27;</span>, <span class="hljs-string">&#x27;&lt;leader&gt;qf&#x27;</span>, <span class="hljs-string">&quot;:lua AddSelectionToQuickfix()&lt;CR&gt;&quot;</span>, { noremap = <span class="hljs-literal">true</span>, silent = <span class="hljs-literal">true</span> })
+</code></pre>
+<h3>Injecting Console Logs for TypeScript</h3>
+<p>Now all I needed was to be able to select that text from the logs. So it was time for a good old <code><span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span></code> that simply followed the quickfix convention, but. I dont want to write whole lines, I want to be able to place breakpoints! So, time to set up a shortcut for printing logs.</p>
+<p>So, in addition to appending logs to the quickfix list, I wrote a configuration for NeoVim that injects a <code><span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span></code> statement compatible with the quickfix list format for TypeScript files. Here’s how it works:</p>
+<pre><code class="hljs language-lua"><span class="hljs-comment">-- Create an autocommand group for TypeScript file bindings</span>
+vim.api.nvim_create_augroup(<span class="hljs-string">&#x27;TypeScriptBindings&#x27;</span>, { clear = <span class="hljs-literal">true</span> })
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Insert_console_log</span><span class="hljs-params">()</span></span>
+  <span class="hljs-keyword">local</span> line_num = vim.fn.line(<span class="hljs-string">&#x27;.&#x27;</span>)
+  <span class="hljs-keyword">local</span> file_name = vim.fn.expand(<span class="hljs-string">&#x27;%:p&#x27;</span>)
+  file_name = vim.fn.fnamemodify(file_name, <span class="hljs-string">&#x27;:~:.&#x27;</span>)
+
+  <span class="hljs-keyword">local</span> log_statement = <span class="hljs-built_in">string</span>.<span class="hljs-built_in">format</span>(<span class="hljs-string">&quot;console.log(&#x27;BREAK&#x27;, &#x27;%s:%d&#x27;, this || &#x27;&#x27;);&quot;</span>, file_name, line_num + <span class="hljs-number">1</span>)
+
+  vim.api.nvim_buf_set_lines(<span class="hljs-number">0</span>, line_num, line_num, <span class="hljs-literal">false</span>, { log_statement })
+<span class="hljs-keyword">end</span>
+
+vim.api.nvim_create_autocmd(<span class="hljs-string">&#x27;FileType&#x27;</span>, {
+  group = <span class="hljs-string">&#x27;TypeScriptBindings&#x27;</span>,
+  pattern = <span class="hljs-string">&#x27;typescript&#x27;</span>,
+  callback = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>
+    vim.api.nvim_buf_set_keymap(<span class="hljs-number">0</span>, <span class="hljs-string">&#x27;n&#x27;</span>, <span class="hljs-string">&#x27;&lt;Leader&gt;b&#x27;</span>, <span class="hljs-string">[[:lua Insert_console_log()&lt;CR&gt;]]</span>, { noremap = <span class="hljs-literal">true</span>, silent = <span class="hljs-literal">true</span> })
+  <span class="hljs-keyword">end</span>,
+})
+</code></pre>
+<p>Now hiting space+b will insert a <code><span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span></code> statement at the current line in TypeScript files. This statement will be formatted to match the quickfix list format, allowing you to jump to the line in your code where the log was inserted.</p>
+<h2>Conclusion</h2>
+<p>Turns out, debugging from print can be a lot more luxurious than you think. These simple tools allowed me to solve problems using logs in ways that provide a lot of the functionality you get from a debugger. The bonus is that you can replay logs even when the program isn’t running, as delog merely needs to play through the log, allowing you to simulate breakpoints. It’s all about making logs as powerful and easy to use as possible—without all the hassles of traditional debugging tools.</p>
+<h2>Final Thought</h2>
+<p>There is something to be said for the personal development environment. With the right tools, like nocol and delog, and some clever configuration of your text editor, I was able to acheive a lot of the functionality I was looking for with a lot less pain, at least, in my opinion. You may be different, your working style might be different, but if you are a Software Engineer, and your environment doesnt suit you, remember that your environment is software, and that you can change it.</p>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-21 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/podcast">Podcast</a></span>
+    </footer>
+
+    <script src="/js/index.js"></script>
+  </body>
+</html>
