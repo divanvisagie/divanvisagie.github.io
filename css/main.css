@@ -34,7 +34,7 @@
 
 html {
   width: 100%;
-  font-family: Lexend, Helvetica Neue,sans-serif;
+  font-family: Lexend, Helvetica Neue, sans-serif;
 }
 
 a {
@@ -89,6 +89,7 @@ nav .links {
 }
 
 nav h1 {
+  font-size: 1.7em;
   margin-top: 17px;
   margin-bottom: 2px; 
 }
@@ -301,7 +302,6 @@ table {
   width: 30px !important;
   height: 30px !important;
 }
-
 
 
 
