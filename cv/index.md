@@ -1,4 +1,4 @@
-# Divan Visagie - CV
+# CV
 
 I am a senior software engineer based in Stockholm, Sweden with over a decade of experience in the software industry. I have worked across mobile, web, and large-scale backend systems in both B2B and consumer-facing contexts, with a strong focus in recent years on privacy, consent, and regulatory compliance (GDPR and US state privacy laws). I care about building systems that are highly scalable, maintainable, and cost-efficient, while keeping user choice and control at the centre of product design.
 
