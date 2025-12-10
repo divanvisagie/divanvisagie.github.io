@@ -235,7 +235,7 @@ table, td, th {
 }
 
 table {
-  margin-left: auto;
+  margin-left: 0;
   margin-right: auto;
 }
 
@@ -302,7 +302,6 @@ table {
   width: 30px !important;
   height: 30px !important;
 }
-
 
 
 

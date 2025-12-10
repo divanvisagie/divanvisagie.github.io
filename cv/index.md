@@ -6,11 +6,11 @@ I am a senior software engineer based in Stockholm, Sweden with over a decade of
 
 | Type     | Value                                                                 |
 | -------- | --------------------------------------------------------------------- |
-| Email    | <a href="mailto:me@divanv.com">me@divanv.com</a>                    |
+| Email    | [me@divanv.com](mailto:me@divanv.com)                                |
 | Location | Stockholm, Sweden                                                    |
-| Github   | https://github.com/divanvisagie                                     |
-| LinkedIn | https://www.linkedin.com/in/divan-visagie                           |
-| Website  | https://divanv.com                                                   |
+| Github   | [github.com/divanvisagie](https://github.com/divanvisagie)           |
+| LinkedIn | [linkedin.com/in/divan-visagie](https://www.linkedin.com/in/divan-visagie) |
+| Website  | [divanv.com](https://divanv.com)                                     |
 
 # Work experience
 
@@ -101,30 +101,7 @@ I am a senior software engineer based in Stockholm, Sweden with over a decade of
 
 I enjoy sharing knowledge through writing and speaking. I have blogged throughout my career and have presented talks both internally and externally.
 
-# Languages
-
-- **English:** Native
-- **Swedish:** Elementary
-- **Afrikaans:** Limited working proficiency
-
-# Articles and Talks
-
-**Articles:**
-
-- [Distributed Request Tracing - Debugging Across Services](https://divanv.com/post/distributed-tracing/)
-- [Getting started with Feature Flags and Progressive Delivery](https://divanv.com/post/feature-flags/)
-- [Documenting RESTful APIs](https://divanv.com/post/open-api/)
-- [Building a sentiment aware Polymer input control](https://divanv.com/post/polymer-sentiment-aware/)
-- [Building a desktop UI in Go](https://divanv.com/post/building-a-desktop-ui-in-go/)
-
-**Talks:**
+# Talks
 
 - [Making Better Technology Decisions (Lightning Talk)](https://www.youtube.com/watch?v=MRvvYJOx9og)
 - [Xamarin Mobile Applications Unpacked](https://youtu.be/uZL-p6miUxc?t=2477)
-
-# Education
-
-## Diploma in Information Systems and Software Development
-
-**CTI Durban**  
-2011 — 2012
