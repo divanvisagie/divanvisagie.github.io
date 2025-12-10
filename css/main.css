@@ -114,6 +114,12 @@ nav h1 {
   padding-bottom: 4px;
 }
 
+.home-tilde {
+  color: var(--accent-color) !important;
+  margin-left: 6px;
+  text-decoration: none;
+}
+
 nav h2 {
   padding-top: 4px;
   padding-right: 26px;
