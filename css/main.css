@@ -23,13 +23,13 @@
 }
 
 [data-theme="dark"] {
-  --toolbar-background: #0a0a0a;
-  --code-background: #0a0a0a;
-  --background-color: #0d0d0d;
-  --text-color: #e4e0db;
-  --title-color: #f7f3ee;
-  --subtitle-color: #c9c3bc;
-  --footer-background:#0f0f0f;
+  --toolbar-background: #000000;
+  --code-background: #000000;
+  --background-color: #000000;
+  --text-color: #ededed;
+  --title-color: #ffffff;
+  --subtitle-color: #c5c5c5;
+  --footer-background:#000000;
   --link-color: #6f9dff;
   --link-color-visited: #a88ce6;
   --toolbar-foreground: #f3f3f3;
@@ -49,7 +49,7 @@
 
 html {
   width: 100%;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-family: 'Lexend', 'Helvetica Neue', Arial, sans-serif;
   background: var(--background-color);
 }
 
@@ -68,7 +68,6 @@ nav {
   background: var(--toolbar-background);
   overflow: hidden;
   height: 70px;
-  border-bottom: 2px solid var(--accent-color);
 }
 
 nav a:visited {
@@ -85,11 +84,9 @@ nav a:hover {
 }
 
 nav > div {
-  max-width: 800px;
+  width: 100%;
   overflow: hidden;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 22px;
+  padding: 0 28px 0 22px;
   display: flex;
   justify-content: space-between;
 }
@@ -98,6 +95,7 @@ nav .links {
   display: flex;
   justify-content: space-evenly;
   width: fit-content;
+  padding-right: 10px;
 }
 
 @media (max-width: 436px) {
@@ -111,11 +109,14 @@ nav h1 {
   margin-top: 17px;
   margin-bottom: 2px; 
   letter-spacing: 0.5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  border-bottom: 2px solid var(--accent-color);
+  padding-bottom: 4px;
 }
 
 nav h2 {
   padding-top: 4px;
-  padding-right: 22px;
+  padding-right: 26px;
   font-size: larger;
   float: right;
 }
