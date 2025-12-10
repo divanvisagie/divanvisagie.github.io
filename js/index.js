@@ -1,5 +1,10 @@
 
-var themeToggleButton = document.querySelector('#darkmode-button')
+var mediaQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme)
+}
+
 function getTextFor(theme) {
     if (theme === 'dark')
         return '☽'
@@ -19,46 +24,26 @@ function getCurrentTheme() {
     return dataTheme
 }
 
-function toggleDarkMode() {
-    var currentTheme = getCurrentTheme()
-    var opposite = getOpposite(currentTheme);
-
-    localStorage.setItem('theme', opposite)
-    document.documentElement.setAttribute('data-theme', opposite);
-    themeToggleButton.title = (currentTheme);
-
-    detectColorScheme(); //apply the theme
-}
-
 // https://stackoverflow.com/questions/56300132/how-to-over-ride-css-prefers-color-scheme-setting
 // determines if the user has a set theme
 function detectColorScheme() {
     var theme = "light";    //default to light
 
-    //local storage is used to override OS theme settings
-    if (localStorage.getItem("theme")) {
-        if (localStorage.getItem("theme") == "dark") {
-            theme = "dark";
-        }
-    } else if (!window.matchMedia) {
-        //matchMedia method not supported
-        return false;
-    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    if (mediaQuery && mediaQuery.matches) {
         //OS theme setting detected as dark
         theme = "dark";
     }
 
-    //dark theme preferred, set document with a `data-theme` attribute
-    if (theme == "dark") {
-        document.documentElement.setAttribute("data-theme", "dark");
-    }
+    applyTheme(theme)
 }
 detectColorScheme();
 (function () {
-    var currentTheme = getCurrentTheme();
+    detectColorScheme();
 
-    themeToggleButton.setAttribute('title', getOpposite(currentTheme))
-
-    // themeToggleButton.innerText = getTextFor(getOpposite(currentTheme))
-    themeToggleButton.onclick = toggleDarkMode;
+    if (mediaQuery) {
+        mediaQuery.addEventListener('change', function (e) {
+            var theme = e.matches ? "dark" : "light";
+            applyTheme(theme)
+        })
+    }
 }());
