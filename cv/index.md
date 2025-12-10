@@ -6,8 +6,7 @@ I am a senior software engineer based in Stockholm, Sweden with over a decade of
 
 | Type     | Value                                                                 |
 | -------- | --------------------------------------------------------------------- |
-| Email    | <a href="mailto:divanvisagie@proton.me">divanvisagie@proton.me</a>   |
-| Phone    | +46 72 015 0597                                                      |
+| Email    | <a href="mailto:me@divanv.com">me@divanv.com</a>                    |
 | Location | Stockholm, Sweden                                                    |
 | Github   | https://github.com/divanvisagie                                     |
 | LinkedIn | https://www.linkedin.com/in/divan-visagie                           |
