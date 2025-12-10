@@ -1,61 +1,87 @@
 # Divan Visagie - CV
 
-I'm a software engineer from Durban, South Africa with 8 years of experience in the software industry.
-I have experience in many different areas in the field as a Software Consultant, from Mobile to Web, to highly scaled microservices, and have worked both with Enterprise B2B and Consumer facing systems with clients.
-My current area of interest when it comes to Software Engineering is creating systems that are both highly scalable and easy to maintain, which would allow for quicker delivery and reduced cost of development.
+I am a senior software engineer based in Stockholm, Sweden with over a decade of experience in the software industry. I have worked across mobile, web, and large-scale backend systems in both B2B and consumer-facing contexts, with a strong focus in recent years on privacy, consent, and regulatory compliance (GDPR and US state privacy laws). I care about building systems that are highly scalable, maintainable, and cost-efficient, while keeping user choice and control at the centre of product design.
 
 # Contact information
 
-| Type     | Value                                                              |
-| -------- | ------------------------------------------------------------------ |
-| Email    | <a href="mailto:visagiedivan@gmail.com">visagiedivan@gmail.com</a> |
-| Github   | https://github.com/divanvisagie                                    |
-| LinkedIn | https://www.linkedin.com/in/divan-visagie/                         |
-| Website  | https://divanv.com                                                 |
+| Type     | Value                                                                 |
+| -------- | --------------------------------------------------------------------- |
+| Email    | <a href="mailto:divanvisagie@proton.me">divanvisagie@proton.me</a>   |
+| Phone    | +46 72 015 0597                                                      |
+| Location | Stockholm, Sweden                                                    |
+| Github   | https://github.com/divanvisagie                                     |
+| LinkedIn | https://www.linkedin.com/in/divan-visagie                           |
+| Website  | https://divanv.com                                                   |
 
 # Work experience
 
-## Technical Specialist
+## Klarna
 
-**\*Kaleidocode**, Durban, South Africa – (Jun 2013 — Present)\*
+**Senior Software Engineer**  
+*Stockholm, Sweden – Jul 2024 — Nov 2025*
 
-### Senior Developer
+- Played a leading technical role in building consent systems compliant with GDPR and multiple US state privacy laws to support new marketing and revenue initiatives.
+- Designed and implemented systems where user choice is the first priority, ensuring transparency and control over marketing and data usage.
+- Collaborated closely with product, legal, and marketing stakeholders to translate regulatory and business requirements into robust technical solutions.
 
-_Oct 2018 — Present_
+**Software Engineer**  
+*Stockholm, Sweden – Oct 2021 — Jul 2024*
 
-Full-stack Senior Developer working on site with our client's developers in the team responsible for a large scale white label consumer facing banking solution built on a microservices architecture.
+- Transitioned from an individual contributor role into a key technical coordinator on the Consent & Preferences team.
+- Led the move from a manual batch-based process to a Kafka-based streaming solution for GDPR-compliant user deletions, improving reliability and scalability.
+- Orchestrated a cross-team initiative to clearly define ownership and a shared API contract for consent-related functionality.
+- Drove the team’s migration to ARM-based cloud CPUs as part of a wider cost-saving program, successfully meeting a critical migration deadline.
+- Improved and simplified project pipelines to make contribution easier for junior developers, particularly ahead of Black Friday traffic peaks.
 
-During this time I lead an initiative to create a solution that scanned the database and frontend in order to find deprecated strings, greatly reducing the cost when support for a new language is added to the system.
+**Software Engineer**  
+*Berlin, Germany – Jan 2021 — Oct 2021*
 
-I also headed up the investigation into using Feature Flags in the system and worked with the System Architect to document the adoption process.
+- Worked on services managing marketing consent and privacy settings for customers across multiple markets and legal jurisdictions.
+- Introduced a buffering mechanism for batch-processing services to absorb traffic spikes and prevent failures under high load, reducing operational noise and unnecessary alerts.
 
-### Lead **Frontend Engineer**
+---
 
-_Jan 2017 — Sep 2018_
+## Kaleidocode Pty Ltd
 
-Lead Front-end engineer implementing back-office applications to replace existing Silverlight applications in time for complete deprecation.
+**Software Development Consultant**  
+*Durban, South Africa – Jul 2013 — Dec 2020*
 
-### Full Stack Developer
+- Worked as a consultant across multiple client projects and domains, covering frontend, backend, and mobile development.
+- Gained broad exposure by working both on-site embedded within client teams and from the Kaleidocode office.
 
-_Sep 2015 — Dec 2016_
+**Full Stack Developer – GEHS (Government Employees Housing Scheme)**  
+*Durban, South Africa – Sep 2015 — Dec 2016*
 
-GEHS(Government Employees Housing Scheme) enrolment website. I was part of the team that got the enrolment application running and was primarily tasked with the both frontend and backend work for the project which was managed on Azure.
+- Developed the GEHS enrolment website, working on both frontend and backend components.
+- Helped get the enrolment application into production, hosted and managed on Microsoft Azure.
 
-[Government Employee Housing Scheme](https://www.gehsenrolment.org/)
+### Selected client work via Kaleidocode
 
-### Cross Platform **Mobile Developer**
+**Senior Developer (Consultant) – Derivco**  
+*Umhlanga, South Africa – Oct 2018 — Jun 2020*
 
-_Jul 2013 — Sep 2015_
+- Senior developer in a team responsible for ensuring a large-scale gaming platform remained compliant with GDPR and fast-changing country-specific gambling laws.
+- Frequently collaborated with legal teams, client stakeholders, vendors, and deployment engineers to ensure regulatory changes were properly understood, implemented, and deployed.
 
-Lead iOS Developer on the initial Xamarin app for our client LexisNexis South Africa. Also heavily involved with development of the Android implementation.
+**iOS / Cross-Platform Mobile Developer – LexisNexis South Africa**  
+*Durban, South Africa – Jul 2013 — Sep 2015*
 
-[Lexis® Mobile](https://www.lexisnexis.co.za/lexismobile)
+- Lead iOS developer on the initial Xamarin-based mobile app that delivered legal publications and case law to lawyers on touch devices.
+- Implemented features for annotations and highlights, ensuring they were synced reliably across devices.
+- Heavily involved in the Android implementation of the same application.
 
-## Native iOS Developer
+---
 
-**\*Current Solutions/Network Support**, Durban, South Africa — (April 2012 — Jun 2013)\*
+## Network Support (Current Solutions)
 
-Objective-C developer tasked with creating an internal enterprise iPad/iPhone app for an existing web based Job Card system. The project also involved creating a new Node.js API to serve the App as well as continual maintenance and support.
+**Native iOS Developer**  
+*Durban, South Africa – Apr 2012 — Jun 2013*
+
+- Objective-C developer responsible for creating an internal iPad/iPhone application for an existing web-based job card system.
+- Designed and implemented a Node.js API to support the mobile application.
+- Built a custom C++ signature control library to work around performance limitations on early iOS hardware, enabling smooth stylus-based document signing.
+- Contributed to open source by updating the `amarcadet/XMLReader` library for ARC support during Apple’s transition to Automatic Reference Counting.
+- Provided ongoing maintenance and enhancements for the application in production.
 
 ---
 
@@ -63,27 +89,24 @@ Objective-C developer tasked with creating an internal enterprise iPad/iPhone ap
 
 ## Technology
 
-### JavaScript/TypeScript
+- **Languages & Platforms:** TypeScript, JavaScript, C#, Objective-C, Rust, Java, C++, Node.js
+- **Frontend:** React, Angular (1.x and 2+), AngularJS, KnockoutJS, jQuery, HTML5, CSS3
+- **Backend & Services:** Spring Boot, Node.js APIs, .NET (monoliths and microservices), Kafka-based event streaming
+- **Mobile:** iOS (Objective-C), Xamarin, cross-platform mobile development
+- **Databases:** SQL (SQLite, SQL Server, Azure SQL), relational schema design, querying, and migration scripting
+- **Cloud & Infrastructure:** Azure, ARM-based cloud environments, high-scale microservices, performance optimisation
+- **Privacy & Compliance:** GDPR, US state privacy laws, consent & preference management, data deletion workflows
+- **Tooling & Practices:** Feature flags, distributed systems, CI/CD, documentation, cross-team API design
 
-Probably my most used programming language to date, I've worked with it for over 6 years. I've used it on the front-end with multiple frameworks over the years including jQuery, Knockout, AngularJS, Angular, React... etc. I have also made Use of Node.JS at multiple points for both backends and custom tooling.
+## Technical writing & speaking
 
-### C# / .Net
+I enjoy sharing knowledge through writing and speaking. I have blogged throughout my career and have presented talks both internally and externally.
 
-I have made use of .Net throughout my career from monolithic applications to microservices as well as Mobile applications in Xamarin. Most of my knowledge about SOLID principles and software design patterns were learned in this language.
+# Languages
 
-### SQL
-
-Most of the projects I have worked with have contained a Database component. From using SQLite on mobile to working with MSQL on Azure. I have experience in database design, querying and writing migration scripts for proper relational database management in production.
-
-### Technical writing/talks
-
-I like to write and give talks on technical topics. I love sharing my knowledge and have blogged on my website throughout my career whenever I felt a piece of information would be useful to others. I have also given talks both internally and externally at Kaleidocode and at Agile SA.
-
-## Languages
-
-### English
-
-Native speaker
+- **English:** Native
+- **Swedish:** Elementary
+- **Afrikaans:** Limited working proficiency
 
 # Articles and Talks
 
@@ -102,6 +125,7 @@ Native speaker
 
 # Education
 
-## **Diploma in Information Systems and Software Development**
+## Diploma in Information Systems and Software Development
 
-**_CTI Durban_** 2011 - 2012
+**CTI Durban**  
+2011 — 2012
