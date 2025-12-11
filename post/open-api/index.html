@@ -53,13 +53,13 @@
     <div class="content"><div class="post-content"><h1 class="title">Documenting RESTful APIs</h1>
 <h2 class="subtitle">An introduction to OpenAPI and Swagger</h2>
 <span class="date">2020-06-22</span>
-<p>Let's say we are tasked with creating a RESTful API that will return a user object based on the user Id, e.g. <code>http:<span class="hljs-regexp">//my</span>Api<span class="hljs-regexp">/user/</span><span class="hljs-number">123</span></code> will return the user with the ID 123.</p>
-<pre><code class="hljs language-js">{
-  <span class="hljs-attr">id</span>: <span class="hljs-number">123</span>,
-  <span class="hljs-attr">username</span>: <span class="hljs-string">&#x27;realFakeDoors&#x27;</span>,
-  <span class="hljs-attr">displayName</span>: <span class="hljs-string">&#x27;Real Fake Doors&#x27;</span>,
-  <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;getreal@fakedoors.com&#x27;</span>,
-  <span class="hljs-attr">accountStatus</span>: <span class="hljs-string">&#x27;verified&#x27;</span>
+<p>Let's say we are tasked with creating a RESTful API that will return a user object based on the user Id, e.g. <code>http://myApi/user/123</code> will return the user with the ID 123.</p>
+<pre><code class="language-js">{
+  id: 123,
+  username: 'realFakeDoors',
+  displayName: 'Real Fake Doors',
+  email: 'getreal@fakedoors.com',
+  accountStatus: 'verified'
 }
 </code></pre>
 <p>This endpoint is to be consumed by other developers in our company as part of a micro-services architecture. We cannot simply leave this endpoint undocumented, since this would require anyone consuming our service to have to open up and read our code in order to understand if our service is even what they were looking for.</p>
@@ -76,80 +76,80 @@
 </blockquote>
 <h1>Defining a document</h1>
 <p>So basically, OpenAPI is a standardised way of defining an API in either a JSON or YAML format. Lets see what a very simple definition of our user API would look like following the OpenAPI standard .</p>
-<pre><code class="hljs language-yaml"><span class="hljs-attr">openapi:</span> <span class="hljs-number">3.0</span><span class="hljs-number">.2</span>
-<span class="hljs-attr">info:</span>
-  <span class="hljs-attr">title:</span> <span class="hljs-string">User</span> <span class="hljs-string">Service</span>
-  <span class="hljs-attr">version:</span> <span class="hljs-number">1.0</span><span class="hljs-number">.0</span>
-  <span class="hljs-attr">description:</span> <span class="hljs-string">&#x27;&#x27;</span>
-  <span class="hljs-attr">termsOfService:</span> <span class="hljs-string">&#x27;http://swagger.io/terms/&#x27;</span>
-  <span class="hljs-attr">contact:</span>
-    <span class="hljs-attr">email:</span> <span class="hljs-string">apiteam@swagger.io</span>
-  <span class="hljs-attr">license:</span>
-    <span class="hljs-attr">name:</span> <span class="hljs-string">Apache</span> <span class="hljs-number">2.0</span>
-    <span class="hljs-attr">url:</span> <span class="hljs-string">&#x27;http://www.apache.org/licenses/LICENSE-2.0.html&#x27;</span>
-<span class="hljs-attr">servers:</span>
-  <span class="hljs-bullet">-</span> <span class="hljs-attr">url:</span> <span class="hljs-string">&#x27;http://myApi/v2&#x27;</span>
-<span class="hljs-attr">paths:</span>
-  <span class="hljs-string">&#x27;/user/{userId}&#x27;</span><span class="hljs-string">:</span>
-    <span class="hljs-attr">summary:</span> <span class="hljs-string">Get</span> <span class="hljs-string">user</span> <span class="hljs-string">by</span> <span class="hljs-string">Id</span>
-    <span class="hljs-attr">get:</span>
-      <span class="hljs-attr">tags:</span> []
-      <span class="hljs-attr">parameters:</span>
-        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">userId</span>
-          <span class="hljs-attr">description:</span> <span class="hljs-string">&#x27;The id of the user that needs to be retrieved&#x27;</span>
-          <span class="hljs-attr">schema:</span>
-            <span class="hljs-attr">type:</span> <span class="hljs-string">string</span>
-          <span class="hljs-attr">in:</span> <span class="hljs-string">path</span>
-          <span class="hljs-attr">required:</span> <span class="hljs-literal">true</span>
-      <span class="hljs-attr">responses:</span>
-        <span class="hljs-attr">&#x27;200&#x27;:</span>
-          <span class="hljs-attr">content:</span>
-            <span class="hljs-attr">application/xml:</span>
-              <span class="hljs-attr">schema:</span>
-                <span class="hljs-string">$ref:</span> <span class="hljs-string">&#x27;#/components/schemas/User&#x27;</span>
-            <span class="hljs-attr">application/json:</span>
-              <span class="hljs-attr">schema:</span>
-                <span class="hljs-string">$ref:</span> <span class="hljs-string">&#x27;#/components/schemas/User&#x27;</span>
-          <span class="hljs-attr">description:</span> <span class="hljs-string">successful</span> <span class="hljs-string">operation</span>
-          <span class="hljs-attr">x-last-modified:</span> <span class="hljs-number">1592503145775</span>
-        <span class="hljs-attr">&#x27;400&#x27;:</span>
-          <span class="hljs-attr">description:</span> <span class="hljs-string">Invalid</span> <span class="hljs-string">user</span> <span class="hljs-string">Id</span> <span class="hljs-string">supplied</span>
-        <span class="hljs-attr">&#x27;404&#x27;:</span>
-          <span class="hljs-attr">description:</span> <span class="hljs-string">User</span> <span class="hljs-string">not</span> <span class="hljs-string">found</span>
-      <span class="hljs-attr">operationId:</span> <span class="hljs-string">getUserById</span>
-      <span class="hljs-attr">summary:</span> <span class="hljs-string">Get</span> <span class="hljs-string">user</span> <span class="hljs-string">by</span> <span class="hljs-string">userId</span>
-      <span class="hljs-attr">description:</span> <span class="hljs-string">&#x27;&#x27;</span>
-    <span class="hljs-attr">x-last-modified:</span> <span class="hljs-number">1592502781135</span>
-<span class="hljs-attr">components:</span>
-  <span class="hljs-attr">schemas:</span>
-    <span class="hljs-attr">User:</span>
-      <span class="hljs-attr">type:</span> <span class="hljs-string">object</span>
-      <span class="hljs-attr">properties:</span>
-        <span class="hljs-attr">id:</span>
-          <span class="hljs-attr">format:</span> <span class="hljs-string">int64</span>
-          <span class="hljs-attr">type:</span> <span class="hljs-string">integer</span>
-        <span class="hljs-attr">username:</span>
-          <span class="hljs-attr">type:</span> <span class="hljs-string">string</span>
-        <span class="hljs-attr">displayName:</span>
-          <span class="hljs-attr">type:</span> <span class="hljs-string">string</span>
-        <span class="hljs-attr">email:</span>
-          <span class="hljs-attr">type:</span> <span class="hljs-string">string</span>
-        <span class="hljs-attr">accountStatus:</span>
-          <span class="hljs-attr">type:</span> <span class="hljs-string">string</span>
-      <span class="hljs-attr">xml:</span>
-        <span class="hljs-attr">name:</span> <span class="hljs-string">User</span>
-      <span class="hljs-attr">example:</span> <span class="hljs-string">&#x27;&#x27;</span>
-      <span class="hljs-attr">x-last-modified:</span> <span class="hljs-number">1592502967853</span>
-  <span class="hljs-attr">securitySchemes:</span> {}
-  <span class="hljs-attr">responses:</span> {}
-  <span class="hljs-attr">parameters:</span> {}
-<span class="hljs-attr">tags:</span>
-  <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Get</span> <span class="hljs-string">User</span> <span class="hljs-string">By</span> <span class="hljs-string">Id</span>
-    <span class="hljs-attr">description:</span> <span class="hljs-string">Operations</span> <span class="hljs-string">about</span> <span class="hljs-string">users</span>
-<span class="hljs-attr">externalDocs:</span>
-  <span class="hljs-attr">description:</span> <span class="hljs-string">Find</span> <span class="hljs-string">out</span> <span class="hljs-string">more</span> <span class="hljs-string">about</span> <span class="hljs-string">Swagger</span>
-  <span class="hljs-attr">url:</span> <span class="hljs-string">&#x27;http://swagger.io&#x27;</span>
-<span class="hljs-attr">security:</span> []
+<pre><code class="language-yaml">openapi: 3.0.2
+info:
+  title: User Service
+  version: 1.0.0
+  description: ''
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: 'http://myApi/v2'
+paths:
+  '/user/{userId}':
+    summary: Get user by Id
+    get:
+      tags: []
+      parameters:
+        - name: userId
+          description: 'The id of the user that needs to be retrieved'
+          schema:
+            type: string
+          in: path
+          required: true
+      responses:
+        '200':
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: successful operation
+          x-last-modified: 1592503145775
+        '400':
+          description: Invalid user Id supplied
+        '404':
+          description: User not found
+      operationId: getUserById
+      summary: Get user by userId
+      description: ''
+    x-last-modified: 1592502781135
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          format: int64
+          type: integer
+        username:
+          type: string
+        displayName:
+          type: string
+        email:
+          type: string
+        accountStatus:
+          type: string
+      xml:
+        name: User
+      example: ''
+      x-last-modified: 1592502967853
+  securitySchemes: {}
+  responses: {}
+  parameters: {}
+tags:
+  - name: Get User By Id
+    description: Operations about users
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
+security: []
 </code></pre>
 <p>Now you may be thinking to yourself: &quot;You said easier to read&quot;, and this document at first glance admittedly looks a little complicated. But while this may not be the best format for humans to read, since OpenAPI is a standard, it makes it very easy for programs to read. As a result there exists a large selection of tools that allow you to visualise these documents, one such tool is the <a href="https://editor.swagger.io/">Swagger Editor</a>.</p>
 <p><img src="Screenshot_2020-06-18_at_20.33.30.png" alt="Screenshot_2020-06-18_at_20.33.30.png"></p>
@@ -176,136 +176,136 @@
 <h2>Java Example</h2>
 <p>Lets take our user endpoint from earlier as an example. Here I will implement the user endpoint in Java using Spring Boot.</p>
 <p>After creating a simple <a href="https://spring.io/projects/spring-boot">Spring Boot</a> project with <a href="https://start.spring.io/">Spring Initializr</a>, very little code needs to be added in order to to get a working mock endpoint.</p>
-<p>We simply need to add the following controller <code><span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">UserController</span>.</span></span>java</code></p>
-<pre><code class="hljs language-java"><span class="hljs-meta">@RestController</span>
-<span class="hljs-meta">@RequestMapping(&quot;/user&quot;)</span>
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserController</span> {
+<p>We simply need to add the following controller <code>UserController.java</code></p>
+<pre><code class="language-java">@RestController
+@RequestMapping(&quot;/user&quot;)
+public class UserController {
 
-	<span class="hljs-meta">@GetMapping(&quot;/{id}&quot;)</span>
-	<span class="hljs-keyword">public</span> ResponseEntity&lt;User&gt; <span class="hljs-title function_">getUser</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable(&quot;id&quot;)</span> String id)</span> {
-		<span class="hljs-type">User</span> <span class="hljs-variable">response</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>()
-						.setId(<span class="hljs-number">123</span>)
-						.setUsername(<span class="hljs-string">&quot;fake&quot;</span>)
-						.setDisplayName(<span class="hljs-string">&quot;Fake User&quot;</span>)
-						.setAccountStatus(<span class="hljs-string">&quot;Activated&quot;</span>)
-						.setEmail(<span class="hljs-string">&quot;fakeemail@test.com&quot;</span>);
+	@GetMapping(&quot;/{id}&quot;)
+	public ResponseEntity&lt;User&gt; getUser(@PathVariable(&quot;id&quot;) String id) {
+		User response = new User()
+						.setId(123)
+						.setUsername(&quot;fake&quot;)
+						.setDisplayName(&quot;Fake User&quot;)
+						.setAccountStatus(&quot;Activated&quot;)
+						.setEmail(&quot;fakeemail@test.com&quot;);
 
-		<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ResponseEntity</span>&lt;&gt;(response, HttpStatus.OK);
+		return new ResponseEntity&lt;&gt;(response, HttpStatus.OK);
 	}
 }
 </code></pre>
-<p>And here the Entity of type <code><span class="hljs-keyword">User</span></code> which it returns in <code><span class="hljs-keyword">User</span>.java</code></p>
-<pre><code class="hljs language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">User</span> {
-    <span class="hljs-keyword">private</span> Integer id;
-    <span class="hljs-keyword">private</span> String username;
-    <span class="hljs-keyword">private</span> String displayName;
-    <span class="hljs-keyword">private</span> String email;
-    <span class="hljs-keyword">private</span> String accountStatus;
+<p>And here the Entity of type <code>User</code> which it returns in <code>User.java</code></p>
+<pre><code class="language-java">public class User {
+    private Integer id;
+    private String username;
+    private String displayName;
+    private String email;
+    private String accountStatus;
 
     ...
-    <span class="hljs-comment">//Getters and Setters defined offscreen</span>
+    //Getters and Setters defined offscreen
 }
 </code></pre>
 <p>This is now enough that when I run it and browse to <a href="http://localhost:8080/user/123">http://localhost:8080/user/123</a> I see the following:</p>
-<pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
-  <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">123</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;username&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;fake&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;displayName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Fake User&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;email&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;fakeEmail@test.com&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;accountStatus&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Activated&quot;</span>
-<span class="hljs-punctuation">}</span>
-</code></pre>
-<p>Now that the working endpoint is in place, I can add OpenAPI documentation with minimal effort. I simply need to import the <code><span class="hljs-attribute">springdoc-openapi-ui</span></code> library.</p>
-<pre><code class="hljs language-groovy">implementation <span class="hljs-string">&#x27;org.springdoc:springdoc-openapi-ui:1.3.1&#x27;</span>
-</code></pre>
-<p>Inject an instance of the OpenAPI object to tell the generator what to call itself.</p>
-<pre><code class="hljs language-java"><span class="hljs-meta">@Bean</span>
-<span class="hljs-keyword">public</span> OpenAPI <span class="hljs-title function_">customOpenAPI</span><span class="hljs-params">()</span> {
-	<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">OpenAPI</span>()
-		.info(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Info</span>().title(<span class="hljs-string">&quot;User Service&quot;</span>).version(<span class="hljs-string">&quot;v1&quot;</span>).description(<span class="hljs-string">&quot;Service for user management&quot;</span>)
-		.termsOfService(<span class="hljs-string">&quot;http://swagger.io/terms/&quot;</span>)
-		.license(<span class="hljs-keyword">new</span> <span class="hljs-title class_">License</span>().name(<span class="hljs-string">&quot;Apache 2.0&quot;</span>).url(<span class="hljs-string">&quot;http://springdoc.org&quot;</span>)));
+<pre><code class="language-json">{
+  &quot;id&quot;: 123,
+  &quot;username&quot;: &quot;fake&quot;,
+  &quot;displayName&quot;: &quot;Fake User&quot;,
+  &quot;email&quot;: &quot;fakeEmail@test.com&quot;,
+  &quot;accountStatus&quot;: &quot;Activated&quot;
 }
 </code></pre>
-<p>And simply add configuration to <code><span class="hljs-built_in">application</span>.properties</code> in order to set swagger-ui to our root path.</p>
-<pre><code class="hljs language-bash">springdoc.swagger-ui.path=/
+<p>Now that the working endpoint is in place, I can add OpenAPI documentation with minimal effort. I simply need to import the <code>springdoc-openapi-ui</code> library.</p>
+<pre><code class="language-groovy">implementation 'org.springdoc:springdoc-openapi-ui:1.3.1'
+</code></pre>
+<p>Inject an instance of the OpenAPI object to tell the generator what to call itself.</p>
+<pre><code class="language-java">@Bean
+public OpenAPI customOpenAPI() {
+	return new OpenAPI()
+		.info(new Info().title(&quot;User Service&quot;).version(&quot;v1&quot;).description(&quot;Service for user management&quot;)
+		.termsOfService(&quot;http://swagger.io/terms/&quot;)
+		.license(new License().name(&quot;Apache 2.0&quot;).url(&quot;http://springdoc.org&quot;)));
+}
+</code></pre>
+<p>And simply add configuration to <code>application.properties</code> in order to set swagger-ui to our root path.</p>
+<pre><code class="language-bash">springdoc.swagger-ui.path=/
 springdoc.swagger-ui.version=v
 </code></pre>
 <p>Browsing to <a href="http://localhost:8080/v3/api-docs">http://localhost:8080/v3/api-docs</a> now returns the following OpenAPI specification document:</p>
-<pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
-  <span class="hljs-attr">&quot;openapi&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;3.0.1&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;info&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-    <span class="hljs-attr">&quot;title&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;User Service&quot;</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Service for user management&quot;</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-attr">&quot;termsOfService&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;http://swagger.io/terms/&quot;</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-attr">&quot;license&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-      <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Apache 2.0&quot;</span><span class="hljs-punctuation">,</span>
-      <span class="hljs-attr">&quot;url&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;http://springdoc.org&quot;</span>
-    <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;v1&quot;</span>
-  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;servers&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
-    <span class="hljs-punctuation">{</span>
-      <span class="hljs-attr">&quot;url&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;http://localhost:8080&quot;</span><span class="hljs-punctuation">,</span>
-      <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Generated server url&quot;</span>
-    <span class="hljs-punctuation">}</span>
-  <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;paths&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-    <span class="hljs-attr">&quot;/user/{id}&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-      <span class="hljs-attr">&quot;get&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-        <span class="hljs-attr">&quot;tags&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;user-controller&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
-        <span class="hljs-attr">&quot;operationId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;getUser&quot;</span><span class="hljs-punctuation">,</span>
-        <span class="hljs-attr">&quot;parameters&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
-          <span class="hljs-punctuation">{</span>
-            <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;id&quot;</span><span class="hljs-punctuation">,</span>
-            <span class="hljs-attr">&quot;in&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;path&quot;</span><span class="hljs-punctuation">,</span>
-            <span class="hljs-attr">&quot;required&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
-            <span class="hljs-attr">&quot;schema&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-              <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;string&quot;</span>
-            <span class="hljs-punctuation">}</span>
-          <span class="hljs-punctuation">}</span>
-        <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
-        <span class="hljs-attr">&quot;responses&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-          <span class="hljs-attr">&quot;200&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-            <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;default response&quot;</span><span class="hljs-punctuation">,</span>
-            <span class="hljs-attr">&quot;content&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-              <span class="hljs-attr">&quot;*/*&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-                <span class="hljs-attr">&quot;schema&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-                  <span class="hljs-attr">&quot;$ref&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;#/components/schemas/User&quot;</span>
-                <span class="hljs-punctuation">}</span>
-              <span class="hljs-punctuation">}</span>
-            <span class="hljs-punctuation">}</span>
-          <span class="hljs-punctuation">}</span>
-        <span class="hljs-punctuation">}</span>
-      <span class="hljs-punctuation">}</span>
-    <span class="hljs-punctuation">}</span>
-  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;components&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-    <span class="hljs-attr">&quot;schemas&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-      <span class="hljs-attr">&quot;User&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-        <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;object&quot;</span><span class="hljs-punctuation">,</span>
-        <span class="hljs-attr">&quot;properties&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-          <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;integer&quot;</span><span class="hljs-punctuation">,</span>
-            <span class="hljs-attr">&quot;format&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;int32&quot;</span>
-          <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
-          <span class="hljs-attr">&quot;username&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;string&quot;</span>
-          <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
-          <span class="hljs-attr">&quot;displayName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;string&quot;</span>
-          <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
-          <span class="hljs-attr">&quot;email&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;string&quot;</span>
-          <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
-          <span class="hljs-attr">&quot;accountStatus&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;string&quot;</span>
-          <span class="hljs-punctuation">}</span>
-        <span class="hljs-punctuation">}</span>
-      <span class="hljs-punctuation">}</span>
-    <span class="hljs-punctuation">}</span>
-  <span class="hljs-punctuation">}</span>
-<span class="hljs-punctuation">}</span>
+<pre><code class="language-json">{
+  &quot;openapi&quot;: &quot;3.0.1&quot;,
+  &quot;info&quot;: {
+    &quot;title&quot;: &quot;User Service&quot;,
+    &quot;description&quot;: &quot;Service for user management&quot;,
+    &quot;termsOfService&quot;: &quot;http://swagger.io/terms/&quot;,
+    &quot;license&quot;: {
+      &quot;name&quot;: &quot;Apache 2.0&quot;,
+      &quot;url&quot;: &quot;http://springdoc.org&quot;
+    },
+    &quot;version&quot;: &quot;v1&quot;
+  },
+  &quot;servers&quot;: [
+    {
+      &quot;url&quot;: &quot;http://localhost:8080&quot;,
+      &quot;description&quot;: &quot;Generated server url&quot;
+    }
+  ],
+  &quot;paths&quot;: {
+    &quot;/user/{id}&quot;: {
+      &quot;get&quot;: {
+        &quot;tags&quot;: [&quot;user-controller&quot;],
+        &quot;operationId&quot;: &quot;getUser&quot;,
+        &quot;parameters&quot;: [
+          {
+            &quot;name&quot;: &quot;id&quot;,
+            &quot;in&quot;: &quot;path&quot;,
+            &quot;required&quot;: true,
+            &quot;schema&quot;: {
+              &quot;type&quot;: &quot;string&quot;
+            }
+          }
+        ],
+        &quot;responses&quot;: {
+          &quot;200&quot;: {
+            &quot;description&quot;: &quot;default response&quot;,
+            &quot;content&quot;: {
+              &quot;*/*&quot;: {
+                &quot;schema&quot;: {
+                  &quot;$ref&quot;: &quot;#/components/schemas/User&quot;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  &quot;components&quot;: {
+    &quot;schemas&quot;: {
+      &quot;User&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+          &quot;id&quot;: {
+            &quot;type&quot;: &quot;integer&quot;,
+            &quot;format&quot;: &quot;int32&quot;
+          },
+          &quot;username&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;displayName&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;email&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;accountStatus&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          }
+        }
+      }
+    }
+  }
+}
 </code></pre>
 <p>And browsing to our root path <a href="http://localhost:8080/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config">http://localhost:8080/</a> reveals the Swagger UI.</p>
 <p><img src="Untitled%204.png" alt="Untitled%204.png"></p>

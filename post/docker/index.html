@@ -68,10 +68,10 @@
 <p>You will notice something about this forklift: it is designed to lift only one kind of object. It would be impossible, or at least damaging if we were to attempt to use it to lift a car, or a pile of boxes or a shipment of sensitive electronics, yet this forklift probably lifts all of those objects every single day. This is because all of these differently shaped objects are stored <em>inside</em> of the shipping containers, and the forklift is really good at lifting those.</p>
 <p>Docker containers are the software equivalent of those shipping containers, they can contain different types of software that have different dependencies, but because they are in a container it allows us to treat them all the same way.</p>
 <h2>A concrete example</h2>
-<p>Let's take an example. I have a Linux machine that does not have Java installed, if I run the <code><span class="hljs-attribute">java</span></code> command, I get the following:</p>
-<pre><code class="hljs language-bash">divan@linuxbox:~$ java
+<p>Let's take an example. I have a Linux machine that does not have Java installed, if I run the <code>java</code> command, I get the following:</p>
+<pre><code class="language-bash">divan@linuxbox:~$ java
 
-Command <span class="hljs-string">&#x27;java&#x27;</span> not found, but can be installed with:
+Command 'java' not found, but can be installed with:
 
 sudo apt install default-jre
 sudo apt install openjdk-11-jre-headless
@@ -79,43 +79,43 @@ sudo apt install openjdk-8-jre-headless
 </code></pre>
 <p>Now If I wanted to run an application like <a href="https://zipkin.io/pages/quickstart.html">Zipkin</a> for example. I would need to first install Java on this machine. However, I have an alternative; I could instead set up Docker and pull down a container with the application <em>and</em> all of its dependancies inside it and docker would know how to run it.</p>
 <p>So instead of running:</p>
-<pre><code class="hljs language-bash">curl -sSL https://zipkin.io/quickstart.sh | bash -s
+<pre><code class="language-bash">curl -sSL https://zipkin.io/quickstart.sh | bash -s
 java -jar zipkin.jar
 </code></pre>
 <p>I would run:</p>
-<pre><code class="hljs language-bash">docker run -d -p 9411:9411 openzipkin/zipkin
+<pre><code class="language-bash">docker run -d -p 9411:9411 openzipkin/zipkin
 </code></pre>
 <p>This will start up a copy of the Zipkin Docker image, exposing the port 9411 as 9411 on your machine, and if it doesn't find it on this local machine, it will pull it from <a href="https://hub.docker.com/r/openzipkin/zipkin/">DockerHub</a>.Once it is set up, you will be able to browse to zipking at <a href="http://localhost:9411">http://localhost:9411</a></p>
 <p>Now this may seem pointless right now, since I have only replaced the one software install (Java) with another software install (Docker), but let's take this a step further and install <a href="https://github.com/Unleash/unleash">Unleash</a> on our machine.</p>
 <p>Unleash requires <a href="https://nodejs.org/en/">Node.JS</a> to be installed, and perhaps more importantly, It requires an instance of <a href="https://www.postgresql.org/">PostgreSQL</a>.</p>
 <p>Because we are using docker, this won't be much of a problem because the interface is the same</p>
-<pre><code class="hljs language-bash">docker run --name unleash-postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres -d postgres
+<pre><code class="language-bash">docker run --name unleash-postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres -d postgres
 </code></pre>
 <p>And now we simply install unleash with the same command:</p>
-<pre><code class="hljs language-bash">docker run -e DATABASE_URL=postgres://user:postgres@[host-ip]:5432/unleash -p 4242:4242 -d unleashorg/unleash-server
+<pre><code class="language-bash">docker run -e DATABASE_URL=postgres://user:postgres@[host-ip]:5432/unleash -p 4242:4242 -d unleashorg/unleash-server
 </code></pre>
 <p>Unleash will start up with node inside its container and will have access to this PostgreSQL instance since the port has been made available.</p>
 <p>This shows you the power of docker, being able to set up applications quickly and easily and all with the same management interface.</p>
 <h2>Compose</h2>
 <p>Running commands is great but I would like to introduce one last concept because to me, it was the feature that made docker useful to me as a developer, and that is compose. If applications are shipping containers then compose is the shipment. It allows you to define environments such as the one above and have you set them up, or tear them down at will.</p>
 <p>Compose lets us handle the environment above with a single command by defining it in a <code>docker-compose.yml</code> file</p>
-<pre><code class="hljs language-yaml"><span class="hljs-attr">version:</span> <span class="hljs-string">&#x27;3&#x27;</span>
-<span class="hljs-attr">services:</span>
-  <span class="hljs-attr">unleash:</span>
-    <span class="hljs-attr">image:</span> <span class="hljs-string">unleashorg/unleash-server:3.1</span>
-    <span class="hljs-attr">ports:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;4242:4242&quot;</span>
-    <span class="hljs-attr">environment:</span>
-      <span class="hljs-attr">DATABASE_URL:</span> <span class="hljs-string">postgres://postgres:unleash@db/postgres</span>
-    <span class="hljs-attr">depends_on:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">db</span>
-  <span class="hljs-attr">db:</span>
-    <span class="hljs-attr">expose:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;5432&quot;</span>
-    <span class="hljs-attr">image:</span> <span class="hljs-string">postgres:10-alpine</span>
+<pre><code class="language-yaml">version: '3'
+services:
+  unleash:
+    image: unleashorg/unleash-server:3.1
+    ports:
+      - &quot;4242:4242&quot;
+    environment:
+      DATABASE_URL: postgres://postgres:unleash@db/postgres
+    depends_on:
+      - db
+  db:
+    expose:
+      - &quot;5432&quot;
+    image: postgres:10-alpine
 </code></pre>
 <p>This will reduce the unleash environment in our previous example to running:</p>
-<pre><code class="hljs language-bash">docker-compose up
+<pre><code class="language-bash">docker-compose up
 </code></pre>
 <p>In the directory that contains the definition file. Compose as a developer tool, especially when dealing with networked applications is envaluable and allows us to simulate having multiple machines without having to own our own data-center.</p>
 <p>It also is the tip of the iceberg in a concept called Container Orchestration, which allows us to spin up and tear down server applications at will in response to load. That is beyond the scope of this article, but is definately a contributing factor to Docker's popularity in production environments.</p>

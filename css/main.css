@@ -234,7 +234,7 @@ footer {
   padding: 50px 0;
   bottom: 0;
   width: 100%;
-  border-top: 1px solid var(--subtitle-color);
+  border-top: 1px solid var(--accent-color);
 }
 
 .content {

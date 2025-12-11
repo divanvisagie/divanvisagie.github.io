@@ -58,48 +58,48 @@
 <p>A lot of the time you can end up with a very long list of items in a UITableView and you really need a search bar to filter what you want. This is when a UISearchBar is needed in your table, in this tutorial , I will explain how to link up that UISearchBar and use it to filter through your tableView.</p>
 <p>Lets get started by setting up a project and populating a standard UITableViewController:</p>
 <h3>ViewController.h</h3>
-<pre><code class="hljs language-objectivec"><span class="hljs-meta">#import <span class="hljs-string">&lt;UIKit/UIKit.h&gt;</span></span>
-<span class="hljs-class"><span class="hljs-keyword">@interface</span> <span class="hljs-title">ViewController</span> : <span class="hljs-title">UITableViewController</span> </span>
-<span class="hljs-keyword">@end</span>
+<pre><code class="language-objectivec">#import &lt;UIKit/UIKit.h&gt;
+@interface ViewController : UITableViewController 
+@end
 </code></pre>
 <h3>ViewController.m</h3>
-<pre><code class="hljs language-objectivec"><span class="hljs-meta">#import <span class="hljs-string">&quot;ViewController.h&quot;</span></span>
-<span class="hljs-class"><span class="hljs-keyword">@interface</span> <span class="hljs-title">ViewController</span> ()</span>{
-<span class="hljs-keyword">@private</span>
-    <span class="hljs-built_in">NSArray</span> *objects;
+<pre><code class="language-objectivec">#import &quot;ViewController.h&quot;
+@interface ViewController (){
+@private
+    NSArray *objects;
 }
-<span class="hljs-keyword">@end</span>
-<span class="hljs-class"><span class="hljs-keyword">@implementation</span> <span class="hljs-title">ViewController</span></span>
-- (<span class="hljs-type">void</span>)viewDidLoad
+@end
+@implementation ViewController
+- (void)viewDidLoad
 {
-    [<span class="hljs-variable language_">super</span> viewDidLoad];
-    <span class="hljs-comment">// Do any additional setup after loading the view, typically from a nib.</span>
+    [super viewDidLoad];
+    // Do any additional setup after loading the view, typically from a nib.
     
-    objects = @[<span class="hljs-string">@&quot;Badger&quot;</span>,<span class="hljs-string">@&quot;BADGER&quot;</span>,<span class="hljs-string">@&quot;badger&quot;</span>,<span class="hljs-string">@&quot;mushroom&quot;</span>,<span class="hljs-string">@&quot;MuShRoOm&quot;</span>];
-    [<span class="hljs-keyword">self</span>.tableView reloadData];
+    objects = @[@&quot;Badger&quot;,@&quot;BADGER&quot;,@&quot;badger&quot;,@&quot;mushroom&quot;,@&quot;MuShRoOm&quot;];
+    [self.tableView reloadData];
 }
-- (<span class="hljs-type">void</span>)didReceiveMemoryWarning
+- (void)didReceiveMemoryWarning
 {
-    [<span class="hljs-variable language_">super</span> didReceiveMemoryWarning];
-    <span class="hljs-comment">// Dispose of any resources that can be recreated.</span>
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
 }
-<span class="hljs-meta">#<span class="hljs-keyword">pragma</span> mark - TableView DataSource -</span>
-- (<span class="hljs-built_in">NSInteger</span>)numberOfSectionsInTableView:(<span class="hljs-built_in">UITableView</span> *)tableView{
-    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+#pragma mark - TableView DataSource -
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
 }
--(<span class="hljs-built_in">NSInteger</span>)tableView:(<span class="hljs-built_in">UITableView</span> *)tableView numberOfRowsInSection:(<span class="hljs-built_in">NSInteger</span>)section{
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     
-    <span class="hljs-keyword">return</span> objects.count;
+    return objects.count;
 }
--(<span class="hljs-built_in">UITableViewCell</span>*)tableView:(<span class="hljs-built_in">UITableView</span> *)tableView cellForRowAtIndexPath:(<span class="hljs-built_in">NSIndexPath</span> *)indexPath{
+-(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    <span class="hljs-built_in">UITableViewCell</span> *cell = [tableView dequeueReusableCellWithIdentifier:<span class="hljs-string">@&quot;Cell&quot;</span> forIndexPath:indexPath];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@&quot;Cell&quot; forIndexPath:indexPath];
     
     cell.textLabel.text = objects[indexPath.row];
     
-    <span class="hljs-keyword">return</span> cell;
+    return cell;
 }
-<span class="hljs-keyword">@end</span>
+@end
 </code></pre>
 <p><img src="1.png" alt="Screenshot showing a sample list"></p>
 <p>Now that we have that running lets drop a search bar on to that table in the storyboard.</p>
@@ -113,71 +113,71 @@
 <p>Personally in the real world, I use the &quot;on text change&quot; for searching locally and the &quot;on search button press&quot; for searching over the web when connected to a web service.</p>
 <p>modify</p>
 <h3>ViewController.h:</h3>
-<pre><code class="hljs language-objectivec"><span class="hljs-meta">#import <span class="hljs-string">&lt;UIKit/UIKit.h&gt;</span></span>
-<span class="hljs-class"><span class="hljs-keyword">@interface</span> <span class="hljs-title">ViewController</span> : <span class="hljs-title">UITableViewController</span> &lt;<span class="hljs-title">UISearchBarDelegate</span>&gt;</span>
-<span class="hljs-keyword">@end</span>
-and now <span class="hljs-keyword">in</span> ViewController.m we will handle the messages that the search bar will send its delegate:
+<pre><code class="language-objectivec">#import &lt;UIKit/UIKit.h&gt;
+@interface ViewController : UITableViewController &lt;UISearchBarDelegate&gt;
+@end
+and now in ViewController.m we will handle the messages that the search bar will send its delegate:
 
-<span class="hljs-meta">#<span class="hljs-keyword">pragma</span> mark - SearchBar Delegate -</span>
--(<span class="hljs-type">void</span>)searchBar:(<span class="hljs-built_in">UISearchBar</span> *)searchBar textDidChange:(<span class="hljs-built_in">NSString</span> *)searchText{
-    <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@&quot;searchBar text changed to : %@&quot;</span>,searchText);
+#pragma mark - SearchBar Delegate -
+-(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText{
+    NSLog(@&quot;searchBar text changed to : %@&quot;,searchText);
 }
-- (<span class="hljs-type">void</span>)searchBarSearchButtonClicked:(<span class="hljs-built_in">UISearchBar</span> *)searchBar{
-    <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@&quot;searchBar button clicked&quot;</span>);
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar{
+    NSLog(@&quot;searchBar button clicked&quot;);
 }
 </code></pre>
 <p>Now lets put in some search code ,first we need to create a place to store the searched data and a BOOL ivar to determine which array the tableView must use ,after this we also need to tell the tableView which data sources to use by modifying the DataSource methods:</p>
-<pre><code class="hljs language-objectivec"><span class="hljs-class"><span class="hljs-keyword">@interface</span> <span class="hljs-title">ViewController</span> () </span>{
-<span class="hljs-keyword">@private</span>
-    <span class="hljs-built_in">NSArray</span> *objects;
-    <span class="hljs-built_in">NSArray</span> *searchedData;
-    <span class="hljs-type">BOOL</span> isFiltered;
+<pre><code class="language-objectivec">@interface ViewController () {
+@private
+    NSArray *objects;
+    NSArray *searchedData;
+    BOOL isFiltered;
 }
 </code></pre>
 <p>and then:</p>
-<pre><code class="hljs language-objectivec">-(<span class="hljs-built_in">NSInteger</span>)numberOfSectionsInTableView:(<span class="hljs-built_in">UITableView</span> *)tableView{
-    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+<pre><code class="language-objectivec">-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
 }
--(<span class="hljs-built_in">NSInteger</span>)tableView:(<span class="hljs-built_in">UITableView</span> *)tableView numberOfRowsInSection:(<span class="hljs-built_in">NSInteger</span>)section{
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     
-    <span class="hljs-keyword">return</span> isFiltered ? searchedData.count : objects.count;
+    return isFiltered ? searchedData.count : objects.count;
 }
--(<span class="hljs-built_in">UITableViewCell</span>*)tableView:(<span class="hljs-built_in">UITableView</span> *)tableView cellForRowAtIndexPath:(<span class="hljs-built_in">NSIndexPath</span> *)indexPath{
+-(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    <span class="hljs-built_in">UITableViewCell</span> *cell = [tableView dequeueReusableCellWithIdentifier:<span class="hljs-string">@&quot;Cell&quot;</span> forIndexPath:indexPath];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@&quot;Cell&quot; forIndexPath:indexPath];
     
     cell.textLabel.text = isFiltered ? searchedData[indexPath.row] : objects[indexPath.row];
     
-    <span class="hljs-keyword">return</span> cell;
+    return cell;
 }
 </code></pre>
 <p>Now let do some search code:</p>
-<pre><code class="hljs language-objectivec"><span class="hljs-meta">#<span class="hljs-keyword">pragma</span> mark - SearchBar Delegate -</span>
--(<span class="hljs-type">void</span>)searchBar:(<span class="hljs-built_in">UISearchBar</span> *)searchBar textDidChange:(<span class="hljs-built_in">NSString</span> *)searchText{
+<pre><code class="language-objectivec">#pragma mark - SearchBar Delegate -
+-(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText{
     
-    <span class="hljs-keyword">if</span> (searchText.length == <span class="hljs-number">0</span>)
-        isFiltered = <span class="hljs-literal">NO</span>;
-    <span class="hljs-keyword">else</span>
-        isFiltered = <span class="hljs-literal">YES</span>;
+    if (searchText.length == 0)
+        isFiltered = NO;
+    else
+        isFiltered = YES;
     
-    <span class="hljs-built_in">NSMutableArray</span> *tmpSearched = [[<span class="hljs-built_in">NSMutableArray</span> alloc] init];
+    NSMutableArray *tmpSearched = [[NSMutableArray alloc] init];
     
-    <span class="hljs-keyword">for</span> (<span class="hljs-built_in">NSString</span> *string <span class="hljs-keyword">in</span> objects) {
+    for (NSString *string in objects) {
         
-        <span class="hljs-comment">//we are going for case insensitive search here</span>
-        <span class="hljs-built_in">NSRange</span> range = [string rangeOfString:searchText
-                                      options:<span class="hljs-built_in">NSCaseInsensitiveSearch</span>];
+        //we are going for case insensitive search here
+        NSRange range = [string rangeOfString:searchText
+                                      options:NSCaseInsensitiveSearch];
         
-        <span class="hljs-keyword">if</span> (range.location != <span class="hljs-built_in">NSNotFound</span>)
+        if (range.location != NSNotFound)
             [tmpSearched addObject:string];
     }
     
     searchedData = tmpSearched.copy;
     
-    [<span class="hljs-keyword">self</span>.tableView reloadData];
+    [self.tableView reloadData];
 }
-- (<span class="hljs-type">void</span>)searchBarSearchButtonClicked:(<span class="hljs-built_in">UISearchBar</span> *)searchBar{
-    <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@&quot;searchBar button clicked&quot;</span>);
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar{
+    NSLog(@&quot;searchBar button clicked&quot;);
 }
 </code></pre>
 <p>The code for searchBarSearchButtonClicked will be the same as what i have implemented in textDidChange so I wont repeat it here.</p>
@@ -189,76 +189,76 @@ and now <span class="hljs-keyword">in</span> ViewController.m we will handle the
 <p>As you can see, the case insensitive search works , now as usual , the full code below</p>
 <h2>Full code</h2>
 <h3>ViewController.h</h3>
-<pre><code class="hljs language-objectivec"><span class="hljs-meta">#import <span class="hljs-string">&lt;UIKit/UIKit.h&gt;</span></span>
-<span class="hljs-class"><span class="hljs-keyword">@interface</span> <span class="hljs-title">ViewController</span> : <span class="hljs-title">UITableViewController</span> &lt;<span class="hljs-title">UISearchBarDelegate</span>&gt;</span>
-<span class="hljs-keyword">@end</span>
+<pre><code class="language-objectivec">#import &lt;UIKit/UIKit.h&gt;
+@interface ViewController : UITableViewController &lt;UISearchBarDelegate&gt;
+@end
 </code></pre>
 <h3>ViewController.m</h3>
-<pre><code class="hljs language-objectivec"><span class="hljs-class"><span class="hljs-keyword">@interface</span> <span class="hljs-title">ViewController</span> ()</span>{
-<span class="hljs-keyword">@private</span>
-    <span class="hljs-built_in">NSArray</span> *objects;
-    <span class="hljs-built_in">NSArray</span> *searchedData;
-    <span class="hljs-type">BOOL</span> isFiltered;
+<pre><code class="language-objectivec">@interface ViewController (){
+@private
+    NSArray *objects;
+    NSArray *searchedData;
+    BOOL isFiltered;
 }
-<span class="hljs-keyword">@end</span>
-<span class="hljs-class"><span class="hljs-keyword">@implementation</span> <span class="hljs-title">ViewController</span></span>
-- (<span class="hljs-type">void</span>)viewDidLoad
+@end
+@implementation ViewController
+- (void)viewDidLoad
 {
-    [<span class="hljs-variable language_">super</span> viewDidLoad];
-<span class="hljs-comment">// Do any additional setup after loading the view, typically from a nib.</span>
+    [super viewDidLoad];
+// Do any additional setup after loading the view, typically from a nib.
     
-    objects = @[<span class="hljs-string">@&quot;Badger&quot;</span>,<span class="hljs-string">@&quot;BADGER&quot;</span>,<span class="hljs-string">@&quot;badger&quot;</span>,<span class="hljs-string">@&quot;mushroom&quot;</span>,<span class="hljs-string">@&quot;MuShRoOm&quot;</span>];
-    [<span class="hljs-keyword">self</span>.tableView reloadData];
+    objects = @[@&quot;Badger&quot;,@&quot;BADGER&quot;,@&quot;badger&quot;,@&quot;mushroom&quot;,@&quot;MuShRoOm&quot;];
+    [self.tableView reloadData];
 }
-- (<span class="hljs-type">void</span>)didReceiveMemoryWarning
+- (void)didReceiveMemoryWarning
 {
-    [<span class="hljs-variable language_">super</span> didReceiveMemoryWarning];
-    <span class="hljs-comment">// Dispose of any resources that can be recreated.</span>
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
 }
-<span class="hljs-meta">#<span class="hljs-keyword">pragma</span> mark - TableView DataSource -</span>
-- (<span class="hljs-built_in">NSInteger</span>)numberOfSectionsInTableView:(<span class="hljs-built_in">UITableView</span> *)tableView{
-    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+#pragma mark - TableView DataSource -
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
 }
--(<span class="hljs-built_in">NSInteger</span>)tableView:(<span class="hljs-built_in">UITableView</span> *)tableView numberOfRowsInSection:(<span class="hljs-built_in">NSInteger</span>)section{
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     
-    <span class="hljs-keyword">return</span> isFiltered ? searchedData.count : objects.count;
+    return isFiltered ? searchedData.count : objects.count;
 }
--(<span class="hljs-built_in">UITableViewCell</span>*)tableView:(<span class="hljs-built_in">UITableView</span> *)tableView cellForRowAtIndexPath:(<span class="hljs-built_in">NSIndexPath</span> *)indexPath{
+-(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    <span class="hljs-built_in">UITableViewCell</span> *cell = [tableView dequeueReusableCellWithIdentifier:<span class="hljs-string">@&quot;Cell&quot;</span> forIndexPath:indexPath];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@&quot;Cell&quot; forIndexPath:indexPath];
     
     cell.textLabel.text = isFiltered ? searchedData[indexPath.row] : objects[indexPath.row];
     
-    <span class="hljs-keyword">return</span> cell;
+    return cell;
 }
-<span class="hljs-meta">#<span class="hljs-keyword">pragma</span> mark - SearchBar Delegate -</span>
--(<span class="hljs-type">void</span>)searchBar:(<span class="hljs-built_in">UISearchBar</span> *)searchBar textDidChange:(<span class="hljs-built_in">NSString</span> *)searchText{
+#pragma mark - SearchBar Delegate -
+-(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText{
     
-    <span class="hljs-keyword">if</span> (searchText.length == <span class="hljs-number">0</span>)
-        isFiltered = <span class="hljs-literal">NO</span>;
-    <span class="hljs-keyword">else</span>
-        isFiltered = <span class="hljs-literal">YES</span>;
+    if (searchText.length == 0)
+        isFiltered = NO;
+    else
+        isFiltered = YES;
     
-    <span class="hljs-built_in">NSMutableArray</span> *tmpSearched = [[<span class="hljs-built_in">NSMutableArray</span> alloc] init];
+    NSMutableArray *tmpSearched = [[NSMutableArray alloc] init];
     
-    <span class="hljs-keyword">for</span> (<span class="hljs-built_in">NSString</span> *string <span class="hljs-keyword">in</span> objects) {
+    for (NSString *string in objects) {
         
-        <span class="hljs-comment">//we are going for case insensitive search here</span>
-        <span class="hljs-built_in">NSRange</span> range = [string rangeOfString:searchText
-                                      options:<span class="hljs-built_in">NSCaseInsensitiveSearch</span>];
+        //we are going for case insensitive search here
+        NSRange range = [string rangeOfString:searchText
+                                      options:NSCaseInsensitiveSearch];
         
-        <span class="hljs-keyword">if</span> (range.location != <span class="hljs-built_in">NSNotFound</span>)
+        if (range.location != NSNotFound)
             [tmpSearched addObject:string];
     }
     
     searchedData = tmpSearched.copy;
     
-    [<span class="hljs-keyword">self</span>.tableView reloadData];
+    [self.tableView reloadData];
 }
-- (<span class="hljs-type">void</span>)searchBarSearchButtonClicked:(<span class="hljs-built_in">UISearchBar</span> *)searchBar{
-    <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@&quot;searchBar button clicked&quot;</span>);
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar{
+    NSLog(@&quot;searchBar button clicked&quot;);
 }
-<span class="hljs-keyword">@end</span>
+@end
 </code></pre>
 </div>
 </div>

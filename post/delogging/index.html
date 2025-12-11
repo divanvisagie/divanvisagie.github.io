@@ -66,94 +66,94 @@
 <h2>Logging Tools</h2>
 <p>To address some of these challenges, I built a range of tools that enhance the logging experience, making it more like using a debugger but with the added advantages of being lightweight and available in production.</p>
 <h3>nocol</h3>
-<p>One of the first tools I developed is called <strong>nocol</strong>. Written in C, this command-line utility strips colors from streaming output, eliminating those pesky ANSI color codes. Unlike other tools like <code>a<span class="hljs-symbol">nsi2</span>txt</code>, nocol streams logs instantly. This avoids the long pauses typical of tools that buffer before writing to <code><span class="hljs-built_in">tee</span></code> or other destinations. Perfect for real-time log processing, nocol is great for piping logs from services and program runners like Cargo or Yarn, which generate colored outputs. Having logs stripped of color in real-time is invaluable for easier searching within NeoVim or other text editors. You can find nocol here: <a href="https://github.com/divanvisagie/nocol">https://github.com/divanvisagie/nocol</a>.</p>
+<p>One of the first tools I developed is called <strong>nocol</strong>. Written in C, this command-line utility strips colors from streaming output, eliminating those pesky ANSI color codes. Unlike other tools like <code>ansi2txt</code>, nocol streams logs instantly. This avoids the long pauses typical of tools that buffer before writing to <code>tee</code> or other destinations. Perfect for real-time log processing, nocol is great for piping logs from services and program runners like Cargo or Yarn, which generate colored outputs. Having logs stripped of color in real-time is invaluable for easier searching within NeoVim or other text editors. You can find nocol here: <a href="https://github.com/divanvisagie/nocol">https://github.com/divanvisagie/nocol</a>.</p>
 <h3>delog</h3>
 <p>Another tool I've built is <strong>delog</strong>. This tool executes a command and pauses whenever an output line contains the keyword &quot;BREAK.&quot; This is particularly useful for creating manual breakpoints in your logs and allows for a debugger-like pause using mere console outputs. delog can be found here: <a href="https://github.com/divanvisagie/delog">https://github.com/divanvisagie/delog</a>.</p>
 <h3>Enhancing NeoVim with Quickfix Lists</h3>
 <p>At this pont I was all in on making sure I don't go insan enext time I try to do something simple like look at a value. So it was time for text editor integraiton, so I can jump to the code that logged something.</p>
 <p>Vim and NeoVim have a feature called the quickfix list, a list of errors that you can quickly jump to in your code. This feature is immensely useful and simple, since it merely requires that the output from a tool follows a particular format. To leverage this, I created a custom configuration that appends any quickfix formated selected text to the quickfix list:</p>
-<pre><code class="hljs language-lua"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">GetVisualSelection</span><span class="hljs-params">()</span></span>
-  <span class="hljs-keyword">local</span> start_pos = vim.fn.getpos(<span class="hljs-string">&quot;&#x27;&lt;&quot;</span>)
-  <span class="hljs-keyword">local</span> end_pos = vim.fn.getpos(<span class="hljs-string">&quot;&#x27;&gt;&quot;</span>)
+<pre><code class="language-lua">function GetVisualSelection()
+  local start_pos = vim.fn.getpos(&quot;'&lt;&quot;)
+  local end_pos = vim.fn.getpos(&quot;'&gt;&quot;)
 
-  <span class="hljs-keyword">local</span> start_line = start_pos[<span class="hljs-number">2</span>]
-  <span class="hljs-keyword">local</span> start_col = start_pos[<span class="hljs-number">3</span>]
-  <span class="hljs-keyword">local</span> end_line = end_pos[<span class="hljs-number">2</span>]
-  <span class="hljs-keyword">local</span> end_col = end_pos[<span class="hljs-number">3</span>]
+  local start_line = start_pos[2]
+  local start_col = start_pos[3]
+  local end_line = end_pos[2]
+  local end_col = end_pos[3]
 
-  <span class="hljs-keyword">if</span> start_line == end_line <span class="hljs-keyword">then</span>
-    <span class="hljs-keyword">return</span> vim.fn.getline(start_line):<span class="hljs-built_in">sub</span>(start_col, end_col)
-  <span class="hljs-keyword">else</span>
-    <span class="hljs-keyword">local</span> <span class="hljs-built_in">lines</span> = vim.fn.getline(start_line, end_line)
-    <span class="hljs-built_in">lines</span>[<span class="hljs-number">1</span>] = <span class="hljs-built_in">lines</span>[<span class="hljs-number">1</span>]:<span class="hljs-built_in">sub</span>(start_col, <span class="hljs-number">-1</span>)
-    <span class="hljs-built_in">lines</span>[#<span class="hljs-built_in">lines</span>] = <span class="hljs-built_in">lines</span>[#<span class="hljs-built_in">lines</span>]:<span class="hljs-built_in">sub</span>(<span class="hljs-number">1</span>, end_col)
-    <span class="hljs-keyword">return</span> <span class="hljs-built_in">table</span>.<span class="hljs-built_in">concat</span>(<span class="hljs-built_in">lines</span>, <span class="hljs-string">&quot;\n&quot;</span>)
-  <span class="hljs-keyword">end</span>
-<span class="hljs-keyword">end</span>
+  if start_line == end_line then
+    return vim.fn.getline(start_line):sub(start_col, end_col)
+  else
+    local lines = vim.fn.getline(start_line, end_line)
+    lines[1] = lines[1]:sub(start_col, -1)
+    lines[#lines] = lines[#lines]:sub(1, end_col)
+    return table.concat(lines, &quot;\n&quot;)
+  end
+end
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">AddSelectionToQuickfix</span><span class="hljs-params">()</span></span>
-  <span class="hljs-keyword">local</span> line = GetVisualSelection()
-  <span class="hljs-built_in">print</span>(line)
+function AddSelectionToQuickfix()
+  local line = GetVisualSelection()
+  print(line)
 
-  <span class="hljs-keyword">local</span> filename = <span class="hljs-string">&#x27;&#x27;</span>
-  <span class="hljs-keyword">local</span> line_num = <span class="hljs-number">0</span>
-  <span class="hljs-keyword">local</span> body = <span class="hljs-string">&#x27;&#x27;</span>
+  local filename = ''
+  local line_num = 0
+  local body = ''
 
-  <span class="hljs-keyword">local</span> parts = vim.fn.split(line, <span class="hljs-string">&#x27;[: ]&#x27;</span>)
+  local parts = vim.fn.split(line, '[: ]')
 
-  <span class="hljs-keyword">for</span> part_idx, part <span class="hljs-keyword">in</span> <span class="hljs-built_in">ipairs</span>(parts) <span class="hljs-keyword">do</span>
-    <span class="hljs-keyword">if</span> part_idx == <span class="hljs-number">1</span> <span class="hljs-keyword">then</span>
+  for part_idx, part in ipairs(parts) do
+    if part_idx == 1 then
       filename = part
-    <span class="hljs-keyword">end</span>
-    <span class="hljs-keyword">if</span> part_idx == <span class="hljs-number">2</span> <span class="hljs-keyword">then</span>
-      line_num = <span class="hljs-built_in">tonumber</span>(part)
-    <span class="hljs-keyword">end</span>
-    <span class="hljs-keyword">if</span> part_idx &gt; <span class="hljs-number">2</span> <span class="hljs-keyword">then</span>
+    end
+    if part_idx == 2 then
+      line_num = tonumber(part)
+    end
+    if part_idx &gt; 2 then
         body = body .. part
-    <span class="hljs-keyword">end</span>
-  <span class="hljs-keyword">end</span>
+    end
+  end
 
-  <span class="hljs-keyword">local</span> qf_list = {}
-  <span class="hljs-built_in">table</span>.<span class="hljs-built_in">insert</span>(qf_list, {
+  local qf_list = {}
+  table.insert(qf_list, {
     filename = filename,
     lnum = line_num,
-    col = <span class="hljs-number">1</span>,
+    col = 1,
     text = body
   })
 
-  vim.fn.setqflist(qf_list, <span class="hljs-string">&#x27;a&#x27;</span>)
-  <span class="hljs-keyword">if</span> vim.fn.empty(vim.fn.getqflist()) == <span class="hljs-number">0</span> <span class="hljs-keyword">then</span>
-      vim.cmd(<span class="hljs-string">&#x27;copen&#x27;</span>)
-  <span class="hljs-keyword">end</span>
-<span class="hljs-keyword">end</span>
+  vim.fn.setqflist(qf_list, 'a')
+  if vim.fn.empty(vim.fn.getqflist()) == 0 then
+      vim.cmd('copen')
+  end
+end
 
-vim.api.nvim_set_keymap(<span class="hljs-string">&#x27;v&#x27;</span>, <span class="hljs-string">&#x27;&lt;leader&gt;qf&#x27;</span>, <span class="hljs-string">&quot;:lua AddSelectionToQuickfix()&lt;CR&gt;&quot;</span>, { noremap = <span class="hljs-literal">true</span>, silent = <span class="hljs-literal">true</span> })
+vim.api.nvim_set_keymap('v', '&lt;leader&gt;qf', &quot;:lua AddSelectionToQuickfix()&lt;CR&gt;&quot;, { noremap = true, silent = true })
 </code></pre>
 <h3>Injecting Console Logs for TypeScript</h3>
-<p>Now all I needed was to be able to select that text from the logs. So it was time for a good old <code><span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span></code> that simply followed the quickfix convention, but. I dont want to write whole lines, I want to be able to place breakpoints! So, time to set up a shortcut for printing logs.</p>
-<p>So, in addition to appending logs to the quickfix list, I wrote a configuration for NeoVim that injects a <code><span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span></code> statement compatible with the quickfix list format for TypeScript files. Here’s how it works:</p>
-<pre><code class="hljs language-lua"><span class="hljs-comment">-- Create an autocommand group for TypeScript file bindings</span>
-vim.api.nvim_create_augroup(<span class="hljs-string">&#x27;TypeScriptBindings&#x27;</span>, { clear = <span class="hljs-literal">true</span> })
+<p>Now all I needed was to be able to select that text from the logs. So it was time for a good old <code>console.log</code> that simply followed the quickfix convention, but. I dont want to write whole lines, I want to be able to place breakpoints! So, time to set up a shortcut for printing logs.</p>
+<p>So, in addition to appending logs to the quickfix list, I wrote a configuration for NeoVim that injects a <code>console.log</code> statement compatible with the quickfix list format for TypeScript files. Here’s how it works:</p>
+<pre><code class="language-lua">-- Create an autocommand group for TypeScript file bindings
+vim.api.nvim_create_augroup('TypeScriptBindings', { clear = true })
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Insert_console_log</span><span class="hljs-params">()</span></span>
-  <span class="hljs-keyword">local</span> line_num = vim.fn.line(<span class="hljs-string">&#x27;.&#x27;</span>)
-  <span class="hljs-keyword">local</span> file_name = vim.fn.expand(<span class="hljs-string">&#x27;%:p&#x27;</span>)
-  file_name = vim.fn.fnamemodify(file_name, <span class="hljs-string">&#x27;:~:.&#x27;</span>)
+function Insert_console_log()
+  local line_num = vim.fn.line('.')
+  local file_name = vim.fn.expand('%:p')
+  file_name = vim.fn.fnamemodify(file_name, ':~:.')
 
-  <span class="hljs-keyword">local</span> log_statement = <span class="hljs-built_in">string</span>.<span class="hljs-built_in">format</span>(<span class="hljs-string">&quot;console.log(&#x27;BREAK&#x27;, &#x27;%s:%d&#x27;, this || &#x27;&#x27;);&quot;</span>, file_name, line_num + <span class="hljs-number">1</span>)
+  local log_statement = string.format(&quot;console.log('BREAK', '%s:%d', this || '');&quot;, file_name, line_num + 1)
 
-  vim.api.nvim_buf_set_lines(<span class="hljs-number">0</span>, line_num, line_num, <span class="hljs-literal">false</span>, { log_statement })
-<span class="hljs-keyword">end</span>
+  vim.api.nvim_buf_set_lines(0, line_num, line_num, false, { log_statement })
+end
 
-vim.api.nvim_create_autocmd(<span class="hljs-string">&#x27;FileType&#x27;</span>, {
-  group = <span class="hljs-string">&#x27;TypeScriptBindings&#x27;</span>,
-  pattern = <span class="hljs-string">&#x27;typescript&#x27;</span>,
-  callback = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>
-    vim.api.nvim_buf_set_keymap(<span class="hljs-number">0</span>, <span class="hljs-string">&#x27;n&#x27;</span>, <span class="hljs-string">&#x27;&lt;Leader&gt;b&#x27;</span>, <span class="hljs-string">[[:lua Insert_console_log()&lt;CR&gt;]]</span>, { noremap = <span class="hljs-literal">true</span>, silent = <span class="hljs-literal">true</span> })
-  <span class="hljs-keyword">end</span>,
+vim.api.nvim_create_autocmd('FileType', {
+  group = 'TypeScriptBindings',
+  pattern = 'typescript',
+  callback = function()
+    vim.api.nvim_buf_set_keymap(0, 'n', '&lt;Leader&gt;b', [[:lua Insert_console_log()&lt;CR&gt;]], { noremap = true, silent = true })
+  end,
 })
 </code></pre>
-<p>Now hiting space+b will insert a <code><span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span></code> statement at the current line in TypeScript files. This statement will be formatted to match the quickfix list format, allowing you to jump to the line in your code where the log was inserted.</p>
+<p>Now hiting space+b will insert a <code>console.log</code> statement at the current line in TypeScript files. This statement will be formatted to match the quickfix list format, allowing you to jump to the line in your code where the log was inserted.</p>
 <h2>Conclusion</h2>
 <p>Turns out, debugging from print can be a lot more luxurious than you think. These simple tools allowed me to solve problems using logs in ways that provide a lot of the functionality you get from a debugger. The bonus is that you can replay logs even when the program isn’t running, as delog merely needs to play through the log, allowing you to simulate breakpoints. It’s all about making logs as powerful and easy to use as possible—without all the hassles of traditional debugging tools.</p>
 <h2>Final Thought</h2>

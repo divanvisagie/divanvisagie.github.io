@@ -57,101 +57,101 @@
 <blockquote></blockquote>
 <p>The idea with this article is to simply provide a quick tutorial on how to set up a simple <a href="https://nodejs.org/">Node.js</a> project with nodemon for development reloading and of course unit tests. This means I have gone for a minimalist approach and tried to keep everything as generic as possible by not doing things like sticking to my preference of <a href="https://yarnpkg.com/en/">Yarn</a> or adding unnecessary dependencies.</p>
 <p>Let’s start off the same way we start any node project, running <a href="https://www.npmjs.com/">npm</a> init in our project’s folder.</p>
-<pre><code class="hljs language-bash">npm init
+<pre><code class="language-bash">npm init
 </code></pre>
 <p>When prompted by npm to answer the questions you have the option of just pressing enter every time and filling out your package.json later, but I took this opportunity to sneak in our test command:</p>
-<pre><code class="hljs language-bash">mocha -r ts-node/register <span class="hljs-built_in">test</span>/**/*.spec.ts
+<pre><code class="language-bash">mocha -r ts-node/register test/**/*.spec.ts
 </code></pre>
 <p>Here we get a glimpse of the tool that is helping us achieve this whole thing; <a href="https://github.com/TypeStrong/ts-node">ts-node</a> provides TypeScript execution for Node.js, and here it allows us to execute mocha tests that were written in TypeScript.</p>
 <p>You will also notice that I set our main option to <em>index.ts</em> instead of <em>index.js</em>, later on this will tell tools like nodemon where to look for our starting point.</p>
 <p><img src="node-ts-1.png" alt="ScreenShot of npm init output"></p>
 <p>Next we need to set up TypeScript in the project</p>
-<pre><code class="hljs language-bash">npm i typescript
+<pre><code class="language-bash">npm i typescript
 </code></pre>
 <p>While we are here, let’s also install ts-node:</p>
-<pre><code class="hljs language-bash">npm i -D ts-node
+<pre><code class="language-bash">npm i -D ts-node
 </code></pre>
 <p>You have the option of also installing TypeScript globally but I chose to run the locally installed module for the next step using <a href="https://www.npmjs.com/package/npx">npx</a>.</p>
 <p>So, lets initialise our TypeScript project.</p>
-<pre><code class="hljs language-bash">npx tsc --init
+<pre><code class="language-bash">npx tsc --init
 </code></pre>
 <p>We should now have our default <em>tsconfig.json</em> file</p>
 <h1>Something to execute</h1>
 <p>In this next bit we need to write some TypeScript to execute. I have gone for a simple express app here in <em>index.ts</em>:</p>
-<pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> express, {<span class="hljs-title class_">Express</span>} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;express&#x27;</span>
+<pre><code class="language-ts">import express, {Express} from 'express'
 
-<span class="hljs-keyword">const</span> <span class="hljs-attr">port</span>: <span class="hljs-built_in">number</span> = <span class="hljs-number">3000</span>
-<span class="hljs-keyword">const</span> <span class="hljs-attr">app</span>: <span class="hljs-title class_">Express</span> = <span class="hljs-title function_">express</span>()
+const port: number = 3000
+const app: Express = express()
 
-app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
-    res.<span class="hljs-title function_">json</span>({<span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Hello World&#x27;</span>})
+app.get('/', (req, res) =&gt; {
+    res.json({message: 'Hello World'})
 })
 
-app.<span class="hljs-title function_">listen</span>(port, <span class="hljs-function">() =&gt;</span> {
-    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Express is listening on port <span class="hljs-subst">${port}</span>`</span>)
+app.listen(port, () =&gt; {
+    console.log(`Express is listening on port ${port}`)
 }
 </code></pre>
-<p>At this point if we run the app having only installed the express module (<code><span class="hljs-built_in">npm</span> i express</code> ):</p>
-<pre><code class="hljs language-bash">npx ts-node index.ts
+<p>At this point if we run the app having only installed the express module (<code>npm i express</code> ):</p>
+<pre><code class="language-bash">npx ts-node index.ts
 </code></pre>
 <p>We will get the following error:</p>
 <p><img src="node-ts-2.png" alt="Screenshot of npx ts-node index.ts output with error"></p>
-<p>This is because the default <em>tsconfig.json</em> has strict type checking enabled, removing <code>“<span class="hljs-keyword">strict</span>”: <span class="hljs-keyword">true</span></code> would indeed fix this error, but since you are going through the effort of setting up TypeScript, you probably really want type safety. So the other option is to install the types for any packages you may need, in this example, for express:</p>
-<pre><code class="hljs language-bash">npm i @types/express
+<p>This is because the default <em>tsconfig.json</em> has strict type checking enabled, removing <code>“strict”: true</code> would indeed fix this error, but since you are going through the effort of setting up TypeScript, you probably really want type safety. So the other option is to install the types for any packages you may need, in this example, for express:</p>
+<pre><code class="language-bash">npm i @types/express
 </code></pre>
-<p>Now when we run <code>npx ts-<span class="hljs-keyword">node</span> <span class="hljs-title">index</span>.ts</code> we should get a running express server:</p>
+<p>Now when we run <code>npx ts-node index.ts</code> we should get a running express server:</p>
 <p><img src="node-ts-3.png" alt="Screenshot of npm ts-node index.ts output"></p>
 <p>We don’t however want to be running our app via ts-node in production, so let’s set up a start script that will build our JavaScript and run our app in the regular Node.js environment.</p>
-<p>Currently if we had to run <code><span class="hljs-attribute">tsc</span></code> it would output our <em>index.js</em> right next to our source code. Some people prefer it this way and that’s completely fine, but my personal preference is to have output go to a build directory, we can do this by setting the outDir property in our <em>tsconfig.json</em>:</p>
-<pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+<p>Currently if we had to run <code>tsc</code> it would output our <em>index.js</em> right next to our source code. Some people prefer it this way and that’s completely fine, but my personal preference is to have output go to a build directory, we can do this by setting the outDir property in our <em>tsconfig.json</em>:</p>
+<pre><code class="language-json">{
 ...
-    <span class="hljs-attr">&quot;outDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./build&quot;</span><span class="hljs-punctuation">,</span>
+    &quot;outDir&quot;: &quot;./build&quot;,
 ...
-<span class="hljs-punctuation">}</span>
+}
 </code></pre>
-<p>We can now set up our <code><span class="hljs-attribute">build</span></code> and <code><span class="hljs-literal">start</span></code> scripts in our <em>package.json:</em></p>
-<pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+<p>We can now set up our <code>build</code> and <code>start</code> scripts in our <em>package.json:</em></p>
+<pre><code class="language-json">{
 ...
-    <span class="hljs-attr">&quot;scripts&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-        <span class="hljs-attr">&quot;build&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tsc&quot;</span><span class="hljs-punctuation">,</span>
-        <span class="hljs-attr">&quot;start&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tsc &amp;&amp; node ./build/index.js&quot;</span><span class="hljs-punctuation">,</span>
-        <span class="hljs-attr">&quot;test&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;mocha -r ts-node/register test/**/*.spec.ts&quot;</span>
-    <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    &quot;scripts&quot;: {
+        &quot;build&quot;: &quot;tsc&quot;,
+        &quot;start&quot;: &quot;tsc &amp;&amp; node ./build/index.js&quot;,
+        &quot;test&quot;: &quot;mocha -r ts-node/register test/**/*.spec.ts&quot;
+    },
 ...
-<span class="hljs-punctuation">}</span>
+}
 </code></pre>
 <h1>Unit Testing</h1>
 <p>Now that we have a running TypeScript app, we want to set up some unit testing. Since we already set up mocha with ts-node in the beginning we should be able to simply run it once written, you don’t have to just use mocha though, ts-node also <a href="https://github.com/TypeStrong/ts-node#tape">officially</a> supports <a href="https://github.com/substack/tape">tape</a>, and you can probably get it to run other tests as well.</p>
 <p>Lets start off by installing our dependencies, remembering to also install the typings for mocha and chai:</p>
-<pre><code class="hljs language-bash">npm i -D mocha chai @types/mocha @types/chai
+<pre><code class="language-bash">npm i -D mocha chai @types/mocha @types/chai
 </code></pre>
 <p>Then we create a simple test (I called mine <em>default.spec.ts</em>) inside a folder named <em>test</em>:</p>
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">import</span> {expect} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;chai&#x27;</span>
+<pre><code class="language-javascript">import {expect} from 'chai'
 
-<span class="hljs-title function_">describe</span>(<span class="hljs-string">&#x27;When we run tests&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
-    <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;Should actually work&#x27;</span> , <span class="hljs-function">() =&gt;</span> {
-        <span class="hljs-title function_">expect</span>(<span class="hljs-literal">true</span>).<span class="hljs-property">to</span>.<span class="hljs-property">be</span>.<span class="hljs-title function_">eq</span>(<span class="hljs-literal">true</span>)
+describe('When we run tests', () =&gt; {
+    it('Should actually work' , () =&gt; {
+        expect(true).to.be.eq(true)
     })
 }
 </code></pre>
-<p>This certainly isn’t a useful test but this isn’t a unit testing tutorial, we just want to see that test’s run in our setup. Let’s run <code>npm <span class="hljs-built_in">test</span></code>:</p>
+<p>This certainly isn’t a useful test but this isn’t a unit testing tutorial, we just want to see that test’s run in our setup. Let’s run <code>npm test</code>:</p>
 <p><img src="node-ts-4.png" alt="Screenshot of npm test output"></p>
 <p>Neat! our test’s work.</p>
 <h1>Nodemon</h1>
 <p><a href="https://nodemon.io/">Nodemon</a> is a neat tool that will run and reload your application when the source code changes. Honestly once you work with a tool like this you want it everywhere because it comes in really handy during development.</p>
 <p>First, lets install nodemon</p>
-<pre><code class="hljs language-sh">npm i -D nodemon
+<pre><code class="language-sh">npm i -D nodemon
 </code></pre>
 <p>Next we configure nodemon to work with our TypeScript files. Nodemon can be configured either as a property inside your <em>package.json</em> or in it’s own <em>nodemon.json</em> file, which is the method I chose to use here:</p>
-<pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
-    <span class="hljs-attr">&quot;ext&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ts&quot;</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-attr">&quot;exec&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;npm start&quot;</span>
-<span class="hljs-punctuation">}</span>
+<pre><code class="language-json">{
+    &quot;ext&quot;: &quot;ts&quot;,
+    &quot;exec&quot;: &quot;npm start&quot;
+}
 </code></pre>
 <blockquote></blockquote>
 <p><strong>Pro Tip:</strong> The nodemon config supports an env property so you can set environment variables, I use this to set environment variables for dev that will be different in production, ie:
 <code>“env”: { “DEBUG”: “app,app:*” }</code></p>
-<p>Now if we simply run <code><span class="hljs-attribute">npx nodemon</span></code> our app will restart when we make code changes, go add a line to your index.ts and watch the magic!</p>
+<p>Now if we simply run <code>npx nodemon</code> our app will restart when we make code changes, go add a line to your index.ts and watch the magic!</p>
 <p>And that’s a wrap! You should now have a nicely set up TypeScript Node.js application. Enjoy the type safety!</p>
 </div>
 </div>

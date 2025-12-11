@@ -63,51 +63,51 @@
 <p>NOTE: This tutorial is intended for developers who are familiar with the mentioned platforms and skips the reglar explanations of syntax etc as it is intended to teach a concept rather than teaching code. For a lot of the concepts in this tutorial , the code IS the explanation.</p>
 <p>First start off by creating a folder to work in , I named mine WebSocket_Test.</p>
 <h2>The Server</h2>
-<p>The server uses node.js, if you don't already have it , you can pick it up <a href="http://nodejs.org/">here</a>. Once you are done there you can pick up my little library called <a href="https://npmjs.org/package/narf">NARF</a> you can download narf from <a href="https://github.com/divanvisagie/NARF">GitHub</a> here or install it via npm <code>npm <span class="hljs-keyword">install</span> -g narf</code>, this is less for the websockets and more for the quick implementation of HTTP GET functionality as you will see later. Once you have a copy of NARF copy its contents into your project folder.</p>
+<p>The server uses node.js, if you don't already have it , you can pick it up <a href="http://nodejs.org/">here</a>. Once you are done there you can pick up my little library called <a href="https://npmjs.org/package/narf">NARF</a> you can download narf from <a href="https://github.com/divanvisagie/NARF">GitHub</a> here or install it via npm <code>npm install -g narf</code>, this is less for the websockets and more for the quick implementation of HTTP GET functionality as you will see later. Once you have a copy of NARF copy its contents into your project folder.</p>
 <p>Now create a file called server.js(you can name it anything you want actually but I will stick to this name so that we dont get lost).</p>
 <p>The first thing we do in server.js is 'import' narf , after that we create an array that will store all of the client connections to the server. Next we create a GET function that will update a message to all of the clients.</p>
 <p>When we start the http server , we store its variable for use with the socket server.</p>
-<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> narf = <span class="hljs-built_in">require</span>( <span class="hljs-string">&#x27;./narf&#x27;</span> );
+<pre><code class="language-js">var narf = require( './narf' );
 
-<span class="hljs-keyword">var</span> connectedClients = []; <span class="hljs-comment">//keep track of which clients are connected</span>
+var connectedClients = []; //keep track of which clients are connected
 
-<span class="hljs-keyword">var</span> <span class="hljs-title class_">APIFunctions</span> = { <span class="hljs-comment">//forward facing functions</span>
-    <span class="hljs-attr">GET</span>: {  <span class="hljs-comment">//headers object and parsed url are passed as a parameter for get functions</span>
-        <span class="hljs-attr">sendToClients</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">header, url</span>){
-            connectedClients.<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">connection</span>){
-                connection.<span class="hljs-title function_">send</span>( <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( { message : url.<span class="hljs-property">message</span> } ) );
+var APIFunctions = { //forward facing functions
+    GET: {  //headers object and parsed url are passed as a parameter for get functions
+        sendToClients: function (header, url){
+            connectedClients.forEach(function(connection){
+                connection.send( JSON.stringify( { message : url.message } ) );
             });
         }
     },
-    <span class="hljs-attr">POST</span>: {}
+    POST: {}
 };
 
-narf.<span class="hljs-title function_">startHTTPServer</span>(<span class="hljs-title class_">APIFunctions</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"> httpServer </span>) {
+narf.startHTTPServer(APIFunctions, function( httpServer ) {
 
-    narf.<span class="hljs-title function_">startSocketServer</span>(httpServer, <span class="hljs-keyword">function</span>(<span class="hljs-params"> request </span>) {
+    narf.startSocketServer(httpServer, function( request ) {
 
-        <span class="hljs-keyword">var</span> connection = request.<span class="hljs-title function_">accept</span>( <span class="hljs-literal">null</span>, request.<span class="hljs-property">origin</span> ); <span class="hljs-comment">//accept the connection request</span>
+        var connection = request.accept( null, request.origin ); //accept the connection request
 
-        connectedClients.<span class="hljs-title function_">push</span>(connection);
-        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>( connectedClients.<span class="hljs-property">length</span> + <span class="hljs-string">&#x27; connections open&#x27;</span> );
+        connectedClients.push(connection);
+        console.log( connectedClients.length + ' connections open' );
 
-        connection.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;message&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">message</span>) { <span class="hljs-comment">//the user has sent a message</span>
+        connection.on('message', function(message) { //the user has sent a message
 
-        <span class="hljs-keyword">if</span> ( message.<span class="hljs-property">type</span> === <span class="hljs-string">&#x27;utf8&#x27;</span> ){
-            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>( message ); <span class="hljs-comment">//process</span>
-            <span class="hljs-keyword">if</span>( <span class="hljs-keyword">typeof</span> message === <span class="hljs-string">&#x27;string&#x27;</span> ) message = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(message);
-            connection.<span class="hljs-title function_">send</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>({ message : <span class="hljs-string">&#x27;hello client&#x27;</span> }));
+        if ( message.type === 'utf8' ){
+            console.log( message ); //process
+            if( typeof message === 'string' ) message = JSON.parse(message);
+            connection.send(JSON.stringify({ message : 'hello client' }));
         }
 
         } );
 
-        connection.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;close&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) { <span class="hljs-comment">//The user has closed the connection</span>
+        connection.on('close', function() { //The user has closed the connection
             
-            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i <span class="hljs-keyword">in</span> connectedClients) {
-                <span class="hljs-comment">/* remove the client connection from the array and free some memory*/</span>
-                <span class="hljs-keyword">if</span>( connectedClients[i] == connection ){
-                    connectedClients.<span class="hljs-title function_">splice</span>(i,<span class="hljs-number">1</span>);
-                    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;removing from disconnected client list&#x27;</span>);
+            for (var i in connectedClients) {
+                /* remove the client connection from the array and free some memory*/
+                if( connectedClients[i] == connection ){
+                    connectedClients.splice(i,1);
+                    console.log('removing from disconnected client list');
                 }
             }
 
@@ -117,151 +117,151 @@ narf.<span class="hljs-title function_">startHTTPServer</span>(<span class="hljs
 });
 </code></pre>
 <p>To run the server simply run:</p>
-<p><code><span class="hljs-keyword">node</span> <span class="hljs-title">server</span>.js</code></p>
+<p><code>node server.js</code></p>
 <p>You may have to install portastic and websocket as well before the server will work:</p>
-<pre><code class="hljs language-sh">npm install portastic
+<pre><code class="language-sh">npm install portastic
 npm install websocket
 </code></pre>
 <p>NARF runs the server on port 8080 , but this can be changed , for more details view NARF's readme</p>
 <h1>HTML Client</h1>
 <p>The HTML client is very simple, here I have hardwired it to localhost which you may have to change if you are running the server somewhere else or on a different port.</p>
-<pre><code class="hljs language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;utf-8&quot;</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Web Sockets<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;content&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript">
-            <span class="hljs-variable language_">window</span>.<span class="hljs-property">WebSocket</span> = <span class="hljs-variable language_">window</span>.<span class="hljs-property">WebSocket</span> || <span class="hljs-variable language_">window</span>.<span class="hljs-property">MozWebSocket</span>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;meta charset=&quot;utf-8&quot;&gt;
+        &lt;title&gt;Web Sockets&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id=&quot;content&quot;&gt;&lt;/div&gt;
+        &lt;script&gt;
+            window.WebSocket = window.WebSocket || window.MozWebSocket
 
-            <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> <span class="hljs-title class_">WebSocket</span>(<span class="hljs-string">&#x27;ws://localhost:8080&#x27;</span>);
+            var connection = new WebSocket('ws://localhost:8080');
 
-            connection.<span class="hljs-property">onopen</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
-                <span class="hljs-comment">//connection opened</span>
-                <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;connection open&#x27;</span>);
-                connection.<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;Hello Server&#x27;</span>);
+            connection.onopen = function() {
+                //connection opened
+                console.log('connection open');
+                connection.send('Hello Server');
             };
 
-            connection.<span class="hljs-property">onerror</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>){
-                <span class="hljs-comment">//connection error</span>
+            connection.onerror = function(){
+                //connection error
             };
 
-            connection.<span class="hljs-property">onmessage</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"> message </span>){
-                <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Recieved message from server: &#x27;</span>);
-                <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(message);
+            connection.onmessage = function( message ){
+                console.log('Recieved message from server: ');
+                console.log(message);
 
-                <span class="hljs-keyword">var</span> dataObject = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(message.<span class="hljs-property">data</span> );
-                <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;content&#x27;</span>).<span class="hljs-property">innerHTML</span> = dataObject.<span class="hljs-property">message</span>;
+                var dataObject = JSON.parse(message.data );
+                document.getElementById('content').innerHTML = dataObject.message;
             }
 
-        </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
 </code></pre>
 <p>You cannot change the text on the html client but running the following in a new tab will call the GET function we set up on the server and update the message on all clients:</p>
-<p>http://localhost:8080/?serverfunction=sendToClients&amp;message=Hello%20World</p>
+<p><a href="http://localhost:8080/?serverfunction=sendToClients&amp;message=Hello%20World">http://localhost:8080/?serverfunction=sendToClients&amp;message=Hello World</a></p>
 <h2>iOS Client</h2>
 <p>For the iOS client download and set up the SocketRocket Library  in a new Xcode project, don't forget to refer to the README and see if you have all of the required framework dependancies.</p>
 <p>For this demo is set up a universal iOS app with 2 text fields and a button. One text field was for the server IP and port and the other for the message text itself. The button is merely to reset the connection once the user has changed the IP.</p>
 <p>I set this all up in the default viewController , here is the code:</p>
 <h3>ViewController.h</h3>
-<pre><code class="hljs language-objectivec"><span class="hljs-comment">//</span>
-<span class="hljs-comment">//  ViewController.h</span>
-<span class="hljs-comment">//  SocketTest</span>
-<span class="hljs-comment">//</span>
-<span class="hljs-comment">//  Created by Divan Visagie on 2012/12/02.</span>
-<span class="hljs-comment">//  Copyright (c) 2012 Divan Visagie. All rights reserved.</span>
-<span class="hljs-comment">//</span>
-<span class="hljs-meta">#import <span class="hljs-string">&lt;UIKit/UIKit.h&gt;</span></span>
-<span class="hljs-meta">#import <span class="hljs-string">&quot;SRWebSocket.h&quot;</span></span>
-<span class="hljs-class"><span class="hljs-keyword">@interface</span> <span class="hljs-title">ViewController</span> : <span class="hljs-title">UIViewController</span> &lt;<span class="hljs-title">UITextFieldDelegate</span>,<span class="hljs-title">SRWebSocketDelegate</span>&gt;</span>
-<span class="hljs-keyword">@property</span> (<span class="hljs-keyword">weak</span>, <span class="hljs-keyword">nonatomic</span>) <span class="hljs-keyword">IBOutlet</span> <span class="hljs-built_in">UITextField</span> *urlField;
-<span class="hljs-keyword">@property</span> (<span class="hljs-keyword">strong</span>, <span class="hljs-keyword">nonatomic</span>) <span class="hljs-keyword">IBOutlet</span> <span class="hljs-built_in">UITextField</span> *textField;
-- (<span class="hljs-keyword">IBAction</span>)setDown:(<span class="hljs-type">id</span>)sender;
-- (<span class="hljs-keyword">IBAction</span>)textChanged:(<span class="hljs-type">id</span>)sender;
-<span class="hljs-keyword">@end</span>
+<pre><code class="language-objectivec">//
+//  ViewController.h
+//  SocketTest
+//
+//  Created by Divan Visagie on 2012/12/02.
+//  Copyright (c) 2012 Divan Visagie. All rights reserved.
+//
+#import &lt;UIKit/UIKit.h&gt;
+#import &quot;SRWebSocket.h&quot;
+@interface ViewController : UIViewController &lt;UITextFieldDelegate,SRWebSocketDelegate&gt;
+@property (weak, nonatomic) IBOutlet UITextField *urlField;
+@property (strong, nonatomic) IBOutlet UITextField *textField;
+- (IBAction)setDown:(id)sender;
+- (IBAction)textChanged:(id)sender;
+@end
 </code></pre>
 <h3>ViewController.m</h3>
-<pre><code class="hljs language-objectivec"><span class="hljs-comment">//</span>
-<span class="hljs-comment">//  ViewController.m</span>
-<span class="hljs-comment">//  SocketTest</span>
-<span class="hljs-comment">//</span>
-<span class="hljs-comment">//  Created by Divan Visagie on 2012/12/02.</span>
-<span class="hljs-comment">//  Copyright (c) 2012 Divan Visagie. All rights reserved.</span>
-<span class="hljs-comment">//</span>
-<span class="hljs-meta">#import <span class="hljs-string">&quot;ViewController.h&quot;</span></span>
-<span class="hljs-class"><span class="hljs-keyword">@interface</span> <span class="hljs-title">ViewController</span> ()</span>{
+<pre><code class="language-objectivec">//
+//  ViewController.m
+//  SocketTest
+//
+//  Created by Divan Visagie on 2012/12/02.
+//  Copyright (c) 2012 Divan Visagie. All rights reserved.
+//
+#import &quot;ViewController.h&quot;
+@interface ViewController (){
     SRWebSocket *socket;
-    <span class="hljs-built_in">NSString</span> *lastMessage;
+    NSString *lastMessage;
 }
-<span class="hljs-keyword">@end</span>
-<span class="hljs-class"><span class="hljs-keyword">@implementation</span> <span class="hljs-title">ViewController</span></span>
-- (<span class="hljs-type">void</span>)viewDidLoad
+@end
+@implementation ViewController
+- (void)viewDidLoad
 {
-    [<span class="hljs-variable language_">super</span> viewDidLoad];
-    <span class="hljs-comment">// Do any additional setup after loading the view, typically from a nib.</span>
+    [super viewDidLoad];
+    // Do any additional setup after loading the view, typically from a nib.
     
-    <span class="hljs-comment">//create a web socket connection</span>
-    socket = [[SRWebSocket alloc] initWithURLRequest:[<span class="hljs-built_in">NSURLRequest</span> requestWithURL:[<span class="hljs-built_in">NSURL</span> URLWithString:[<span class="hljs-built_in">NSString</span> stringWithFormat:<span class="hljs-string">@&quot;http://%@&quot;</span>,_urlField.text]]]];
+    //create a web socket connection
+    socket = [[SRWebSocket alloc] initWithURLRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@&quot;http://%@&quot;,_urlField.text]]]];
     
    
     [socket open];
 }
-- (<span class="hljs-type">void</span>)didReceiveMemoryWarning
+- (void)didReceiveMemoryWarning
 {
-    [<span class="hljs-variable language_">super</span> didReceiveMemoryWarning];
-    <span class="hljs-comment">// Dispose of any resources that can be recreated.</span>
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
 }
-- (<span class="hljs-keyword">IBAction</span>)setDown:(<span class="hljs-type">id</span>)sender {
+- (IBAction)setDown:(id)sender {
     
     [socket close];
     
-    socket = <span class="hljs-literal">nil</span>;
-    socket = [[SRWebSocket alloc] initWithURLRequest:[<span class="hljs-built_in">NSURLRequest</span> requestWithURL:[<span class="hljs-built_in">NSURL</span> URLWithString:[<span class="hljs-built_in">NSString</span> stringWithFormat:<span class="hljs-string">@&quot;http://%@&quot;</span>,_urlField.text]]]];
-     socket.delegate = <span class="hljs-keyword">self</span>;
+    socket = nil;
+    socket = [[SRWebSocket alloc] initWithURLRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@&quot;http://%@&quot;,_urlField.text]]]];
+     socket.delegate = self;
     
     [socket open];
 }
-- (<span class="hljs-keyword">IBAction</span>)textChanged:(<span class="hljs-type">id</span>)sender {
+- (IBAction)textChanged:(id)sender {
       
-    <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@&quot;%@&quot;</span>,((<span class="hljs-built_in">UITextView</span>*)sender).text);
+    NSLog(@&quot;%@&quot;,((UITextView*)sender).text);
     
-    <span class="hljs-built_in">NSString</span> *stringtoUse = ((<span class="hljs-built_in">UITextView</span>*)sender).text;
+    NSString *stringtoUse = ((UITextView*)sender).text;
      
-    <span class="hljs-keyword">if</span>(![lastMessage isEqualToString:stringtoUse]){
+    if(![lastMessage isEqualToString:stringtoUse]){
         
-        stringtoUse = [stringtoUse stringByReplacingOccurrencesOfString:<span class="hljs-string">@&quot; &quot;</span> withString:<span class="hljs-string">@&quot;%20&quot;</span>];
+        stringtoUse = [stringtoUse stringByReplacingOccurrencesOfString:@&quot; &quot; withString:@&quot;%20&quot;];
         
-        <span class="hljs-built_in">NSURLRequest</span> *request = [<span class="hljs-built_in">NSURLRequest</span> requestWithURL: 
-                                 [<span class="hljs-built_in">NSURL</span> URLWithString:
-                                  [<span class="hljs-built_in">NSString</span> stringWithFormat:
-                                   <span class="hljs-string">@&quot;http://%@/?serverfunction=sendToClients&amp;message=%@&quot;</span>,_urlField.text,stringtoUse]]];
+        NSURLRequest *request = [NSURLRequest requestWithURL: 
+                                 [NSURL URLWithString:
+                                  [NSString stringWithFormat:
+                                   @&quot;http://%@/?serverfunction=sendToClients&amp;message=%@&quot;,_urlField.text,stringtoUse]]];
         
-        [<span class="hljs-built_in">NSURLConnection</span> connectionWithRequest:request delegate:<span class="hljs-literal">nil</span>];
+        [NSURLConnection connectionWithRequest:request delegate:nil];
     }
 }
--(<span class="hljs-type">void</span>)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(<span class="hljs-type">id</span>)message{
+-(void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)message{
     
-    <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@&quot;%@&quot;</span>,message);
+    NSLog(@&quot;%@&quot;,message);
     
-    <span class="hljs-built_in">NSString</span> *msgString = message;
-    <span class="hljs-built_in">NSData</span> *data = [msgString dataUsingEncoding:<span class="hljs-built_in">NSUTF8StringEncoding</span>];
-    <span class="hljs-built_in">NSDictionary</span> *toUse = [<span class="hljs-built_in">NSJSONSerialization</span> JSONObjectWithData:data options:<span class="hljs-built_in">NSJSONReadingMutableLeaves</span> error:<span class="hljs-literal">nil</span>];
+    NSString *msgString = message;
+    NSData *data = [msgString dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *toUse = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:nil];
     
-    <span class="hljs-keyword">if</span> (![toUse[<span class="hljs-string">@&quot;message&quot;</span>] isEqualToString:lastMessage] &amp;&amp; ![toUse[<span class="hljs-string">@&quot;message&quot;</span>] isEqualToString:_textField.text]) {        
-        _textField.text = toUse[<span class="hljs-string">@&quot;message&quot;</span>];
-        lastMessage = toUse[<span class="hljs-string">@&quot;message&quot;</span>];
+    if (![toUse[@&quot;message&quot;] isEqualToString:lastMessage] &amp;&amp; ![toUse[@&quot;message&quot;] isEqualToString:_textField.text]) {        
+        _textField.text = toUse[@&quot;message&quot;];
+        lastMessage = toUse[@&quot;message&quot;];
     }
     
 }
--(<span class="hljs-type">void</span>)webSocket:(SRWebSocket *)webSocket didFailWithError:(<span class="hljs-built_in">NSError</span> *)error{
+-(void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error{
     
 }
--(<span class="hljs-type">void</span>)webSocket:(SRWebSocket *)webSocket didCloseWithCode:(<span class="hljs-built_in">NSInteger</span>)code reason:(<span class="hljs-built_in">NSString</span> *)reason wasClean:(<span class="hljs-type">BOOL</span>)wasClean{
+-(void)webSocket:(SRWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean{
 }
-<span class="hljs-keyword">@end</span>
+@end
 </code></pre>
 <p>Now if you are running your node server and have all of your ip adresses set up correctly , when you run the app it will connect to the server and any text changed in the text field will automatically update on other devices.</p>
 <p>If you do not have multiple devices to test on , I suggest copy/pasting the html client code and at least reading section 2 then running it , even if you dont know whats going on, just so that you can see that everything is working.</p>

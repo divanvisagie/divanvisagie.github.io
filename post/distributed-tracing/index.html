@@ -62,43 +62,43 @@
 <p><img src="mono-uml.svg" alt="Monolithic UML Diagram"></p>
 <p>These internals are very simple, but critically, each layer is still running in the same process, this makes debugging easy because we only have a single place where we need to check the logs.</p>
 <p>Lets imagine we run into the scenario where users are reporting that registrations are failing, we can simply look at the logs of our application:</p>
-<pre><code class="hljs language-java">08091 INFO  c.d.tracing.RegistrationController   : Calling method on user service
+<pre><code class="language-java">08091 INFO  c.d.tracing.RegistrationController   : Calling method on user service
 08091 INFO  com.divanvisagie.tracing.UserService : Calling method on mail service
 09129 INFO  c.d.tracing.RegistrationController   : Calling method on user service
 09129 INFO  com.divanvisagie.tracing.UserService : Calling method on mail service
-09129 ERROR com.divanvisagie.tracing.UserService : An error ocurred <span class="hljs-keyword">while</span> sending the mail.
+09129 ERROR com.divanvisagie.tracing.UserService : An error ocurred while sending the mail.
 </code></pre>
-<p>Looking at the above logs gives us a lot of information about our bug and where it lives, <code>08091</code> and <code>09129</code> uniquely identify seperate requests, we are able to see that <code>08091</code> completed successfully while <code>09129</code> logged an error, our log even tells us which class this error ocurred in: <code>com<span class="hljs-selector-class">.divanvisagie</span><span class="hljs-selector-class">.tracing</span>.UserService</code> and that it occurs just after the mail service gets called.</p>
+<p>Looking at the above logs gives us a lot of information about our bug and where it lives, <code>08091</code> and <code>09129</code> uniquely identify seperate requests, we are able to see that <code>08091</code> completed successfully while <code>09129</code> logged an error, our log even tells us which class this error ocurred in: <code>com.divanvisagie.tracing.UserService</code> and that it occurs just after the mail service gets called.</p>
 <p>If we go and open up that class in our application we can have a look:</p>
-<pre><code class="hljs language-java">
-<span class="hljs-meta">@Service</span>
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserService</span> {
+<pre><code class="language-java">
+@Service
+public class UserService {
 
-    <span class="hljs-meta">@Autowired</span>
-    <span class="hljs-keyword">private</span> MailService mailService;
+    @Autowired
+    private MailService mailService;
 
-    <span class="hljs-keyword">private</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(UserService.class);
+    private Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">registerUser</span><span class="hljs-params">()</span> {
-        <span class="hljs-keyword">try</span>{
-            logger.info(<span class="hljs-string">&quot;Calling method on mail service&quot;</span>);
+    public void registerUser() {
+        try{
+            logger.info(&quot;Calling method on mail service&quot;);
             mailService.sendMail();
-        } <span class="hljs-keyword">catch</span> (Exception e) {
-            logger.error(<span class="hljs-string">&quot;An error ocurred while sending the mail.&quot;</span>, e.getMessage());
+        } catch (Exception e) {
+            logger.error(&quot;An error ocurred while sending the mail.&quot;, e.getMessage());
         }
     }
 }
 </code></pre>
 <p>Let's go look at that sendMail function and see what it's doing:</p>
-<pre><code class="hljs language-java">
-<span class="hljs-meta">@Service</span>
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MailService</span> {
-    <span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">shouldBreak</span> <span class="hljs-operator">=</span> <span class="hljs-literal">true</span>;
+<pre><code class="language-java">
+@Service
+public class MailService {
+    private boolean shouldBreak = true;
 
-    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">sendMail</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Exception {
+    public void sendMail() throws Exception {
         shouldBreak = !shouldBreak;
-        <span class="hljs-keyword">if</span> (shouldBreak) {
-            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Exception</span>(<span class="hljs-string">&quot;An evil programmer broke every second request&quot;</span>);
+        if (shouldBreak) {
+            throw new Exception(&quot;An evil programmer broke every second request&quot;);
         }
     }
 }
@@ -125,24 +125,24 @@
 <p>Alright, now let's take a look at one of the red traces and see if we can get to the bottom of our bug:</p>
 <p><img src="error-trace.png" alt="Error trace"></p>
 <p>If we go through our spans we see that they are all the same as the previous blue trace, however if we select the mail service we see an additional tag called <em>error</em> which gives us the message from the exception thrown within the <em>mail-service</em>, now we know exactly where to look for the error</p>
-<pre><code class="hljs language-java"><span class="hljs-meta">@RestController</span>
-<span class="hljs-meta">@RequestMapping(&quot;mail&quot;)</span>
-<span class="hljs-meta">@Tag(name=&quot;Mail&quot;)</span>
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MailController</span> {
+<pre><code class="language-java">@RestController
+@RequestMapping(&quot;mail&quot;)
+@Tag(name=&quot;Mail&quot;)
+public class MailController {
 
-    <span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">shouldBreak</span> <span class="hljs-operator">=</span> <span class="hljs-literal">true</span>;
+    private boolean shouldBreak = true;
 
-    <span class="hljs-meta">@PostMapping(&quot;&quot;)</span>
-    <span class="hljs-meta">@Operation(summary = &quot;Send a mail&quot;)</span>
-    <span class="hljs-keyword">public</span> ResponseEntity&lt;MailResponse&gt; <span class="hljs-title function_">sendmail</span><span class="hljs-params">(<span class="hljs-meta">@RequestBody</span> MailRequest mailRequest)</span> <span class="hljs-keyword">throws</span> Exception {
+    @PostMapping(&quot;&quot;)
+    @Operation(summary = &quot;Send a mail&quot;)
+    public ResponseEntity&lt;MailResponse&gt; sendmail(@RequestBody MailRequest mailRequest) throws Exception {
         shouldBreak = !shouldBreak;
-        <span class="hljs-keyword">if</span> (shouldBreak) {
-            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Exception</span>(<span class="hljs-string">&quot;Something went wrong&quot;</span>);
+        if (shouldBreak) {
+            throw new Exception(&quot;Something went wrong&quot;);
         }
 
-        <span class="hljs-type">MailResponse</span> <span class="hljs-variable">mailResponse</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MailResponse</span>()
-                .setMessage(<span class="hljs-string">&quot;The mail has been sent&quot;</span>);
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ResponseEntity</span>&lt;MailResponse&gt;(mailResponse, HttpStatus.OK);
+        MailResponse mailResponse = new MailResponse()
+                .setMessage(&quot;The mail has been sent&quot;);
+        return new ResponseEntity&lt;MailResponse&gt;(mailResponse, HttpStatus.OK);
     }
 }
 </code></pre>

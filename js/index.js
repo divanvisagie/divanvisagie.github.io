@@ -1,4 +1,5 @@
 
+// deno-lint-ignore-file
 var mediaQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null
 
 function applyTheme(theme) {

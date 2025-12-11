@@ -62,52 +62,52 @@
 <p>I decided that since I would be writing the tests in Python I would whip up a the test service in the same language. A microframework seemed like the perfect tool for that so it was <a href="http://flask.pocoo.org/">Flask</a> to the rescue.</p>
 <p>Locust simulates users hitting the site, so I decided on a simple flow of login and browse to index.</p>
 <p>Below is my super secure server implementation using flask, a lightweight solution indeed! Though I wouldn’t want to roll anything like this into production any time soon.</p>
-<pre><code class="hljs language-py"><span class="hljs-keyword">from</span> flask <span class="hljs-keyword">import</span> Flask, request, abort
+<pre><code class="language-py">from flask import Flask, request, abort
 app = Flask(__name__)
-token = <span class="hljs-string">&#x27;a-very-real-token&#x27;</span>
+token = 'a-very-real-token'
 
-<span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/login&#x27;</span>, methods = [<span class="hljs-string">&#x27;POST&#x27;</span>]</span>)</span>
-<span class="hljs-keyword">def</span> <span class="hljs-title function_">login</span>():
-    <span class="hljs-keyword">return</span> token
+@app.route('/login', methods = ['POST'])
+def login():
+    return token
 
-<span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/&#x27;</span></span>)</span>
-<span class="hljs-keyword">def</span> <span class="hljs-title function_">hello</span>():
-    token = request.headers.get(<span class="hljs-string">&#x27;Authorization&#x27;</span>)
-    <span class="hljs-keyword">if</span> token != token:
-        abort(<span class="hljs-number">401</span>)
-    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&#x27;Found token <span class="hljs-subst">{token}</span>&#x27;</span>)
-    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;Hello Locust!&#x27;</span>
+@app.route('/')
+def hello():
+    token = request.headers.get('Authorization')
+    if token != token:
+        abort(401)
+    print(f'Found token {token}')
+    return 'Hello Locust!'
 </code></pre>
-<p>I ran a single instance to test against simply using the dev server: <code><span class="hljs-attr">FLASK_APP</span>=server.py flask run</code></p>
+<p>I ran a single instance to test against simply using the dev server: <code>FLASK_APP=server.py flask run</code></p>
 <h2>The Test</h2>
 <p>The next thing to do was to create a <a href="https://docs.locust.io/en/latest/writing-a-locustfile.html">locustfile</a> to define the user behaviour that we would be testing. The <a href="https://docs.locust.io/en/latest/quickstart.html">quick start guide</a> was a good place to start, but I make some modifications to store my super secure token.</p>
-<pre><code class="hljs language-py"><span class="hljs-keyword">from</span> locust <span class="hljs-keyword">import</span> HttpLocust, TaskSet, task
+<pre><code class="language-py">from locust import HttpLocust, TaskSet, task
 
-<span class="hljs-keyword">def</span> <span class="hljs-title function_">login</span>(<span class="hljs-params">l</span>):
-    response = l.client.post(<span class="hljs-string">&#x27;/login&#x27;</span>)
+def login(l):
+    response = l.client.post('/login')
     token = response.content
-    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&#x27;Got token from login: <span class="hljs-subst">{token}</span>&#x27;</span>)
-    <span class="hljs-keyword">return</span> token
+    print(f'Got token from login: {token}')
+    return token
 
-<span class="hljs-keyword">class</span> <span class="hljs-title class_">MyTaskSet</span>(<span class="hljs-title class_ inherited__">TaskSet</span>):
-    <span class="hljs-keyword">def</span> <span class="hljs-title function_">on_start</span>(<span class="hljs-params">self</span>):
+class MyTaskSet(TaskSet):
+    def on_start(self):
         self.token = login(self)
 
-<span class="hljs-meta">    @task</span>
-    <span class="hljs-keyword">def</span> <span class="hljs-title function_">my_task</span>(<span class="hljs-params">self</span>):
-        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&#x27;executing with token: <span class="hljs-subst">{self.token}</span>&#x27;</span>)
+    @task
+    def my_task(self):
+        print(f'executing with token: {self.token}')
         headers = {
-            <span class="hljs-string">&#x27;Authorization&#x27;</span>: self.token
+            'Authorization': self.token
         }
-        self.client.get(<span class="hljs-string">&#x27;/&#x27;</span>, headers = headers)
+        self.client.get('/', headers = headers)
 
-<span class="hljs-keyword">class</span> <span class="hljs-title class_">MyLocust</span>(<span class="hljs-title class_ inherited__">HttpLocust</span>):
+class MyLocust(HttpLocust):
     task_set = MyTaskSet
-    min_wait = <span class="hljs-number">5000</span>
-    max_wait = <span class="hljs-number">1500</span>
+    min_wait = 5000
+    max_wait = 1500
 </code></pre>
-<p>Once I got that right (it took more attempts than I would like to admit), it was a matter of running locust against my endpoint with: <code>locust --host=http:<span class="hljs-regexp">//</span>localhost:<span class="hljs-number">5000</span></code></p>
-<p>After that, browsing to http://localhost:8089 gave me the following interface where I could set up my simulation.</p>
+<p>Once I got that right (it took more attempts than I would like to admit), it was a matter of running locust against my endpoint with: <code>locust --host=http://localhost:5000</code></p>
+<p>After that, browsing to <a href="http://localhost:8089">http://localhost:8089</a> gave me the following interface where I could set up my simulation.</p>
 <p><img src="locust-swarm-setup.png" alt="Screensot of Locust startup page"></p>
 <p>Once you get up and going the interface is quite simple, providing details on average and median request speeds, exceptions, failures, charts, and the option to download the stats you have gathered in CSV form.</p>
 <p><img src="locust-swarm-results.png" alt="Locust Swarm Results"></p>

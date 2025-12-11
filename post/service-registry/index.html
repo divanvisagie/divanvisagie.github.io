@@ -58,13 +58,13 @@
 <img alt="Collection of services behind a gateway" src="system.svg" class="themed">
 <p>In order for our gateway to be able to call the services it needs, it will have to know about:</p>
 <ul>
-<li>The User Service on <code><span class="hljs-number">10.0.0.2</span></code></li>
-<li>The Timeline Service on <code><span class="hljs-number">10.0.0.5</span></code></li>
-<li>The Announcement Service on <code><span class="hljs-number">10.0.0.4</span></code></li>
+<li>The User Service on <code>10.0.0.2</code></li>
+<li>The Timeline Service on <code>10.0.0.5</code></li>
+<li>The Announcement Service on <code>10.0.0.4</code></li>
 </ul>
-<p>Any downstream services will also have to be configured in order to know about their downstream services, e.g. <em>Timeline Service</em> will have to know about the <em>Announcement Service</em> on <code><span class="hljs-number">10.0.0.4</span></code>.</p>
+<p>Any downstream services will also have to be configured in order to know about their downstream services, e.g. <em>Timeline Service</em> will have to know about the <em>Announcement Service</em> on <code>10.0.0.4</code>.</p>
 <h1>How this becomes a problem</h1>
-<p>Now lets imagine a scenario where a new version of the <em>Announcement Service</em> is deployed. As part of a <a href="https://martinfowler.com/bliki/BlueGreenDeployment.html">blue/green deployment strategy</a>, the IT team has decided that the new version of the Announcement Service will be deployed on a new box (<code><span class="hljs-number">10.0.0.6</span></code>). Then all the upstream services will be updated to point to <code><span class="hljs-number">10.0.0.6</span></code> instead of <code><span class="hljs-number">10.0.0.4</span></code>.</p>
+<p>Now lets imagine a scenario where a new version of the <em>Announcement Service</em> is deployed. As part of a <a href="https://martinfowler.com/bliki/BlueGreenDeployment.html">blue/green deployment strategy</a>, the IT team has decided that the new version of the Announcement Service will be deployed on a new box (<code>10.0.0.6</code>). Then all the upstream services will be updated to point to <code>10.0.0.6</code> instead of <code>10.0.0.4</code>.</p>
 <p>If our servers are configured with a file like a <em>Web.config</em> or <em>application.properties</em> then we will need to update the configurations for both our <em>Gateway</em> and <em>Timeline Service</em>. Most times these sorts of configurations also require the service to be restarted in order to take effect, so even in this system with only a few services, the disruption is quite severe, taking out 3 services just because we deployed one new one. This is the problem that the Service Registry tries to solve.</p>
 <h1>The Service Registry</h1>
 <p>You can think of a service registry as a central database of all the services that are currently running. When a new service or instance of a service is spun up, it registers itself with the service registry.</p>
@@ -102,24 +102,24 @@
 </tbody>
 </table>
 <p>When our <em>Gateway</em> or <em>Timeline Service</em> want to make a call to the <em>Announcement Service</em>, instead of using the IP configured directly in their config file, they will ask the service registry which instances are available and map the name to the appropriate IP address.</p>
-<p>This allows our code to make direct references to the API by name, for example we could get a list of announcements by directly pointing our GET request to <code>http:<span class="hljs-regexp">//</span>announcement-service<span class="hljs-regexp">/api/</span>v1/announcement</code>.</p>
-<pre><code class="hljs language-java"><span class="hljs-type">AnnouncementList</span> <span class="hljs-variable">response</span> <span class="hljs-operator">=</span> restTemplate.getForObject(
-  <span class="hljs-string">&quot;http://announcement-service/api/v1/announcement&quot;</span>,
+<p>This allows our code to make direct references to the API by name, for example we could get a list of announcements by directly pointing our GET request to <code>http://announcement-service/api/v1/announcement</code>.</p>
+<pre><code class="language-java">AnnouncementList response = restTemplate.getForObject(
+  &quot;http://announcement-service/api/v1/announcement&quot;,
   AnnouncementList.class);
 List&lt;Announcement&gt; employees = response.getAnnouncements();
 </code></pre>
 <h1>Service Discovery</h1>
-<p>In the above example the <strong>announcement-service</strong> portion of our URL would have been replaced with the IP address of the <em>Announcement Service</em>, in our case <code><span class="hljs-number">10.0.0.4</span></code>.</p>
+<p>In the above example the <strong>announcement-service</strong> portion of our URL would have been replaced with the IP address of the <em>Announcement Service</em>, in our case <code>10.0.0.4</code>.</p>
 <p>So:</p>
-<p><code class="codehilite" style="background: var(--code-background);"><span class="s">- &quot;http://announcement-service/api/v1/announcement&quot;</span></code></p>
+<p><code class="codehilite" style="background: var(--code-background);"><span class="s">- &quot;<a href="http://announcement-service/api/v1/announcement">http://announcement-service/api/v1/announcement</a>&quot;</span></code></p>
 <p>Would have become:</p>
-<p><code class="codehilite" style="background: var(--code-background);"><span class="ne">+ &quot;http://10.0.0.4/api/v1/announcement&quot;</span></code></p>
+<p><code class="codehilite" style="background: var(--code-background);"><span class="ne">+ &quot;<a href="http://10.0.0.4/api/v1/announcement">http://10.0.0.4/api/v1/announcement</a>&quot;</span></code></p>
 <p>The means by which this replacement happens though is by a concept called <strong>Service Discovery</strong>.</p>
 <p>There are 2 patterns for Service Discovery:</p>
 <p><strong><a href="https://microservices.io/patterns/server-side-discovery.html">Server-side Service Discovery</a></strong> operates at a network level, where a router, or load balancer sits on the network between the client service and the rest of the network, the router can then forward calls to the correct IP address based on the information it gets from the Service Registry.</p>
 <p><strong><a href="https://microservices.io/patterns/client-side-discovery.html">Client-side Service Discovery</a></strong> on the other hand, implements this logic for routing and load balancing in the client service itself with all of the code for this logic being packaged as part of the client service.</p>
 <p>Whether client or server side though, Service Discovery is the part of the system that makes the decision on which instances of a service to call and it does this using the information it gets from the Service Registry.</p>
-<p>So far we have only ever had one instance of each of our services, but as I mentioned, service discovery usually also contains a <a href="https://en.wikipedia.org/wiki/Load_balancing_(computing)">load balancer</a>. Lets think back to our deployment scenario. What happens when we spin up our new <em>Announcement Service</em> on <code><span class="hljs-number">10.0.0.6</span></code>?</p>
+<p>So far we have only ever had one instance of each of our services, but as I mentioned, service discovery usually also contains a <a href="https://en.wikipedia.org/wiki/Load_balancing_(computing)">load balancer</a>. Lets think back to our deployment scenario. What happens when we spin up our new <em>Announcement Service</em> on <code>10.0.0.6</code>?</p>
 <table>
 <thead>
 <tr>
@@ -150,10 +150,10 @@ List&lt;Announcement&gt; employees = response.getAnnouncements();
 </tr>
 </tbody>
 </table>
-<p>The new <em>Announcement Service</em> registers itself and we now see multiple IP addresses under the announcement-service name. In this case, the load balancer will make a decision based on how many requests it has already routed and try to keep a balance between sending requests to <code><span class="hljs-number">10.0.0.4</span></code> and <code><span class="hljs-number">10.0.0.6</span></code>.</p>
+<p>The new <em>Announcement Service</em> registers itself and we now see multiple IP addresses under the announcement-service name. In this case, the load balancer will make a decision based on how many requests it has already routed and try to keep a balance between sending requests to <code>10.0.0.4</code> and <code>10.0.0.6</code>.</p>
 <h1>Health checks</h1>
 <p>Service Registries have another tool up their sleeve and this one will be the final one we need to solve our blue/green deployment problem, they constantly check to see if a service is still running, this is usually done by checking a <code>/health</code> endpoint on the service. This means that when a service is shut down, it is removed from the registry.</p>
-<p>In the case of our mythical deployment. This means that once we have started up the new version of the Announcement Service, we can simply shut down the old instance, and the load balancer will go back to only having a single option (<code><span class="hljs-number">10.0.0.6</span></code>) to choose from.</p>
+<p>In the case of our mythical deployment. This means that once we have started up the new version of the Announcement Service, we can simply shut down the old instance, and the load balancer will go back to only having a single option (<code>10.0.0.6</code>) to choose from.</p>
 <p>So, in this case, implementing a Service Registry and Service Discovery in our system has taken our deployment from:</p>
 <ol>
 <li>Spin up new Announcement Service</li>
