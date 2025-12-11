@@ -7,6 +7,3 @@ On this site I share practical notes from over a decade in engineering—coverin
 - **Current interests:** consent & preferences platforms, event-driven systems, performance and cost tuning, and writing to think.
 - **Past lives:** native iOS, cross-platform mobile, frontend frameworks from AngularJS to React, and .NET/Node services.
 
-If you'd like to chat, the best way is email: [me@divanv.com](mailto:me@divanv.com). For a full work history, see the [CV](/cv).
-
-
