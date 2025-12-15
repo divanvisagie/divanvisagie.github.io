@@ -1,3 +1,35 @@
+@font-face {
+  font-family: 'Ubuntu Mono';
+  src: url('/fonts/UbuntuMono-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu Mono';
+  src: url('/fonts/UbuntuMono-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu Mono';
+  src: url('/fonts/UbuntuMono-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu Mono';
+  src: url('/fonts/UbuntuMono-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   --accent-color: #ff6600;
   --toolbar-background: #ffffff;
@@ -49,8 +81,13 @@
 
 html {
   width: 100%;
-  font-family: 'Lexend', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Ubuntu Mono', 'Courier New', Courier, monospace;
   background: var(--background-color);
+}
+
+::selection {
+  background: var(--accent-color);
+  color: #ffffff;
 }
 
 a {
@@ -67,7 +104,8 @@ nav {
   font-kerning: auto;
   background: var(--toolbar-background);
   overflow: hidden;
-  height: 70px;
+  height: 80px;
+  line-height: 1;
 }
 
 nav a:visited {
@@ -107,9 +145,8 @@ nav .links {
 nav h1 {
   font-size: 1.7em;
   margin-top: 17px;
-  margin-bottom: 2px; 
+  margin-bottom: 2px;
   letter-spacing: 0.5px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   border-bottom: 2px solid var(--accent-color);
   padding-bottom: 4px;
 }
@@ -134,7 +171,11 @@ body {
   position: absolute;
   width:100%;
   min-height: 100vh;
-  font-size: medium;
+  font-size: 14pt;
+  font-weight: 500;
+  line-height: 1.7;
+  letter-spacing: -0.3px;
+  word-spacing: 1px;
 }
 
 h1 {
@@ -168,6 +209,30 @@ pre {
   border: 1px solid var(--subtitle-color);
   box-shadow: none;
   padding: 14px;
+  position: relative;
+}
+
+.copy-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--text-color);
+  color: var(--background-color);
+  border: none;
+  padding: 4px 10px;
+  font-size: 12pt;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+pre:hover .copy-button {
+  opacity: 1;
+}
+
+.copy-button:hover {
+  background: var(--accent-color);
+  color: #ffffff;
 }
 
 /* Syntax highlighting overrides (Tomorrow-inspired light, muted dark) */
@@ -288,17 +353,23 @@ footer {
 }
 
 code {
-  font-size: medium;
-  font-family: 'Roboto Mono', 'Andale Mono', monospace;
+  font-size: 12pt;
+  font-weight: 400;
 }
 
 p > code, li > code {
-    background: var(--code-background);
-    color: var(--text-color);
+    background: #000000;
+    color: #ffffff;
     padding-left: 5px;
     padding-right: 5px;
     border-radius: 0;
-    border: 1px solid var(--subtitle-color);
+    border: none;
+}
+
+[data-theme="dark"] p > code,
+[data-theme="dark"] li > code {
+    background: #ffffff;
+    color: #000000;
 }
 
 
