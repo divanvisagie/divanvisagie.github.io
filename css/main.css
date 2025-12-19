@@ -375,8 +375,15 @@ p > code, li > code {
 
 .date {
   color: var(--subtitle-color);
-  opacity: 0.9; 
+  opacity: 0.9;
   font-size: small;
+}
+
+.author {
+  color: var(--subtitle-color);
+  opacity: 0.9;
+  font-size: small;
+  margin-left: 0.5em;
 }
 
 table, td, th {
