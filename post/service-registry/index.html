@@ -14,8 +14,8 @@
     <meta name="twitter:title" content="Service Registry Pattern" />
     <meta name="author" content="Divan Visagie" />
     <link href="/favicon.ico" rel="icon" type="image/x-icon" />
-    <meta property="og:image" content="https://divanv.com/post/service-registry/system.svg" />
-    <meta name="twitter:image" content="https://divanv.com/post/service-registry/system.svg" />
+    <meta property="og:image" content="https://divanv.com/post/service-registry/registry_(1).svg" />
+    <meta name="twitter:image" content="https://divanv.com/post/service-registry/registry_(1).svg" />
     <meta name="twitter:card" content="summary" />
     <meta property="og:url" content="/" />
     <meta property="og:type" content="website" />
@@ -50,7 +50,19 @@
 <span class="date">2020-06-28</span>
 <p>Microservice architectures are popular these days, but while they provide certain benefits they also introduce new problems. One of these problems is that even if you have only a few services, connecting to them via IP address can quickly become painstaking.</p>
 <p>Lets take the following system as an example.</p>
-<img alt="Collection of services behind a gateway" src="system.svg" class="themed">
+<pre><code class="language-mermaid">graph LR
+  Gateway[Gateway]
+  UserService[&quot;User Service\n10.0.0.2&quot;]
+  EmailService[&quot;Email Service\n10.0.0.3&quot;]
+  AnnouncementService[&quot;Announcement Service\n10.0.0.4&quot;]
+  TimelineService[&quot;Timeline Service\n10.0.0.5&quot;]
+
+  Gateway --&gt; UserService
+  UserService --&gt; EmailService
+  Gateway --&gt; AnnouncementService
+  Gateway --&gt; TimelineService
+  TimelineService --&gt; AnnouncementService
+</code></pre>
 <p>In order for our gateway to be able to call the services it needs, it will have to know about:</p>
 <ul>
 <li>The User Service on <code>10.0.0.2</code></li>
@@ -180,6 +192,7 @@ List&lt;Announcement&gt; employees = response.getAnnouncements();
       <span><a href="/weather">Weather</a></span>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="/js/index.js"></script>
   </body>
 </html>

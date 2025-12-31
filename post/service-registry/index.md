@@ -7,7 +7,20 @@ Microservice architectures are popular these days, but while they provide certai
 
 Lets take the following system as an example.
 
-<img alt="Collection of services behind a gateway" src="system.svg" class="themed">
+```mermaid
+graph LR
+  Gateway[Gateway]
+  UserService["User Service\n10.0.0.2"]
+  EmailService["Email Service\n10.0.0.3"]
+  AnnouncementService["Announcement Service\n10.0.0.4"]
+  TimelineService["Timeline Service\n10.0.0.5"]
+
+  Gateway --> UserService
+  UserService --> EmailService
+  Gateway --> AnnouncementService
+  Gateway --> TimelineService
+  TimelineService --> AnnouncementService
+```
 
 In order for our gateway to be able to call the services it needs, it will have to know about:
 
