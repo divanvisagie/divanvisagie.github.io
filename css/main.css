@@ -390,6 +390,13 @@ p > code, li > code {
   margin-left: 0.5em;
 }
 
+.updated {
+  color: var(--subtitle-color);
+  opacity: 0.9;
+  font-size: small;
+  margin-left: 0.5em;
+}
+
 table, td, th {
   text-align: left;
   padding: 5px 16px;

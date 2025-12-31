@@ -48,6 +48,7 @@
     <div class="content"><div class="post-content"><h1 class="title">Distributed Request Tracing</h1>
 <h2 class="subtitle">Debugging across services</h2>
 <span class="date">2020-04-18</span>
+<span class="updated">Updated 2020-10-11 · <a href="https://github.com/divanvisagie/blog/blob/aec63de882b0a4ef7cb31172cb6d66a7d06b49fc/content/post/distributed-tracing/index.md" target="_blank" rel="noopener">aec63de</a></span>
 <p>When working with traditional monolithic applications, you can very quickly become used to a certain style of debugging when something has gone wrong. Logs can reveal quite a lot on their own and the logs for each request may even <a href="https://medium.com/@d.lopez.j/spring-boot-setting-a-unique-id-per-request-dd648efef2b">have a unique identifier</a> so that you can track down what went wrong with a particular request. If that fails, assuming you can replicate your issues on your developer environment, you can simply attach a debugger and watch for when the flow breaks.</p>
 <p>Microservices on the other hand make the problem of debugging much more complicated. When a single request from a user passes through mutliple applications, tracking down where exactly that request went wrong can become a nightmare, even with the same tooling that was such a breeze with our monolith.</p>
 <h2>Monolithic Example</h2>
