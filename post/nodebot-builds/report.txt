@@ -1,0 +1,13 @@
+Missing Image Report
+====================
+
+Original URL: //2.bp.blogspot.com/-IiUwkWhI9-E/UhnJ1-cabxI/AAAAAAAAGAo/J_ltkyUUATE/w820-h738-no/IMG_5412.jpg
+Description: Robot project photo
+Issue: Blogspot returning 200x200 placeholder images instead of original content
+
+Attempted URLs:
+- https://2.bp.blogspot.com/-IiUwkWhI9-E/UhnJ1-cabxI/AAAAAAAAGAo/J_ltkyUUATE/s1600/IMG_5412.jpg
+- https://2.bp.blogspot.com/-IiUwkWhI9-E/UhnJ1-cabxI/AAAAAAAAGAo/J_ltkyUUATE/s0/IMG_5412.jpg
+- https://lh3.googleusercontent.com/-IiUwkWhI9-E/UhnJ1-cabxI/AAAAAAAAGAo/J_ltkyUUATE/s0/IMG_5412.jpg
+
+All returned placeholder images. Original may have been deleted or has privacy restrictions.

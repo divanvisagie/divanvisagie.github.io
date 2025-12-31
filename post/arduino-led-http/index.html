@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Controlling an LED on an Arduino over HTTP - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="Controlling an LED on an Arduino over HTTP - JavaScript Meets Hardware" />
+    <meta property="og:description" content="Controlling an LED on an Arduino over HTTP - JavaScript Meets Hardware" />
+    <meta property="og:title" content="Controlling an LED on an Arduino over HTTP" />
+    <meta name="twitter:title" content="Controlling an LED on an Arduino over HTTP" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com/post/arduino-led-http/prototype.jpg" />
+    <meta name="twitter:image" content="https://divanv.com/post/arduino-led-http/prototype.jpg" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a><a class="home-tilde" href="/">/~</a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/post">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><div class="post-content"><h1 class="title">Controlling an LED on an Arduino over HTTP</h1>
+<h2 class="subtitle">JavaScript Meets Hardware</h2>
+<span class="date">2013-02-05</span>
+<span class="updated">Updated 2025-12-31 · <a href="https://github.com/divanvisagie/blog/blob/1f8c246356472a11e0d32f34edd6a2ad898677ad/content/post/arduino-led-http/index.md" target="_blank" rel="noopener">1f8c246</a></span>
+<h2>Prerequisites</h2>
+<ul>
+<li>Node.js and npm installed with some knowledge of Node</li>
+<li>Arduino IDE installed on your machine</li>
+<li>Knowledge of getting an LED working on pin 13 of an Arduino</li>
+</ul>
+<h2>Setting Up the Arduino</h2>
+<p>Wire an LED to pin 13 on the Arduino and plug the Arduino into your development machine. Then follow the instructions on the johnny-five readme to get your Arduino ready for communication.</p>
+<p><img src="prototype.jpg" alt="Prototype setup"></p>
+<h2>Setting Up the Project</h2>
+<p>Create a folder for your project and create two files in it, server.js and index.html.</p>
+<p>Copy the code from the gist into the respective files and run the following commands in the project folder to install the dependencies:</p>
+<pre><code class="language-bash">npm install narf johnny-five
+</code></pre>
+<p>Now run your server:</p>
+<pre><code class="language-bash">node server.js
+</code></pre>
+<p>And browse to <code>http://localhost:8079/index.html</code></p>
+<p><img src="screenshot.png" alt="Web interface screenshot"></p>
+<p>If you wish to control the light from another machine you will have to edit the urls in index.html and replace localhost with the IP address of the server.</p>
+<h2>How It Works</h2>
+<p>The code is quite simple, I suggest reading through it along with the johnny-five documentation to get a better understanding of what is going on.</p>
+<hr>
+<p><em>Originally posted on <a href="https://dvisagie.blogspot.com/2013/02/controlling-led-on-arduino-over-http.html">Blogspot</a></em></p>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-25 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/cv">CV</a></span> •
+      <span><a href="https://github.com/divanvisagie">GitHub</a></span> •
+      <span><a href="/pman">pman</a></span> •
+      <span><a href="/mdsql">mdsql</a></span> •
+      <span><a href="/fretboard">Fretboard</a></span> •
+      <span><a href="/weather">Weather</a></span>
+    </footer>
+
+    <script src="/js/mermaid.min.js"></script>
+    <script src="/js/index.js"></script>
+  </body>
+</html>

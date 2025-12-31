@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Running Node.js Alongside Apache - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="Running Node.js Alongside Apache - Using Reverse Proxy" />
+    <meta property="og:description" content="Running Node.js Alongside Apache - Using Reverse Proxy" />
+    <meta property="og:title" content="Running Node.js Alongside Apache" />
+    <meta name="twitter:title" content="Running Node.js Alongside Apache" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com/post/nodejs-alongside-apache/reverse-proxy.png" />
+    <meta name="twitter:image" content="https://divanv.com/post/nodejs-alongside-apache/reverse-proxy.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a><a class="home-tilde" href="/">/~</a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/post">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><div class="post-content"><h1 class="title">Running Node.js Alongside Apache</h1>
+<h2 class="subtitle">Using Reverse Proxy</h2>
+<span class="date">2013-02-10</span>
+<span class="updated">Updated 2025-12-31 · <a href="https://github.com/divanvisagie/blog/blob/1f8c246356472a11e0d32f34edd6a2ad898677ad/content/post/nodejs-alongside-apache/index.md" target="_blank" rel="noopener">1f8c246</a></span>
+<p>Running node alongside Apache takes little effort, all it requires is a reverse proxy, which is way less of an effort to set up in Apache than it is in IIS and a way to run your node process as a service.</p>
+<p><img src="reverse-proxy.png" alt="Reverse proxy diagram"></p>
+<p>To set up a reverse proxy in apache simply add the code in the following gist to the end of your httpd.conf (located at /etc/apache2 on OSX) just before the line: <code>Include /private/etc/apache2/other/*.conf</code>.</p>
+<pre><code class="language-apache">ProxyPass /node http://localhost:8080
+ProxyPassReverse /node http://localhost:8080
+</code></pre>
+<p>This will re-route any traffic from <em>yourserver/node</em> to <em>yourserver:8080</em>. Of course the ProxyPass line can be edited according to your liking, but this is just an example.</p>
+<p>Thats it when it comes to the reverse proxy, all you have to do is restart apache and all requests to <em>yourserver/node</em> will now go to the node process running at <em>yourserver:8080</em>.</p>
+<h2>Forever</h2>
+<p>Now that we have Apache rerouting the traffic to the right spot, we should set up the node server as a daemon so that it's always up, there are many ways to do this but one of the easiest is using nodejitsu's <a href="https://github.com/foreverjs/forever">forever</a>.</p>
+<p>To set up your node server as a daemon using forever, just run the following command:</p>
+<pre><code class="language-bash">forever start server.js
+</code></pre>
+<p>There you have it, if all goes well you will now have your node.js server running alongside apache.</p>
+<hr>
+<p><em>Originally posted on <a href="https://dvisagie.blogspot.com/2013/02/running-nodejs-alongside-apache.html">Blogspot</a></em></p>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-25 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/cv">CV</a></span> •
+      <span><a href="https://github.com/divanvisagie">GitHub</a></span> •
+      <span><a href="/pman">pman</a></span> •
+      <span><a href="/mdsql">mdsql</a></span> •
+      <span><a href="/fretboard">Fretboard</a></span> •
+      <span><a href="/weather">Weather</a></span>
+    </footer>
+
+    <script src="/js/mermaid.min.js"></script>
+    <script src="/js/index.js"></script>
+  </body>
+</html>

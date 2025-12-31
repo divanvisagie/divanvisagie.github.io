@@ -1,0 +1,8 @@
+Missing Image Report
+====================
+
+Original URL: https://dlnmh9ip6v2uc.cloudfront.net//images/products/1/0/3/3/6/10336-01.jpg
+Description: Rover 5 tank tread robot base product photo
+Issue: External CDN (SparkFun) blocked download, returned HTML error page
+
+This was a product image for the Rover 5 chassis. A replacement image could be sourced from SparkFun's product page if needed.
