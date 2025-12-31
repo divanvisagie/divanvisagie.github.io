@@ -57,7 +57,7 @@ NOTE: For the Objective-C portion of this tutorial , I will be using a(very tiny
 <strong>PHP</strong>
 Here I have created a simple php script that will provide the necessary services to test the tutorial application. I will not go over this code in detail here because I assume that anyone reading this will ether not care about what it does because all they are trying to do is learn how to connect to a service,or already able to understand it ,in which case the comments should suffice.
 All that you need to know here is that the tasks the service performs are selected by the value of the 'METHOD' <a href="http://en.wikipedia.org/wiki/List_of_HTTP_header_fields">http header fields</a>.</p>
-<?php
+<pre><code class="language-php">&lt;?php
 /*Simple Service
 This is just a simple php script that will return values ,the 
 method is selected using the value of HTTP_METHOD
@@ -65,7 +65,7 @@ method is selected using the value of HTTP_METHOD
 if ($_SERVER['HTTP_METHOD'] === 'getValues'){
 //just return some test values
 $data['value1'] = 1;
-$data['value2'] = "Hello php service world";
+$data['value2'] = &quot;Hello php service world&quot;;
 echo json_encode($data);
 }
 else if ($_SERVER['HTTP_METHOD'] === 'postValues'){ 
@@ -86,9 +86,10 @@ else {
 $data['error'] = 'The Service you asked for was not recognized';
 echo json_encode($data);
 }
-?>
-<p>So all you have to do is copy and save it as * [what ever you want].php <em>in your web server.
-Now browse to it to make sure its working alright, I placed mine in my <a href="http://dvisagie.blogspot.com/2012/07/bringing-back-apacheweb-sharing-after.html">sites directory</a> so my path and the path I will be referring to for the service is: <em><a href="http://localhost/~divanvisagie/SimpleService/index.php%C2%A0">http://localhost/~divanvisagie/SimpleService/index.php </a>*
+?&gt;
+</code></pre>
+<p>So all you have to do is copy and save it as * [what ever you want].php *in your web server.
+Now browse to it to make sure its working alright, I placed mine in my <a href="http://dvisagie.blogspot.com/2012/07/bringing-back-apacheweb-sharing-after.html">sites directory</a> so my path and the path I will be referring to for the service is: *<a href="http://localhost/~divanvisagie/SimpleService/index.php%C2%A0">http://localhost/~divanvisagie/SimpleService/index.php </a>*
 You should get the following output as a result:
 {&quot;error&quot;:&quot;The Service you asked for was not recognized&quot;}
 Don't worry about the error,thats just because we havent sent the service any headers to tell it what to do.
@@ -96,34 +97,37 @@ Don't worry about the error,thats just because we havent sent the service any he
 For the sake of the tutorial , I will create a simple single view iPhone app that will connect to the service:
 <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgGzquMHwUbHMEySFxHpP-COaXsqD0lF1uWc6vvztQlKR1x7mutyP2l8GmXNVzPYu4RD5nfgiyJNuu00HY1r_xhrKLdEdMdjE_9VMn1U_0imZQrxQNC_OhIMi6oFsMgOeVz4gs49zipwQ/s1600/Screen+Shot+2012-08-25+at+12.50.54+PM.png"><img src="image4.png" alt="screenshot"></a>
 Next I create a class called ServiceConnector which inherits from NSObject,this class will be doing all of our connection and request management.
-First we set up the class's header ,so go to <em>ServiceConnector.h</em> . We know we will be calling these request methods from a ViewController and we also know that we will need the data returned to the ViewController in order to display it. so lets set up some protocols for sending messages to the delegate.
-@protocol ServiceConnectorDelegate <NSObject>
--(void)requestReturnedData:(NSData</em>)data;
+First we set up the class's header ,so go to <em>ServiceConnector.h</em> . We know we will be calling these request methods from a ViewController and we also know that we will need the data returned to the ViewController in order to display it. so lets set up some protocols for sending messages to the delegate.</p>
+<pre><code class="language-objc">@protocol ServiceConnectorDelegate &lt;NSObject&gt;
+-(void)requestReturnedData:(NSData*)data;
 @end
-We also need to make sure that ServiceConnector listens to NSURLConnection and we will aslo set up the rest of the interface,here is the whole of ServiceConnector.m:
-//
+</code></pre>
+<p>We also need to make sure that ServiceConnector listens to NSURLConnection and we will aslo set up the rest of the interface,here is the whole of ServiceConnector.m:</p>
+<pre><code class="language-objc">//
 //  ServiceConnector.h
 //  Service Reader
 //
 //  Created by Divan Visagie on 2012/08/25.
 //
 #import &lt;Foundation/Foundation.h&gt;
-@protocol ServiceConnectorDelegate <NSObject>
--(void)requestReturnedData:(NSData</em>)data;
+@protocol ServiceConnectorDelegate &lt;NSObject&gt;
+-(void)requestReturnedData:(NSData*)data;
 @end
 @interface ServiceConnector : NSObject &lt;NSURLConnectionDelegate,NSURLConnectionDataDelegate&gt;
-@property (strong,nonatomic) id <ServiceConnectorDelegate> delegate;
+@property (strong,nonatomic) id &lt;ServiceConnectorDelegate&gt; delegate;
 -(void)getTest;
 -(void)postTest;
 @end
-Now lets move on to ServiceConnector.m and set up the interface, we set up a variable in which to store the received data...
-@implementation ServiceConnector{
+</code></pre>
+<p>Now lets move on to ServiceConnector.m and set up the interface, we set up a variable in which to store the received data...</p>
+<pre><code class="language-objc">@implementation ServiceConnector{
 NSData *receivedData;;
 }
-..then we implement the getTest method.As you should be able to tell my the name , this method will test the GET functionality on our php script. First we build a request and assign it the required headers , then we create an NSURLConnection that will perform the request and return data in its delegate methods.Please note again that this URL will only apply to me (heck my name is in it its that custom), so you will need to replace that with whatever your service URL is.
--(void)getTest{
+</code></pre>
+<p>..then we implement the getTest method.As you should be able to tell my the name , this method will test the GET functionality on our php script. First we build a request and assign it the required headers , then we create an NSURLConnection that will perform the request and return data in its delegate methods.Please note again that this URL will only apply to me (heck my name is in it its that custom), so you will need to replace that with whatever your service URL is.</p>
+<pre><code class="language-objc">-(void)getTest{
 //build up the request that is to be sent to the server
-NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL    URLWithString:@&quot;<a href="http://localhost/~divanvisagie/SimpleService/index.php">http://localhost/~divanvisagie/SimpleService/index.php</a>&quot;]];
+NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL    URLWithString:@&quot;http://localhost/~divanvisagie/SimpleService/index.php&quot;]];
 [request setHTTPMethod:@&quot;GET&quot;];
 [request addValue:@&quot;getValues&quot; forHTTPHeaderField:@&quot;METHOD&quot;]; //selects what task the server will perform
 //initialize an NSURLConnection  with the request
@@ -132,10 +136,11 @@ if(!connection){
 NSLog(@&quot;Connection Failed&quot;);
 }
 }
-Next is the postTest method , the code may look longer , but it is actually pretty much the same thing(replacing setHTTPMethod:@&quot;GET&quot; for @&quot;POST&quot;) of corse. The reason it looks longer is because we have to build up some sample data to attach to the body of the post:
--(void)postTest{
+</code></pre>
+<p>Next is the postTest method , the code may look longer , but it is actually pretty much the same thing(replacing setHTTPMethod:@&quot;GET&quot; for @&quot;POST&quot;) of corse. The reason it looks longer is because we have to build up some sample data to attach to the body of the post:</p>
+<pre><code class="language-objc">-(void)postTest{
 //build up the request that is to be sent to the server
-NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:@&quot;<a href="http://localhost/~divanvisagie/SimpleService/index.php">http://localhost/~divanvisagie/SimpleService/index.php</a>&quot;]];
+NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:@&quot;http://localhost/~divanvisagie/SimpleService/index.php&quot;]];
 [request setHTTPMethod:@&quot;POST&quot;];
 [request addValue:@&quot;postValues&quot; forHTTPHeaderField:@&quot;METHOD&quot;];
 //create data that will be sent in the post
@@ -151,31 +156,33 @@ if(!connection){
 NSLog(@&quot;Connection Failed&quot;);
 }
 }
-Now that thats done all we have to do is handle what is sent back with NSURLConnections delegate methods.
-#pragma mark - Data connection delegate -
--(void)connection:(NSURLConnection <em>)connection didReceiveData:(NSData <em>)data{ // executed when the connection receives data
+</code></pre>
+<p>Now that thats done all we have to do is handle what is sent back with NSURLConnections delegate methods.</p>
+<pre><code class="language-objc">#pragma mark - Data connection delegate -
+-(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data{ // executed when the connection receives data
 receivedData = data;
-/</em> NOTE: if you are working with large data , it may be better to set recievedData as NSMutableData 
+/* NOTE: if you are working with large data , it may be better to set recievedData as NSMutableData 
 and use  [receivedData append:Data] here, in this event you should also set recievedData to nil
 when you are done working with it or any new data received could end up just appending to the 
-last message received</em>/
+last message received*/
 }
 -(void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error{ //executed when the connection fails
 NSLog(@&quot;Connection failed with error: %@&quot;,error.localizedDescription);
 }
 -(void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge{
-/<em>This message is sent when there is an authentication challenge ,our server does not have this requirement so we do not need to handle that here</em>/
+/*This message is sent when there is an authentication challenge ,our server does not have this requirement so we do not need to handle that here*/
 }
 -(void)connectionDidFinishLoading:(NSURLConnection *)connection{
 NSLog(@&quot;Request Complete,recieved %d bytes of data&quot;,receivedData.length);
 [self.delegate requestReturnedData:receivedData];//send the data to the delegate
 }
-That wraps up ServiceConnector.m, now lets head over to the ViewController and set up some UI. Set up the storyboard view with 2 buttons(GET and POST) a textview and two text fields, I also added a value1 and value2 label next to the fields to indicate what goes in there.
+</code></pre>
+<p>That wraps up ServiceConnector.m, now lets head over to the ViewController and set up some UI. Set up the storyboard view with 2 buttons(GET and POST) a textview and two text fields, I also added a value1 and value2 label next to the fields to indicate what goes in there.
 <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg3MC0DGKLruHdvk_mBnWiGD9MHk2QHgssIOFxELHeoIKvLsbw5HdFPlph54oNvj0PagZYBOQtatxOIp6L1WoAchT0eRVdNlIpskNkpc9SxMVQgcV-fFvSgF0m-VHegZUrUoQ81ubbrWg/s1600/Screen+Shot+2012-08-26+at+12.10.48+PM.png"><img src="image2.png" alt="screenshot"></a>
 Drag the controls into the view and connect them to the source file.
 After taking that screenshot ,I also removed the Lorem Ipsum from the textView because I didn't want it around when the app was run for the first time.
-For the copy/pasters here is the code for ViewController.h, but remember you are still going to have to create the view and link up all of the controls to the source file.
-//
+For the copy/pasters here is the code for ViewController.h, but remember you are still going to have to create the view and link up all of the controls to the source file.</p>
+<pre><code class="language-objc">//
 //  ViewController.h
 //  Service Reader
 //
@@ -183,15 +190,16 @@ For the copy/pasters here is the code for ViewController.h, but remember you are
 //
 #import &lt;UIKit/UIKit.h&gt;
 #import &quot;ServiceConnector.h&quot;
-@interface ViewController : UIViewController <ServiceConnectorDelegate>
+@interface ViewController : UIViewController &lt;ServiceConnectorDelegate&gt;
 @property (weak, nonatomic) IBOutlet UITextView *output;
 @property (weak, nonatomic) IBOutlet UITextField *value1TextField;
 @property (weak, nonatomic) IBOutlet UITextField *value2TextField;
 - (IBAction)getDown:(id)sender;
 - (IBAction)postDown:(id)sender;
 @end
-Finally we move over to <em>ViewController.m ,</em> here we set up the button actions which will call the request methods in ServiceConnector:
-- (IBAction)getDown:(id)sender { //perform get request
+</code></pre>
+<p>Finally we move over to <em>ViewController.m ,</em> here we set up the button actions which will call the request methods in ServiceConnector:</p>
+<pre><code class="language-objc">- (IBAction)getDown:(id)sender { //perform get request
 ServiceConnector *serviceConnector = [[ServiceConnector alloc] init];
 serviceConnector.delegate = self;
 [serviceConnector getTest];
@@ -201,8 +209,9 @@ ServiceConnector *serviceConnector = [[ServiceConnector alloc] init];
 serviceConnector.delegate = self;
 [serviceConnector postTest];
 }
-Then we handle the delegate method for when the data is received , here I set the raw string value of the message returned as the text of the textview and set the processed the values of the dictionary keys to the corresponding textFields.
-#pragma mark - ServiceConnectorDelegate -
+</code></pre>
+<p>Then we handle the delegate method for when the data is received , here I set the raw string value of the message returned as the text of the textview and set the processed the values of the dictionary keys to the corresponding textFields.</p>
+<pre><code class="language-objc">#pragma mark - ServiceConnectorDelegate -
 -(void)requestReturnedData:(NSData *)data{ //activated when data is returned
 NSDictionary *dictionary = [NSDictionary dictionaryWithJSONData:data];
 output.text = dictionary.JSONString; // set the textview to the raw string value of the data recieved
@@ -210,7 +219,8 @@ value1TextField.text = [NSString stringWithFormat:@&quot;%d&quot;,[[dictionar
 value2TextField.text = [dictionary objectForKey:@&quot;value2&quot;];
 NSLog(@&quot;%@&quot;,dictionary);
 }
-And thats that , the app is complete , now lets run it and see what happens:
+</code></pre>
+<p>And thats that , the app is complete , now lets run it and see what happens:
 <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSkGdJYcrqYVq7r2gsgsVd_SNKBhXKl9LrHdyDuWRiYOUlC6qTF7GCfTpeWUx9GkpoO3niHgKWy24cxF6tBkYoOmLurIHISTA4hc7h_Jm99kHQgvhI3svIXMDu75yiHgScdAp3LcEvGw/s1600/iOS+Simulator+Screen+shot+26+Aug+2012+12.47.15+PM.png"><img src="image6.png" alt="screenshot"></a>
 First Run
 <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiWBbjo3XOsjMfpEU2RQt1LyegbVPoHv0guoWxJ3zdbK_Yti9z0sQeavwGjwIauDaeo5kfTb2k_thD1Mzl_Zzr2X8THn6Ir45QY49ghJN4KvG7QGoRAOwnPvWw6_c27eLeSFRI4yN-ERQ/s1600/iOS+Simulator+Screen+shot+26+Aug+2012+12.48.24+PM.png"><img src="image8.png" alt="screenshot"></a>

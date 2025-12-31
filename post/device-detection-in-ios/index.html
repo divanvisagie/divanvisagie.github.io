@@ -51,8 +51,8 @@
 <span class="date">2012-09-28</span>
 <span class="updated">Updated 2025-12-31 · <a href="https://github.com/divanvisagie/blog/blob/8c48a1b0fa5cb8eccf4db11137dd4a1294159a89/content/post/device-detection-in-ios/index.md" target="_blank" rel="noopener">8c48a1b</a></span>
 <p>This is just a quick tip on how to determine what device the user is running, this can be useful if you are writing an app for both iPhone and iPad and want to implement a feature in one device but not the other:
-<strong>Code snippet:</strong>
-if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+<strong>Code snippet:</strong></p>
+<pre><code class="language-objc">if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
 //executed if phone
 }
 else if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad){
@@ -61,10 +61,12 @@ else if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceI
 else{
 //Apple invented a new iDevice
 }
-Another thing we can check for is the version of iOS the user is running as well as the system name,here I simply used NSLog to output the results:
-NSLog(@&quot;%@&quot;,[[UIDevice currentDevice] systemVersion]);
+</code></pre>
+<p>Another thing we can check for is the version of iOS the user is running as well as the system name,here I simply used NSLog to output the results:</p>
+<pre><code class="language-objc">NSLog(@&quot;%@&quot;,[[UIDevice currentDevice] systemVersion]);
 NSLog(@&quot;%@&quot;,[[UIDevice currentDevice] systemName]);
-<em>UIDevice</em> has many other methods and properties regarding the users device, you can read through them in Apple's documentation <a href="http://developer.apple.com/library/ios/#documentation/uikit/reference/UIDevice_Class/Reference/UIDevice.html">here</a>.</p>
+</code></pre>
+<p><em>UIDevice</em> has many other methods and properties regarding the users device, you can read through them in Apple's documentation <a href="http://developer.apple.com/library/ios/#documentation/uikit/reference/UIDevice_Class/Reference/UIDevice.html">here</a>.</p>
 <hr>
 <p><em>Originally posted on <a href="https://divcode.blogspot.com/2012/09/device-detection-in-ios.html">Blogspot</a></em></p>
 </div>

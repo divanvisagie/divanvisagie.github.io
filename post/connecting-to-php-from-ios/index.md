@@ -9,6 +9,7 @@ NOTE: For the Objective-C portion of this tutorial , I will be using a(very tiny
 **PHP**
 Here I have created a simple php script that will provide the necessary services to test the tutorial application. I will not go over this code in detail here because I assume that anyone reading this will ether not care about what it does because all they are trying to do is learn how to connect to a service,or already able to understand it ,in which case the comments should suffice.
 All that you need to know here is that the tasks the service performs are selected by the value of the 'METHOD' [http header fields](http://en.wikipedia.org/wiki/List_of_HTTP_header_fields).
+```php
 <?php
 /*Simple Service
 This is just a simple php script that will return values ,the 
@@ -39,6 +40,7 @@ $data['error'] = 'The Service you asked for was not recognized';
 echo json_encode($data);
 }
 ?>
+```
 So all you have to do is copy and save it as * [what ever you want].php *in your web server.
 Now browse to it to make sure its working alright, I placed mine in my [sites directory](http://dvisagie.blogspot.com/2012/07/bringing-back-apacheweb-sharing-after.html) so my path and the path I will be referring to for the service is: *http://localhost/~divanvisagie/SimpleService/index.php *
 You should get the following output as a result:
@@ -49,10 +51,13 @@ For the sake of the tutorial , I will create a simple single view iPhone app tha
 [![screenshot](image4.png)](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgGzquMHwUbHMEySFxHpP-COaXsqD0lF1uWc6vvztQlKR1x7mutyP2l8GmXNVzPYu4RD5nfgiyJNuu00HY1r_xhrKLdEdMdjE_9VMn1U_0imZQrxQNC_OhIMi6oFsMgOeVz4gs49zipwQ/s1600/Screen+Shot+2012-08-25+at+12.50.54+PM.png)
 Next I create a class called ServiceConnector which inherits from NSObject,this class will be doing all of our connection and request management.
 First we set up the class's header ,so go to *ServiceConnector.h* . We know we will be calling these request methods from a ViewController and we also know that we will need the data returned to the ViewController in order to display it. so lets set up some protocols for sending messages to the delegate.
+```objc
 @protocol ServiceConnectorDelegate <NSObject>
 -(void)requestReturnedData:(NSData*)data;
 @end
+```
 We also need to make sure that ServiceConnector listens to NSURLConnection and we will aslo set up the rest of the interface,here is the whole of ServiceConnector.m:
+```objc
 //
 //  ServiceConnector.h
 //  Service Reader
@@ -68,11 +73,15 @@ We also need to make sure that ServiceConnector listens to NSURLConnection and w
 -(void)getTest;
 -(void)postTest;
 @end
+```
 Now lets move on to ServiceConnector.m and set up the interface, we set up a variable in which to store the received data...
+```objc
 @implementation ServiceConnector{
 NSData *receivedData;;
 }
+```
 ..then we implement the getTest method.As you should be able to tell my the name , this method will test the GET functionality on our php script. First we build a request and assign it the required headers , then we create an NSURLConnection that will perform the request and return data in its delegate methods.Please note again that this URL will only apply to me (heck my name is in it its that custom), so you will need to replace that with whatever your service URL is.
+```objc
 -(void)getTest{
 //build up the request that is to be sent to the server
 NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL    URLWithString:@"http://localhost/~divanvisagie/SimpleService/index.php"]];
@@ -84,7 +93,9 @@ if(!connection){
 NSLog(@"Connection Failed");
 }
 }
+```
 Next is the postTest method , the code may look longer , but it is actually pretty much the same thing(replacing setHTTPMethod:@"GET" for @"POST") of corse. The reason it looks longer is because we have to build up some sample data to attach to the body of the post:
+```objc
 -(void)postTest{
 //build up the request that is to be sent to the server
 NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:@"http://localhost/~divanvisagie/SimpleService/index.php"]];
@@ -103,7 +114,9 @@ if(!connection){
 NSLog(@"Connection Failed");
 }
 }
+```
 Now that thats done all we have to do is handle what is sent back with NSURLConnections delegate methods.
+```objc
 #pragma mark - Data connection delegate -
 -(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data{ // executed when the connection receives data
 receivedData = data;
@@ -122,11 +135,13 @@ NSLog(@"Connection failed with error: %@",error.localizedDescription);
 NSLog(@"Request Complete,recieved %d bytes of data",receivedData.length);
 [self.delegate requestReturnedData:receivedData];//send the data to the delegate
 }
+```
 That wraps up ServiceConnector.m, now lets head over to the ViewController and set up some UI. Set up the storyboard view with 2 buttons(GET and POST) a textview and two text fields, I also added a value1 and value2 label next to the fields to indicate what goes in there.
 [![screenshot](image2.png)](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg3MC0DGKLruHdvk_mBnWiGD9MHk2QHgssIOFxELHeoIKvLsbw5HdFPlph54oNvj0PagZYBOQtatxOIp6L1WoAchT0eRVdNlIpskNkpc9SxMVQgcV-fFvSgF0m-VHegZUrUoQ81ubbrWg/s1600/Screen+Shot+2012-08-26+at+12.10.48+PM.png)
 Drag the controls into the view and connect them to the source file.
 After taking that screenshot ,I also removed the Lorem Ipsum from the textView because I didn't want it around when the app was run for the first time.
 For the copy/pasters here is the code for ViewController.h, but remember you are still going to have to create the view and link up all of the controls to the source file.
+```objc
 //
 //  ViewController.h
 //  Service Reader
@@ -142,7 +157,9 @@ For the copy/pasters here is the code for ViewController.h, but remember you are
 - (IBAction)getDown:(id)sender;
 - (IBAction)postDown:(id)sender;
 @end
+```
 Finally we move over to *ViewController.m ,* here we set up the button actions which will call the request methods in ServiceConnector:
+```objc
 - (IBAction)getDown:(id)sender { //perform get request
 ServiceConnector *serviceConnector = [[ServiceConnector alloc] init];
 serviceConnector.delegate = self;
@@ -153,7 +170,9 @@ ServiceConnector *serviceConnector = [[ServiceConnector alloc] init];
 serviceConnector.delegate = self;
 [serviceConnector postTest];
 }
+```
 Then we handle the delegate method for when the data is received , here I set the raw string value of the message returned as the text of the textview and set the processed the values of the dictionary keys to the corresponding textFields.
+```objc
 #pragma mark - ServiceConnectorDelegate -
 -(void)requestReturnedData:(NSData *)data{ //activated when data is returned
 NSDictionary *dictionary = [NSDictionary dictionaryWithJSONData:data];
@@ -162,6 +181,7 @@ value1TextField.text = [NSString stringWithFormat:@"%d",[[dictionary objectF
 value2TextField.text = [dictionary objectForKey:@"value2"];
 NSLog(@"%@",dictionary);
 }
+```
 And thats that , the app is complete , now lets run it and see what happens:
 [![screenshot](image6.png)](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSkGdJYcrqYVq7r2gsgsVd_SNKBhXKl9LrHdyDuWRiYOUlC6qTF7GCfTpeWUx9GkpoO3niHgKWy24cxF6tBkYoOmLurIHISTA4hc7h_Jm99kHQgvhI3svIXMDu75yiHgScdAp3LcEvGw/s1600/iOS+Simulator+Screen+shot+26+Aug+2012+12.47.15+PM.png)
 First Run

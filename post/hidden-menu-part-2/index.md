@@ -5,6 +5,7 @@
 In[ Part 1 of Creating a hidden menu in iOS ](http://divcode.blogspot.com/2012/09/creating-hidden-menu-in-ios.html) I showed how to add gestures to handle the hide/reveal functionality. The swipe gesture is a great and gives a good impression , but it can be better. It is much nicer to have the effect that the *content *View is following the users finger , and that is exactly what we are going to do here.
 Lets start with the project form the previous tutorial , if you dont have it , you can pick it up [here](https://github.com/snip3r8/HiddenMenu).
 First we start by commenting out/removing the GestureRecognizer code in the viewDidLoad , we need to get rid of it because the touch events could conflict with them.
+```objc
 - (void)viewDidLoad
 {
 [super viewDidLoad];
@@ -20,14 +21,18 @@ menuArray = [[NSArray alloc] initWithContentsOfFile:menuPlistPath];
 //    [swipeRight setDirection:UISwipeGestureRecognizerDirectionRight];
 //[self.view addGestureRecognizer:swipeRight];
 }
+```
 Now lets jump to the touch events ,this requires no additional setup,all we have to do is implement the delegate methods.
 The first one we will handle is *touchesBegan *. All we will be doing here is storing the x coordinate of where the touch began ,this is used later to calculate how we should move the *contents* view.
+```objc
 float difference;
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
 CGPoint contentTouchPoint = [[touches anyObject] locationInView:content];
 difference = contentTouchPoint.x;
 }
+```
 Next up is *touchesMoved* ,here we get the coordinate of the touch in *self.view* ,then based on the coordinate ,calculate a new x coordinate for the  *content *view. Here we also implement a check to make sure that the movement does not exceed the bounds of *menuTable. *After we have calculated *xTarget , *All thats left to do is animate the movement.
+```objc
 -(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
 CGPoint pointInView = [[touches anyObject] locationInView:self.view];
 float xTarget = pointInView.x - difference;
@@ -41,7 +46,9 @@ animations:^{
 }
 ];
 }
+```
 The final method we need to handle is touchesEnded. This event is fired when the users finger leaves the screen , at this point the *content* view is most likely to be in mid transition between the "menu shown" and "menu hidden" states,so here we need to calculate which of those states it "snaps" to:
+```objc
 -(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
 CGPoint endPoint = [[touches anyObject] locationInView:self.view];
 float xTarget = endPoint.x - difference;
@@ -55,9 +62,11 @@ animations:^{
 }
 ];
 }
+```
 And thats a wrap , now if you run the project you will be able to drag the menu into hidden/shown states and it will actually follow your finger and not just be fired by a swipe. Below is the full modified code of HiddenMenu:
 [![screenshot](image2.png)](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgzvHVrRELPibx1mVFz1rgIPYIk_EHBdC09vLzmEJ3kKJjUNbqlg8W1xpwF_z_Cp7qtWDCCVBRzpLpNO0_VFtsR7Os8ud1XEAuufWjTxyUe-G_0e3iehV4GbvWkbTAJrgXwvAsGmjMg5A/s1600/iOS+Simulator+Screen+shot+24+Sep+2012+5.20.15+PM.png)
 *ViewController.h:*
+```objc
 //
 //  ViewController.h
 //  HiddenMenu
@@ -72,7 +81,9 @@ And thats a wrap , now if you run the project you will be able to drag the menu 
 @property (weak, nonatomic) IBOutlet UINavigationBar *contentNavBar;
 - (IBAction)showMenuDown:(id)sender;
 @end
+```
 *ViewController.m*
+```objc
 //
 //  ViewController.m
 //  HiddenMenu
@@ -197,6 +208,7 @@ animations:^{
 ];
 }
 @end
+```
 
 ---
 

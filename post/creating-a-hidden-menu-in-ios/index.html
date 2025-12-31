@@ -56,47 +56,51 @@ Our menu will be based on a table view so drag one of those on to the view on th
 Don't forget to set the ViewController as the delegate and data source for the tableView , we do this by ctrl+dragging to the ViewController icon and selecting both delegate and dataSource.
 <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN3xmhV3yrhwa2uBUcsygeVPLq1XKEASZBuk3MDIk1OwL9rMhbSxp83ZgBJyqj8EPERiBCNZXuT_5altq8qlUIVob4M4feAs42ZSOquJVQS74bZqxr_0Wu8zOpypVIfpnvRT-acHQFUg/s1600/Screen+Shot+2012-09-23+at+9.40.23+PM.png"><img src="image3.png" alt="screenshot"></a>
 ViewController icon
-We also need to modify the code of ViewController.h to look like the following:
-#import &lt;UIKit/UIKit.h&gt;
+We also need to modify the code of ViewController.h to look like the following:</p>
+<pre><code class="language-objc">#import &lt;UIKit/UIKit.h&gt;
 @interface ViewController : UIViewController &lt;UITableViewDataSource,UITableViewDelegate&gt;
 @property (weak, nonatomic) IBOutlet UITableView *menuTable;
 @property (weak, nonatomic) IBOutlet UIView *content;
 @end
-Back to the storyboard , lets add a cell to the menuTable(style:subtitle) and give it the Reuse Identifier &quot;MenuCell&quot;
+</code></pre>
+<p>Back to the storyboard , lets add a cell to the menuTable(style:subtitle) and give it the Reuse Identifier &quot;MenuCell&quot;
 <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEje-9pMq8MqrfxLlwlwq9ywahRTMkQ0ZgdEtCQnW7NjKVD7Pm25HQ9aMV7XWCXSYTi3LMsifvQpTlk4y-bs7nGLUdMRcVDCyDXGtGeSRptKmDG-Rx28-wxlhBnCGAYTjiKcUtmiI8PtQw/s1600/Screen+Shot+2012-09-23+at+10.02.23+PM.png"><img src="image10.png" alt="screenshot"></a>
 Finally , we add a navigation bar and a button to the &quot;<em>content</em>&quot; UIView. Link the navigation bar as an outlet and its button as the action *showMenuDown. *This should be the last time we need to deal with the views so you can go ahead and cover up the tableview with the <em>content</em> UIView
 <strong>The menu list</strong>
-For the menu table we will do something interesting, we will be populating the table using an array of dictionaries,but this array will be obtained from a plist file.Before we get into this though , lets create the <em>menuArray</em> in the private interface of <em>ViewController.m</em> .
-@interface ViewController ()
+For the menu table we will do something interesting, we will be populating the table using an array of dictionaries,but this array will be obtained from a plist file.Before we get into this though , lets create the <em>menuArray</em> in the private interface of <em>ViewController.m</em> .</p>
+<pre><code class="language-objc">@interface ViewController ()
 @property (strong,nonatomic) NSArray *menuArray; //array for menu 
 @end
-Now lets create a plist file,create a new file , under the iOS section choose resource and then choose Property List. I simply named mine <em>Menu</em>.
+</code></pre>
+<p>Now lets create a plist file,create a new file , under the iOS section choose resource and then choose Property List. I simply named mine <em>Menu</em>.
 <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiqnMnEZu3F3qOXY04w4igmxCwlcmq5fQiEAxZAGU_ClIGTSoVI4NmQ9hTdtfOnyuwhLCorx7uuzjczyH1i87Zd7P8P9PgN8eAPoP7ah-UfXRlAT6bCEaf3NDuvsZCMWryz8k1N997dow/s1600/Screen+Shot+2012-09-24+at+11.40.24+AM.png"><img src="image9.png" alt="screenshot"></a>
 After this we populate the plist file with some data , I filled mine out with the following structure:
 <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg8dN6iNafOFw2ej7txcgLcuR-ktfwKyU2PS5fCN8dCkKT2DfGjaetfoApFhmqFg0B83urKWtxWJeRmlo3sY_k2FtLUsMTovvnN_lNajPX0in6ye2SuDptFbzhtPzjV4gHaZl1feZsARQ/s1600/Screen+Shot+2012-09-24+at+11.47.46+AM.png"><img src="image2.png" alt="screenshot"></a>
-Now its time to fill the *menuArray ,*So switch back to <em>ViewController.m</em> and add the following to the <em>viewDidLoad</em> :
-//Find the path for the menu resource and load it into the menu array
+Now its time to fill the *menuArray ,*So switch back to <em>ViewController.m</em> and add the following to the <em>viewDidLoad</em> :</p>
+<pre><code class="language-objc">//Find the path for the menu resource and load it into the menu array
 NSString *menuPlistPath = [[NSBundle mainBundle] pathForResource:@&quot;Menu&quot; ofType:@&quot;plist&quot;];
 menuArray = [[NSArray alloc] initWithContentsOfFile:menuPlistPath];
-Finally (for the menu population at least) , we need to implement the datasource methods to populate the menu table. Note that here I have used some of the new Objective-C functionality for dictionary access , if you are having issues here , resorting to the code in the comments may solve your problem.
-#pragma mark - UITableView Datasource -
+</code></pre>
+<p>Finally (for the menu population at least) , we need to implement the datasource methods to populate the menu table. Note that here I have used some of the new Objective-C functionality for dictionary access , if you are having issues here , resorting to the code in the comments may solve your problem.</p>
+<pre><code class="language-objc">#pragma mark - UITableView Datasource -
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
 return menuArray.count;
 }
--(NSInteger)numberOfSectionsInTableView:(UITableView <em>)tableView{
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
 return 1;
 }
--(UITableViewCell</em>)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-UITableViewCell <em>cell = [tableView dequeueReusableCellWithIdentifier:@&quot;MenuCell&quot;];
-NSDictionary <em>menuItem = [menuArray objectAtIndex:indexPath.row];
-cell.textLabel.text = menuItem[@&quot;Title&quot;]; /</em> Note , this is new objective c functionality , 
-for older versions use [menuItem objectForKey:@&quot;Title&quot;];</em>/
+-(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@&quot;MenuCell&quot;];
+NSDictionary *menuItem = [menuArray objectAtIndex:indexPath.row];
+cell.textLabel.text = menuItem[@&quot;Title&quot;]; /* Note , this is new objective c functionality , 
+for older versions use [menuItem objectForKey:@&quot;Title&quot;];*/
 cell.detailTextLabel.text = menuItem[@&quot;Subtitle&quot;];
 return cell;
 }
-<strong>The animations</strong>
-Now that we are done populating the menu , lets show its contents. First , implement the following methods to animate the showing and hiding of the menu:
-#pragma mark - animations -
+</code></pre>
+<p><strong>The animations</strong>
+Now that we are done populating the menu , lets show its contents. First , implement the following methods to animate the showing and hiding of the menu:</p>
+<pre><code class="language-objc">#pragma mark - animations -
 -(void)showMenu{
 //slide the content view to the right to reveal the menu 
 [UIView animateWithDuration:.25
@@ -113,42 +117,47 @@ animations:^{
 }
 ];
 }
-And then we implement those methods in the showMenuDown button action:
-#pragma mark - Actions -
+</code></pre>
+<p>And then we implement those methods in the showMenuDown button action:</p>
+<pre><code class="language-objc">#pragma mark - Actions -
 - (IBAction)showMenuDown:(id)sender {
 if(content.frame.origin.x == 0) //only show the menu if it is not already shown
 [self showMenu];
 else
 [self hideMenu];
 }
-We also implement the tableview delegate so that we can see the menu in action , when a menu item is pressed ,we will set the title of the navigation bar to the title of the menu option.
-#pragma mark - UITableView Delegate -
+</code></pre>
+<p>We also implement the tableview delegate so that we can see the menu in action , when a menu item is pressed ,we will set the title of the navigation bar to the title of the menu option.</p>
+<pre><code class="language-objc">#pragma mark - UITableView Delegate -
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-contentNavBar.topItem.title = menuArray[indexPath.row][@&quot;Title&quot;]; /<em>I went wild with the new 
-syntax on this one</em>/
+contentNavBar.topItem.title = menuArray[indexPath.row][@&quot;Title&quot;]; /*I went wild with the new 
+syntax on this one*/
 }
-Now , if you run the app , you should be able to click the button on the navigation bar to show or hide the menu.
+</code></pre>
+<p>Now , if you run the app , you should be able to click the button on the navigation bar to show or hide the menu.
 <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgdhlXVaxO8rC_WVeInlalyNJelaZBDtgF14xMKY_yYdVHWb5QSsxDCG5gWQxbo14nIC8Y_j6AwnfJ40bwJ-tDUOJ3Sqqum0aUTXbUBsGeSyTZiZ04L26ddPmVBDtXYsD49UvA4zc8JZA/s1600/iOS+Simulator+Screen+shot+24+Sep+2012+12.38.19+PM.png"><img src="image5.png" alt="screenshot"></a>
 <strong>Gestures</strong>
-Pressing a button to show and hide the menu is fine, and it works, but this is a touch screen device and we want gestures! To do this we add some gesture recognizers to the main view in the <em>viewDidLoad</em> . A swipe to the left will hide the menu and a swipe to the right will reveal it.
-//add some gestures
-UISwipeGestureRecognizer <em>swipeLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeLeft:)];
+Pressing a button to show and hide the menu is fine, and it works, but this is a touch screen device and we want gestures! To do this we add some gesture recognizers to the main view in the <em>viewDidLoad</em> . A swipe to the left will hide the menu and a swipe to the right will reveal it.</p>
+<pre><code class="language-objc">//add some gestures
+UISwipeGestureRecognizer *swipeLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeLeft:)];
 [swipeLeft setDirection:UISwipeGestureRecognizerDirectionLeft];
 [self.view addGestureRecognizer:swipeLeft];
-UISwipeGestureRecognizer <em>swipeRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeRight:)];
+UISwipeGestureRecognizer *swipeRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeRight:)];
 [swipeRight setDirection:UISwipeGestureRecognizerDirectionRight];
 [self.view addGestureRecognizer:swipeRight];
-Next we handle the gestures , note that here I have done some checks so that the animations aren't fired if they are not required.
-#pragma mark - Gesture handlers -
--(void)handleSwipeLeft:(UISwipeGestureRecognizer</em>)recognizer{
+</code></pre>
+<p>Next we handle the gestures , note that here I have done some checks so that the animations aren't fired if they are not required.</p>
+<pre><code class="language-objc">#pragma mark - Gesture handlers -
+-(void)handleSwipeLeft:(UISwipeGestureRecognizer*)recognizer{
 if(content.frame.origin.x != 0)
 [self hideMenu];
 }
--(void)handleSwipeRight:(UISwipeGestureRecognizer</em>)recognizer{
+-(void)handleSwipeRight:(UISwipeGestureRecognizer*)recognizer{
 if(content.frame.origin.x == 0)
 [self showMenu];
 }
-Thats it , now you should be able to show or hide the menu by swiping left or right , anywhere in the view.
+</code></pre>
+<p>Thats it , now you should be able to show or hide the menu by swiping left or right , anywhere in the view.
 The full Xcode project for this tutorial is available <a href="https://github.com/divanvisagie/HiddenMenu">here</a> on GitHub</p>
 <hr>
 <p><em>Originally posted on <a href="https://divcode.blogspot.com/2012/09/creating-hidden-menu-in-ios.html">Blogspot</a></em></p>

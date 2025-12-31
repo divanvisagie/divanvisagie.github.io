@@ -52,8 +52,8 @@
 <span class="updated">Updated 2025-12-31 · <a href="https://github.com/divanvisagie/blog/blob/8c48a1b0fa5cb8eccf4db11137dd4a1294159a89/content/post/hidden-menu-part-2/index.md" target="_blank" rel="noopener">8c48a1b</a></span>
 <p>In<a href="http://divcode.blogspot.com/2012/09/creating-hidden-menu-in-ios.html"> Part 1 of Creating a hidden menu in iOS </a> I showed how to add gestures to handle the hide/reveal functionality. The swipe gesture is a great and gives a good impression , but it can be better. It is much nicer to have the effect that the *content *View is following the users finger , and that is exactly what we are going to do here.
 Lets start with the project form the previous tutorial , if you dont have it , you can pick it up <a href="https://github.com/snip3r8/HiddenMenu">here</a>.
-First we start by commenting out/removing the GestureRecognizer code in the viewDidLoad , we need to get rid of it because the touch events could conflict with them.
-- (void)viewDidLoad
+First we start by commenting out/removing the GestureRecognizer code in the viewDidLoad , we need to get rid of it because the touch events could conflict with them.</p>
+<pre><code class="language-objc">- (void)viewDidLoad
 {
 [super viewDidLoad];
 // Do any additional setup after loading the view, typically from a nib.
@@ -68,15 +68,17 @@ menuArray = [[NSArray alloc] initWithContentsOfFile:menuPlistPath];
 //    [swipeRight setDirection:UISwipeGestureRecognizerDirectionRight];
 //[self.view addGestureRecognizer:swipeRight];
 }
-Now lets jump to the touch events ,this requires no additional setup,all we have to do is implement the delegate methods.
-The first one we will handle is *touchesBegan *. All we will be doing here is storing the x coordinate of where the touch began ,this is used later to calculate how we should move the <em>contents</em> view.
-float difference;
+</code></pre>
+<p>Now lets jump to the touch events ,this requires no additional setup,all we have to do is implement the delegate methods.
+The first one we will handle is *touchesBegan *. All we will be doing here is storing the x coordinate of where the touch began ,this is used later to calculate how we should move the <em>contents</em> view.</p>
+<pre><code class="language-objc">float difference;
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
 CGPoint contentTouchPoint = [[touches anyObject] locationInView:content];
 difference = contentTouchPoint.x;
 }
-Next up is <em>touchesMoved</em> ,here we get the coordinate of the touch in <em>self.view</em> ,then based on the coordinate ,calculate a new x coordinate for the  *content *view. Here we also implement a check to make sure that the movement does not exceed the bounds of *menuTable. *After we have calculated *xTarget , *All thats left to do is animate the movement.
--(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
+</code></pre>
+<p>Next up is <em>touchesMoved</em> ,here we get the coordinate of the touch in <em>self.view</em> ,then based on the coordinate ,calculate a new x coordinate for the  *content *view. Here we also implement a check to make sure that the movement does not exceed the bounds of *menuTable. *After we have calculated *xTarget , *All thats left to do is animate the movement.</p>
+<pre><code class="language-objc">-(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
 CGPoint pointInView = [[touches anyObject] locationInView:self.view];
 float xTarget = pointInView.x - difference;
 if(xTarget &gt; menuTable.frame.size.width)
@@ -89,8 +91,9 @@ animations:^{
 }
 ];
 }
-The final method we need to handle is touchesEnded. This event is fired when the users finger leaves the screen , at this point the <em>content</em> view is most likely to be in mid transition between the &quot;menu shown&quot; and &quot;menu hidden&quot; states,so here we need to calculate which of those states it &quot;snaps&quot; to:
--(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
+</code></pre>
+<p>The final method we need to handle is touchesEnded. This event is fired when the users finger leaves the screen , at this point the <em>content</em> view is most likely to be in mid transition between the &quot;menu shown&quot; and &quot;menu hidden&quot; states,so here we need to calculate which of those states it &quot;snaps&quot; to:</p>
+<pre><code class="language-objc">-(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
 CGPoint endPoint = [[touches anyObject] locationInView:self.view];
 float xTarget = endPoint.x - difference;
 if(xTarget &lt; (menuTable.frame.size.width/2))
@@ -103,10 +106,11 @@ animations:^{
 }
 ];
 }
-And thats a wrap , now if you run the project you will be able to drag the menu into hidden/shown states and it will actually follow your finger and not just be fired by a swipe. Below is the full modified code of HiddenMenu:
+</code></pre>
+<p>And thats a wrap , now if you run the project you will be able to drag the menu into hidden/shown states and it will actually follow your finger and not just be fired by a swipe. Below is the full modified code of HiddenMenu:
 <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgzvHVrRELPibx1mVFz1rgIPYIk_EHBdC09vLzmEJ3kKJjUNbqlg8W1xpwF_z_Cp7qtWDCCVBRzpLpNO0_VFtsR7Os8ud1XEAuufWjTxyUe-G_0e3iehV4GbvWkbTAJrgXwvAsGmjMg5A/s1600/iOS+Simulator+Screen+shot+24+Sep+2012+5.20.15+PM.png"><img src="image2.png" alt="screenshot"></a>
-<em>ViewController.h:</em>
-//
+<em>ViewController.h:</em></p>
+<pre><code class="language-objc">//
 //  ViewController.h
 //  HiddenMenu
 //
@@ -120,8 +124,9 @@ And thats a wrap , now if you run the project you will be able to drag the menu 
 @property (weak, nonatomic) IBOutlet UINavigationBar *contentNavBar;
 - (IBAction)showMenuDown:(id)sender;
 @end
-<em>ViewController.m</em>
-//
+</code></pre>
+<p><em>ViewController.m</em></p>
+<pre><code class="language-objc">//
 //  ViewController.m
 //  HiddenMenu
 //
@@ -163,21 +168,21 @@ menuArray = [[NSArray alloc] initWithContentsOfFile:menuPlistPath];
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
 return menuArray.count;
 }
--(NSInteger)numberOfSectionsInTableView:(UITableView <em>)tableView{
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
 return 1;
 }
--(UITableViewCell</em>)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-UITableViewCell <em>cell = [tableView dequeueReusableCellWithIdentifier:@&quot;MenuCell&quot;];
-NSDictionary <em>menuItem = [menuArray objectAtIndex:indexPath.row];
-cell.textLabel.text = menuItem[@&quot;Title&quot;]; /</em> Note , this is new objective c functionality , 
-for older versions use [menuItem objectForKey:@&quot;Title&quot;];</em>/
+-(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@&quot;MenuCell&quot;];
+NSDictionary *menuItem = [menuArray objectAtIndex:indexPath.row];
+cell.textLabel.text = menuItem[@&quot;Title&quot;]; /* Note , this is new objective c functionality , 
+for older versions use [menuItem objectForKey:@&quot;Title&quot;];*/
 cell.detailTextLabel.text = menuItem[@&quot;Subtitle&quot;];
 return cell;
 }
 #pragma mark - UITableView Delegate -
--(void)tableView:(UITableView <em>)tableView didSelectRowAtIndexPath:(NSIndexPath <em>)indexPath{
-contentNavBar.topItem.title = menuArray[indexPath.row][@&quot;Title&quot;]; /<em>I went wild with the new 
-syntax on this one</em>/
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+contentNavBar.topItem.title = menuArray[indexPath.row][@&quot;Title&quot;]; /*I went wild with the new 
+syntax on this one*/
 }
 #pragma mark - Actions -
 - (IBAction)showMenuDown:(id)sender {
@@ -204,11 +209,11 @@ animations:^{
 ];
 }
 #pragma mark - Gesture handlers -
--(void)handleSwipeLeft:(UISwipeGestureRecognizer</em>)recognizer{
+-(void)handleSwipeLeft:(UISwipeGestureRecognizer*)recognizer{
 //    if(content.frame.origin.x != 0)
 //        [self hideMenu];
 }
--(void)handleSwipeRight:(UISwipeGestureRecognizer</em>)recognizer{
+-(void)handleSwipeRight:(UISwipeGestureRecognizer*)recognizer{
 //    if(content.frame.origin.x == 0)
 //        [self showMenu];
 }
@@ -244,7 +249,8 @@ animations:^{
 }
 ];
 }
-@end</p>
+@end
+</code></pre>
 <hr>
 <p><em>Originally posted on <a href="https://divcode.blogspot.com/2012/09/hidden-menu-part-2-following-finger.html">Blogspot</a></em></p>
 </div>
