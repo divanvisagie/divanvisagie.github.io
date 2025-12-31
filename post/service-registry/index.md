@@ -40,7 +40,27 @@ If our servers are configured with a file like a *Web.config* or *application.pr
 
 You can think of a service registry as a central database of all the services that are currently running. When a new service or instance of a service is spun up, it registers itself with the service registry. 
 
-<img alt="Collection of services behind a gateway using a service registry" src="registry_(1).svg" class="themed">
+```mermaid
+graph LR
+  Gateway[Gateway]
+  ServiceRegistry[(Service Registry)]
+  UserService[User Service]
+  EmailService[Email Service]
+  AnnouncementService[Announcement Service]
+  TimelineService[Timeline Service]
+
+  Gateway --> UserService
+  UserService --> EmailService
+  Gateway --> AnnouncementService
+  Gateway --> TimelineService
+  TimelineService --> AnnouncementService
+
+  UserService -.-> ServiceRegistry
+  EmailService -.-> ServiceRegistry
+  AnnouncementService -.-> ServiceRegistry
+  TimelineService -.-> ServiceRegistry
+  Gateway -.-> ServiceRegistry
+```
 
 Now, when a service needs to know about the location of another in order to make a call, it can be routed to the correct IP address based on the name.
 

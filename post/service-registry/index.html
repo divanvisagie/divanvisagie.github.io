@@ -14,8 +14,8 @@
     <meta name="twitter:title" content="Service Registry Pattern" />
     <meta name="author" content="Divan Visagie" />
     <link href="/favicon.ico" rel="icon" type="image/x-icon" />
-    <meta property="og:image" content="https://divanv.com/post/service-registry/registry_(1).svg" />
-    <meta name="twitter:image" content="https://divanv.com/post/service-registry/registry_(1).svg" />
+    <meta property="og:image" content="https://divanv.com / favicon.ico" />
+    <meta name="twitter:image" content="https://divanv.com / favicon.ico" />
     <meta name="twitter:card" content="summary" />
     <meta property="og:url" content="/" />
     <meta property="og:type" content="website" />
@@ -75,7 +75,26 @@
 <p>If our servers are configured with a file like a <em>Web.config</em> or <em>application.properties</em> then we will need to update the configurations for both our <em>Gateway</em> and <em>Timeline Service</em>. Most times these sorts of configurations also require the service to be restarted in order to take effect, so even in this system with only a few services, the disruption is quite severe, taking out 3 services just because we deployed one new one. This is the problem that the Service Registry tries to solve.</p>
 <h1>The Service Registry</h1>
 <p>You can think of a service registry as a central database of all the services that are currently running. When a new service or instance of a service is spun up, it registers itself with the service registry.</p>
-<img alt="Collection of services behind a gateway using a service registry" src="registry_(1).svg" class="themed">
+<pre><code class="language-mermaid">graph LR
+  Gateway[Gateway]
+  ServiceRegistry[(Service Registry)]
+  UserService[User Service]
+  EmailService[Email Service]
+  AnnouncementService[Announcement Service]
+  TimelineService[Timeline Service]
+
+  Gateway --&gt; UserService
+  UserService --&gt; EmailService
+  Gateway --&gt; AnnouncementService
+  Gateway --&gt; TimelineService
+  TimelineService --&gt; AnnouncementService
+
+  UserService -.-&gt; ServiceRegistry
+  EmailService -.-&gt; ServiceRegistry
+  AnnouncementService -.-&gt; ServiceRegistry
+  TimelineService -.-&gt; ServiceRegistry
+  Gateway -.-&gt; ServiceRegistry
+</code></pre>
 <p>Now, when a service needs to know about the location of another in order to make a call, it can be routed to the correct IP address based on the name.</p>
 <p>Let's take our example again, if we could peer into the service registry, we would see the following information once everything is running:</p>
 <table>
@@ -192,7 +211,7 @@ List&lt;Announcement&gt; employees = response.getAnnouncements();
       <span><a href="/weather">Weather</a></span>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="/js/mermaid.min.js"></script>
     <script src="/js/index.js"></script>
   </body>
 </html>

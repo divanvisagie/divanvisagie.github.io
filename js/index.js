@@ -17,6 +17,12 @@
         return window.getComputedStyle(body).fontFamily;
     }
 
+    function mermaidMonoColor() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? '#ffffff'
+            : '#000000';
+    }
+
     function initMermaid() {
         if (!window.mermaid) {
             return;
@@ -32,8 +38,19 @@
         });
         window.mermaid.initialize({
             startOnLoad: false,
-            theme: mermaidTheme(),
-            themeVariables: { fontFamily: mermaidFontFamily() }
+            theme: 'base',
+            themeVariables: {
+                fontFamily: mermaidFontFamily(),
+                primaryBorderColor: mermaidMonoColor(),
+                lineColor: mermaidMonoColor(),
+                primaryTextColor: mermaidMonoColor(),
+                primaryColor: 'transparent',
+                secondaryColor: 'transparent',
+                tertiaryColor: 'transparent',
+                clusterBkg: 'transparent',
+                clusterBorder: mermaidMonoColor(),
+                edgeLabelBackground: 'transparent'
+            }
         });
         window.mermaid.run({ querySelector: '.mermaid' });
     }
