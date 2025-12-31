@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="/css/styles.css" />
     <link rel="stylesheet" href="/css/highlight.min.css" />
     <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/katex.min.css" />
   </head>
 
   <body>
@@ -121,10 +122,6 @@
     <span>2016-06-24</span>
     <p>A starter guide to understanding what an sbt file is actually saying</p>
   </li><li>
-    <a href="/post/robot-building-part-2">A Software Developer's Experience Building a Robot</a>
-    <span>2013-11-24</span>
-    <p>Part 2: Tank Treads and Blue Smoke</p>
-  </li><li>
     <a href="/post/robot-building-part-1">A Software Developer's Experience Building a Robot</a>
     <span>2013-08-25</span>
     <p>Part 1: Legs</p>
@@ -141,17 +138,57 @@
     <span>2013-02-05</span>
     <p>JavaScript Meets Hardware</p>
   </li><li>
-    <a href="/post/innovation">Innovation</a>
-    <span>2012-12-22</span>
-    <p>You're Doing It Wrong</p>
-  </li><li>
     <a href="/post/node-websockets-ios">Node.js Web Sockets and iOS</a>
     <span>2012-12-02</span>
     <p>A Web/Node.JS/iOS tutorial</p>
   </li><li>
+    <a href="/post/using-uirefreshcontrol">Using UIRefreshControl</a>
+    <span>2012-11-02</span>
+    <p></p>
+  </li><li>
     <a href="/post/searching-uitableview">Searching through a UITableView</a>
     <span>2012-11-02</span>
     <p>An Objective-C tutorial</p>
+  </li><li>
+    <a href="/post/device-detection-in-ios">Device detection in iOS</a>
+    <span>2012-09-28</span>
+    <p></p>
+  </li><li>
+    <a href="/post/hidden-menu-part-2">Hidden menu Part 2: Following the finger</a>
+    <span>2012-09-24</span>
+    <p></p>
+  </li><li>
+    <a href="/post/creating-a-hidden-menu-in-ios">Creating a hidden menu in iOS</a>
+    <span>2012-09-24</span>
+    <p></p>
+  </li><li>
+    <a href="/post/custom-uitableview-look">How to create a custom look for your UITableView</a>
+    <span>2012-09-10</span>
+    <p></p>
+  </li><li>
+    <a href="/post/connecting-to-php-from-ios">Connecting to a php service from iOS</a>
+    <span>2012-08-26</span>
+    <p></p>
+  </li><li>
+    <a href="/post/xcode-shortcuts">Optimise your Xcode productivity with shortcuts</a>
+    <span>2012-08-19</span>
+    <p></p>
+  </li><li>
+    <a href="/post/ios-libraries">Some useful libraries for iOS development</a>
+    <span>2012-08-19</span>
+    <p></p>
+  </li><li>
+    <a href="/post/custom-uipickerview">Creating a custom UIPickerView</a>
+    <span>2012-08-06</span>
+    <p></p>
+  </li><li>
+    <a href="/post/universal-gravitation-cpp">Universal gravitation in C++</a>
+    <span>2012-07-15</span>
+    <p></p>
+  </li><li>
+    <a href="/post/beginning-ios-development">Beginning iOS development</a>
+    <span>2012-07-12</span>
+    <p></p>
   </li>
   </ul>
 </div>
@@ -169,6 +206,18 @@
     </footer>
 
     <script src="/js/mermaid.min.js"></script>
+    <script src="/js/katex.min.js"></script>
+    <script src="/js/katex-auto-render.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+          ]
+        });
+      });
+    </script>
     <script src="/js/index.js"></script>
   </body>
 </html>

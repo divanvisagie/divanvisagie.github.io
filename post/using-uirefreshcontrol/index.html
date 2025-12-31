@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Using UIRefreshControl - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="Using UIRefreshControl - " />
+    <meta property="og:description" content="Using UIRefreshControl - " />
+    <meta property="og:title" content="Using UIRefreshControl" />
+    <meta name="twitter:title" content="Using UIRefreshControl" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com/post/using-uirefreshcontrol/image2.png" />
+    <meta name="twitter:image" content="https://divanv.com/post/using-uirefreshcontrol/image2.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/katex.min.css" />
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a><a class="home-tilde" href="/">/~</a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/post">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><div class="post-content"><h1 class="title">Using UIRefreshControl</h1>
+<h2 class="subtitle"></h2>
+<span class="date">2012-11-02</span>
+<span class="updated">Updated 2025-12-31 · <a href="https://github.com/divanvisagie/blog/blob/8c48a1b0fa5cb8eccf4db11137dd4a1294159a89/content/post/using-uirefreshcontrol/index.md" target="_blank" rel="noopener">8c48a1b</a></span>
+<p><strong>Prerequisites:</strong>
+You should be able to create a project and set up a UITableViewController and table view in the storyboard.
+<strong>Description:</strong>
+Lets start by setting up a new project with a UITableViewController
+I wont bother populating it as this isn't required to get the UIRefreshControl working.Basically all we have to do after setting up the table is to create a UIRefreshControl ,set it up and customise if you wish ,give it a target method with which to handle the refreshing and then add the refreshControl to self. The most logical place for this of corse being in the viewDidLoad.
+<strong>Code:</strong>
+- (void)viewDidLoad
+{
+[super viewDidLoad];
+UIRefreshControl <em>refreshControl = [[UIRefreshControl alloc] init];
+refreshControl.tintColor = [UIColor redColor]; //you can customize the tint color
+//tell refreshControl where its refreshing will be handled
+[refreshControl addTarget:self action:@selector(refreshing:) forControlEvents:UIControlEventValueChanged];
+[self setRefreshControl:refreshControl];
+}
+-(void)refreshing:(UIRefreshControl</em>)refreshControl{
+//refresh code here (reload table data etc.)
+[refreshControl endRefreshing];
+}
+<strong>The result :</strong>
+<a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjaXqGCR2IuPMBK27q7u6r2euhVPmBTzqjgtdtriCK9mSaN1qaBs9IcceV45u6LTecQec9QOvDRnlM3N7hYP5MA6jMSg4n-sLlKesq580b5mUBwb3rgbEYkySNmzqfLNd39FARwbOLj9Q/s1600/iOS+Simulator+Screen+shot+02+Nov+2012+10.01.21+PM.png"><img src="image2.png" alt="screenshot"></a>
+It really is that simple, for more , read Apples <a href="http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIRefreshControl_class/Reference/Reference.html">documentation</a>.</p>
+<hr>
+<p><em>Originally posted on <a href="https://divcode.blogspot.com/2012/11/using-uirefreshcontrol.html">Blogspot</a></em></p>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-25 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/cv">CV</a></span> •
+      <span><a href="https://github.com/divanvisagie">GitHub</a></span> •
+      <span><a href="/pman">pman</a></span> •
+      <span><a href="/mdsql">mdsql</a></span> •
+      <span><a href="/fretboard">Fretboard</a></span> •
+      <span><a href="/weather">Weather</a></span>
+    </footer>
+
+    <script src="/js/mermaid.min.js"></script>
+    <script src="/js/katex.min.js"></script>
+    <script src="/js/katex-auto-render.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+          ]
+        });
+      });
+    </script>
+    <script src="/js/index.js"></script>
+  </body>
+</html>

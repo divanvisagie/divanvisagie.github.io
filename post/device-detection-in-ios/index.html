@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Device detection in iOS - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="Device detection in iOS - " />
+    <meta property="og:description" content="Device detection in iOS - " />
+    <meta property="og:title" content="Device detection in iOS" />
+    <meta name="twitter:title" content="Device detection in iOS" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com / favicon.ico" />
+    <meta name="twitter:image" content="https://divanv.com / favicon.ico" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/katex.min.css" />
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a><a class="home-tilde" href="/">/~</a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/post">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><div class="post-content"><h1 class="title">Device detection in iOS</h1>
+<h2 class="subtitle"></h2>
+<span class="date">2012-09-28</span>
+<span class="updated">Updated 2025-12-31 · <a href="https://github.com/divanvisagie/blog/blob/8c48a1b0fa5cb8eccf4db11137dd4a1294159a89/content/post/device-detection-in-ios/index.md" target="_blank" rel="noopener">8c48a1b</a></span>
+<p>This is just a quick tip on how to determine what device the user is running, this can be useful if you are writing an app for both iPhone and iPad and want to implement a feature in one device but not the other:
+<strong>Code snippet:</strong>
+if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+//executed if phone
+}
+else if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad){
+//executed if ipad
+}
+else{
+//Apple invented a new iDevice
+}
+Another thing we can check for is the version of iOS the user is running as well as the system name,here I simply used NSLog to output the results:
+NSLog(@&quot;%@&quot;,[[UIDevice currentDevice] systemVersion]);
+NSLog(@&quot;%@&quot;,[[UIDevice currentDevice] systemName]);
+<em>UIDevice</em> has many other methods and properties regarding the users device, you can read through them in Apple's documentation <a href="http://developer.apple.com/library/ios/#documentation/uikit/reference/UIDevice_Class/Reference/UIDevice.html">here</a>.</p>
+<hr>
+<p><em>Originally posted on <a href="https://divcode.blogspot.com/2012/09/device-detection-in-ios.html">Blogspot</a></em></p>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-25 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/cv">CV</a></span> •
+      <span><a href="https://github.com/divanvisagie">GitHub</a></span> •
+      <span><a href="/pman">pman</a></span> •
+      <span><a href="/mdsql">mdsql</a></span> •
+      <span><a href="/fretboard">Fretboard</a></span> •
+      <span><a href="/weather">Weather</a></span>
+    </footer>
+
+    <script src="/js/mermaid.min.js"></script>
+    <script src="/js/katex.min.js"></script>
+    <script src="/js/katex-auto-render.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+          ]
+        });
+      });
+    </script>
+    <script src="/js/index.js"></script>
+  </body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Beginning iOS development - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="Beginning iOS development - " />
+    <meta property="og:description" content="Beginning iOS development - " />
+    <meta property="og:title" content="Beginning iOS development" />
+    <meta name="twitter:title" content="Beginning iOS development" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com / favicon.ico" />
+    <meta name="twitter:image" content="https://divanv.com / favicon.ico" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/katex.min.css" />
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a><a class="home-tilde" href="/">/~</a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/post">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><div class="post-content"><h1 class="title">Beginning iOS development</h1>
+<h2 class="subtitle"></h2>
+<span class="date">2012-07-12</span>
+<span class="updated">Updated 2025-12-31 · <a href="https://github.com/divanvisagie/blog/blob/8c48a1b0fa5cb8eccf4db11137dd4a1294159a89/content/post/beginning-ios-development/index.md" target="_blank" rel="noopener">8c48a1b</a></span>
+<p>When developing in iOS you need to know one very important thing; where to start.There are many secrets to
+Here I will be trying my very hardest to give you that information by listing things you need to know and great places to find the information you might need.
+I will start by listing a few rules of iOS development</p>
+<ul>
+<li>You need a Mac , this is pretty non negotiable , the <a href="https://developer.apple.com/xcode/">SDK</a> is only available for OSX so you need something capable of running OSX.</li>
+<li>Code is generally written in Objective-C/C++ ,A lot of tutorials will steer you away from integrating C++ because its &quot;too advanced for this stage&quot; , but my tutorials won't , because I believe that if everybody steered away from the advanced stuff then nobody would know the advanced stuff and then the human race becomes useless.</li>
+<li><a href="http://itunes.apple.com/us/itunes-u/developing-apps-for-ios-sd/id395631522">Paul Hegarty</a> is your new best friend ,he runs a great series of free lectures and learning material with regards to iOS development on iTunes and he really knows what he is doing. Get these videos! I suggest the 2011 version if you are only doing iOS 5 and higher as I do ,because there have been a lot of changes to the SDK recently.</li>
+<li>Understand the concepts of <a href="http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">MVC</a> and <a href="http://dvisagie.blogspot.com/2012/04/using-delegates-in-objective-c-why-use.html">delegates</a> , as these are key concepts in iOS development , delegates especially are used a lot to communicate between classes. 
+I think thats enough of the jibber jabber ,its time to show you some code,or not. I'm not Going to start with the traditional hello world because that's out there on the net already ,and because you listened to me and watched Paul Hegarty's video and he showed you how. Instead il give you a quick tip of a habit to get into early;
+You may not have come across them yet but there are functions in Objective-C called NSLog()  that we use to print information to the debug console and they are a very handy debugging tool.However these logs can cause an extreme performance knock  and you definitely don't want them hanging around in your release build.The trick to doing this is to write a macro that will be at the top of your program that will prevent the execution of NSLogs , you can find an article I have already written over <a href="http://dvisagie.blogspot.com/2012/06/removing-nslogs-from-release-build.html">here</a> on how to do this.Getting into the habit of optimisation early can save you a lot of time later on.
+Well that concludes my first post on this blog with regards to iOS development , I hope you left feeling a lot more informed than I felt when I first started.
+If you have any requests for tutorials on other sections of iOS development just mention it in the comments and I may write a tutorial on it(if I actually know what you are talking about) or if there is an existing resource that I know of , I will refer you to it.</li>
+</ul>
+<hr>
+<p><em>Originally posted on <a href="https://divcode.blogspot.com/2012/07/beginning-ios-development.html">Blogspot</a></em></p>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-25 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/cv">CV</a></span> •
+      <span><a href="https://github.com/divanvisagie">GitHub</a></span> •
+      <span><a href="/pman">pman</a></span> •
+      <span><a href="/mdsql">mdsql</a></span> •
+      <span><a href="/fretboard">Fretboard</a></span> •
+      <span><a href="/weather">Weather</a></span>
+    </footer>
+
+    <script src="/js/mermaid.min.js"></script>
+    <script src="/js/katex.min.js"></script>
+    <script src="/js/katex-auto-render.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+          ]
+        });
+      });
+    </script>
+    <script src="/js/index.js"></script>
+  </body>
+</html>

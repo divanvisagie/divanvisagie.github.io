@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Nibs or Storyboards? - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="Nibs or Storyboards? - " />
+    <meta property="og:description" content="Nibs or Storyboards? - " />
+    <meta property="og:title" content="Nibs or Storyboards?" />
+    <meta name="twitter:title" content="Nibs or Storyboards?" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com/post/nibs-or-storyboards/image1.png" />
+    <meta name="twitter:image" content="https://divanv.com/post/nibs-or-storyboards/image1.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/katex.min.css" />
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a><a class="home-tilde" href="/">/~</a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/post">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><div class="post-content"><h1 class="title">Nibs or Storyboards?</h1>
+<h2 class="subtitle"></h2>
+<span class="date">2012-08-17</span>
+<p>I started iOS development after the release of iOS5 and only learned and developed using the new features such as ARC and Storyboards. Now storyboarding is a great concept that allowed you to create an app ,even with multiple views without even typing a single line of code.
+<a href="http://upload.wikimedia.org/wikipedia/en/7/7e/InterfaceBuilder.png"><img src="image1.png" alt="screenshot"></a>
+Storyboarding worked well for a while and has many benefits, but then I realised a problem. When you want to access a control that was previously segued to from one or more other controls ,you start to create a very horrible looking,difficult to manage spiders-web of a mess which just gets worse as your application becomes more complex.
+So the solution is to use nibs right? Well not exactly ,you see, I like some of the features in the storyboard ,and I still want to use them for general navigation, and you are allowed to use both in the same application. So heres my idea of a rough set of rules to follow when deciding if a control should be in the storyboard or as a separate nib and called programmatically</p>
+<ul>
+<li>If it's used more than once ,make it a nib</li>
+<li>If you are going to use a view in its exact state(meaning you don't change a single thing in the view editor from one call to another), more than once, put it in a nib. This will save you from having to re-create/copy or spider-web the view. Just a few simple lines and its there. Plus this will make your control more abstract and easier to use in other projects.</li>
+<li>If it's used more than once ,with a different view,but same viewController,fork it(storyboard)</li>
+<li>What I describe as forking is creating/copying and modifying the view for use with the same viewController for a slightly different purpose.You don't want more than one or two(iPad and iPhone) nibs,so if a view needs to be forked ,rather do it in the storyboard.Also ,in this scenario ,if you need to access one of those forked views more than once ,you can programatically create storyboard segues to eliminate the spider web effect.</li>
+<li>If you don't need to feed it data, use the storyboard.</li>
+<li>If all you need is a simple segue without passing any data from one ViewController to another , just do a click and drag segue,no need to overcomplicate things.</li>
+<li>Popovers should usually be nibs</li>
+<li>Popovers(iPad only) are usually called from events such as button presses, so its nice to be able to call them programatically. Also In my experience , adding more than one popover segue to a view in the storyboard deletes the other segue(may cause swearing). </li>
+<li>Change the rules</li>
+<li>Don't always follow the rules , sometimes ,in a particular context, rules need to be changed so do whatever makes the app easier to maintain or more effective.</li>
+</ul>
+<hr>
+<p><em>Originally posted on <a href="https://divcode.blogspot.com/2012/08/nibs-or-storyboards.html">Blogspot</a></em></p>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-25 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/cv">CV</a></span> •
+      <span><a href="https://github.com/divanvisagie">GitHub</a></span> •
+      <span><a href="/pman">pman</a></span> •
+      <span><a href="/mdsql">mdsql</a></span> •
+      <span><a href="/fretboard">Fretboard</a></span> •
+      <span><a href="/weather">Weather</a></span>
+    </footer>
+
+    <script src="/js/mermaid.min.js"></script>
+    <script src="/js/katex.min.js"></script>
+    <script src="/js/katex-auto-render.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+          ]
+        });
+      });
+    </script>
+    <script src="/js/index.js"></script>
+  </body>
+</html>

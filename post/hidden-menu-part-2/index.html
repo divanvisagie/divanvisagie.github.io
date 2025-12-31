@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Hidden menu Part 2: Following the finger - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="Hidden menu Part 2: Following the finger - " />
+    <meta property="og:description" content="Hidden menu Part 2: Following the finger - " />
+    <meta property="og:title" content="Hidden menu Part 2: Following the finger" />
+    <meta name="twitter:title" content="Hidden menu Part 2: Following the finger" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com/post/hidden-menu-part-2/image2.png" />
+    <meta name="twitter:image" content="https://divanv.com/post/hidden-menu-part-2/image2.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/katex.min.css" />
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a><a class="home-tilde" href="/">/~</a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/post">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><div class="post-content"><h1 class="title">Hidden menu Part 2: Following the finger</h1>
+<h2 class="subtitle"></h2>
+<span class="date">2012-09-24</span>
+<span class="updated">Updated 2025-12-31 · <a href="https://github.com/divanvisagie/blog/blob/8c48a1b0fa5cb8eccf4db11137dd4a1294159a89/content/post/hidden-menu-part-2/index.md" target="_blank" rel="noopener">8c48a1b</a></span>
+<p>In<a href="http://divcode.blogspot.com/2012/09/creating-hidden-menu-in-ios.html"> Part 1 of Creating a hidden menu in iOS </a> I showed how to add gestures to handle the hide/reveal functionality. The swipe gesture is a great and gives a good impression , but it can be better. It is much nicer to have the effect that the *content *View is following the users finger , and that is exactly what we are going to do here.
+Lets start with the project form the previous tutorial , if you dont have it , you can pick it up <a href="https://github.com/snip3r8/HiddenMenu">here</a>.
+First we start by commenting out/removing the GestureRecognizer code in the viewDidLoad , we need to get rid of it because the touch events could conflict with them.
+- (void)viewDidLoad
+{
+[super viewDidLoad];
+// Do any additional setup after loading the view, typically from a nib.
+//Find the path for the menu resource and load it into the menu array
+NSString *menuPlistPath = [[NSBundle mainBundle] pathForResource:@&quot;Menu&quot; ofType:@&quot;plist&quot;];
+menuArray = [[NSArray alloc] initWithContentsOfFile:menuPlistPath];
+//add some gestures
+//    UISwipeGestureRecognizer *swipeLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeLeft:)];
+//    [swipeLeft setDirection:UISwipeGestureRecognizerDirectionLeft];
+//[self.view addGestureRecognizer:swipeLeft];
+//    UISwipeGestureRecognizer *swipeRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeRight:)];
+//    [swipeRight setDirection:UISwipeGestureRecognizerDirectionRight];
+//[self.view addGestureRecognizer:swipeRight];
+}
+Now lets jump to the touch events ,this requires no additional setup,all we have to do is implement the delegate methods.
+The first one we will handle is *touchesBegan *. All we will be doing here is storing the x coordinate of where the touch began ,this is used later to calculate how we should move the <em>contents</em> view.
+float difference;
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
+CGPoint contentTouchPoint = [[touches anyObject] locationInView:content];
+difference = contentTouchPoint.x;
+}
+Next up is <em>touchesMoved</em> ,here we get the coordinate of the touch in <em>self.view</em> ,then based on the coordinate ,calculate a new x coordinate for the  *content *view. Here we also implement a check to make sure that the movement does not exceed the bounds of *menuTable. *After we have calculated *xTarget , *All thats left to do is animate the movement.
+-(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
+CGPoint pointInView = [[touches anyObject] locationInView:self.view];
+float xTarget = pointInView.x - difference;
+if(xTarget &gt; menuTable.frame.size.width)
+xTarget = menuTable.frame.size.width;
+else if( xTarget &lt; 0)
+xTarget = 0;
+[UIView animateWithDuration:.25
+animations:^{
+[content setFrame:CGRectMake(xTarget, content.frame.origin.y, content.frame.size.width, content.frame.size.height)];
+}
+];
+}
+The final method we need to handle is touchesEnded. This event is fired when the users finger leaves the screen , at this point the <em>content</em> view is most likely to be in mid transition between the &quot;menu shown&quot; and &quot;menu hidden&quot; states,so here we need to calculate which of those states it &quot;snaps&quot; to:
+-(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
+CGPoint endPoint = [[touches anyObject] locationInView:self.view];
+float xTarget = endPoint.x - difference;
+if(xTarget &lt; (menuTable.frame.size.width/2))
+xTarget = 0;
+else
+xTarget = menuTable.frame.size.width;
+[UIView animateWithDuration:.25
+animations:^{
+[content setFrame:CGRectMake(xTarget, content.frame.origin.y, content.frame.size.width, content.frame.size.height)];
+}
+];
+}
+And thats a wrap , now if you run the project you will be able to drag the menu into hidden/shown states and it will actually follow your finger and not just be fired by a swipe. Below is the full modified code of HiddenMenu:
+<a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgzvHVrRELPibx1mVFz1rgIPYIk_EHBdC09vLzmEJ3kKJjUNbqlg8W1xpwF_z_Cp7qtWDCCVBRzpLpNO0_VFtsR7Os8ud1XEAuufWjTxyUe-G_0e3iehV4GbvWkbTAJrgXwvAsGmjMg5A/s1600/iOS+Simulator+Screen+shot+24+Sep+2012+5.20.15+PM.png"><img src="image2.png" alt="screenshot"></a>
+<em>ViewController.h:</em>
+//
+//  ViewController.h
+//  HiddenMenu
+//
+//  Created by Divan Visagie on 2012/09/23.
+//  Copyright (c) 2012 Divan Visagie. All rights reserved.
+//
+#import &lt;UIKit/UIKit.h&gt;
+@interface ViewController : UIViewController &lt;UITableViewDataSource,UITableViewDelegate&gt;
+@property (weak, nonatomic) IBOutlet UITableView *menuTable;
+@property (weak, nonatomic) IBOutlet UIView *content;
+@property (weak, nonatomic) IBOutlet UINavigationBar *contentNavBar;
+- (IBAction)showMenuDown:(id)sender;
+@end
+<em>ViewController.m</em>
+//
+//  ViewController.m
+//  HiddenMenu
+//
+//  Created by Divan Visagie on 2012/09/23.
+//  Copyright (c) 2012 Divan Visagie. All rights reserved.
+//
+#import &quot;ViewController.h&quot;
+@interface ViewController ()
+@property (strong,nonatomic) NSArray *menuArray; //array for menu
+-(void)showMenu;
+-(void)hideMenu;
+@end
+@implementation ViewController
+@synthesize menuArray,
+menuTable,
+content,
+contentNavBar;
+- (void)viewDidLoad
+{
+[super viewDidLoad];
+// Do any additional setup after loading the view, typically from a nib.
+//Find the path for the menu resource and load it into the menu array
+NSString *menuPlistPath = [[NSBundle mainBundle] pathForResource:@&quot;Menu&quot; ofType:@&quot;plist&quot;];
+menuArray = [[NSArray alloc] initWithContentsOfFile:menuPlistPath];
+//add some gestures
+//    UISwipeGestureRecognizer *swipeLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeLeft:)];
+//    [swipeLeft setDirection:UISwipeGestureRecognizerDirectionLeft];
+//[self.view addGestureRecognizer:swipeLeft];
+//    UISwipeGestureRecognizer *swipeRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeRight:)];
+//    [swipeRight setDirection:UISwipeGestureRecognizerDirectionRight];
+//[self.view addGestureRecognizer:swipeRight];
+}
+- (void)didReceiveMemoryWarning
+{
+[super didReceiveMemoryWarning];
+// Dispose of any resources that can be recreated.
+}
+#pragma mark - UITableView Datasource -
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+return menuArray.count;
+}
+-(NSInteger)numberOfSectionsInTableView:(UITableView <em>)tableView{
+return 1;
+}
+-(UITableViewCell</em>)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+UITableViewCell <em>cell = [tableView dequeueReusableCellWithIdentifier:@&quot;MenuCell&quot;];
+NSDictionary <em>menuItem = [menuArray objectAtIndex:indexPath.row];
+cell.textLabel.text = menuItem[@&quot;Title&quot;]; /</em> Note , this is new objective c functionality , 
+for older versions use [menuItem objectForKey:@&quot;Title&quot;];</em>/
+cell.detailTextLabel.text = menuItem[@&quot;Subtitle&quot;];
+return cell;
+}
+#pragma mark - UITableView Delegate -
+-(void)tableView:(UITableView <em>)tableView didSelectRowAtIndexPath:(NSIndexPath <em>)indexPath{
+contentNavBar.topItem.title = menuArray[indexPath.row][@&quot;Title&quot;]; /<em>I went wild with the new 
+syntax on this one</em>/
+}
+#pragma mark - Actions -
+- (IBAction)showMenuDown:(id)sender {
+if(content.frame.origin.x == 0) //only show the menu if it is not already shown
+[self showMenu];
+else
+[self hideMenu];
+}
+#pragma mark - animations -
+-(void)showMenu{
+//slide the content view to the right to reveal the menu 
+[UIView animateWithDuration:.25
+animations:^{
+[content setFrame:CGRectMake(menuTable.frame.size.width, content.frame.origin.y, content.frame.size.width, content.frame.size.height)];
+}
+];
+}
+-(void)hideMenu{
+//slide the content view to the left to hide the menu
+[UIView animateWithDuration:.25
+animations:^{
+[content setFrame:CGRectMake(0, content.frame.origin.y, content.frame.size.width, content.frame.size.height)];
+}
+];
+}
+#pragma mark - Gesture handlers -
+-(void)handleSwipeLeft:(UISwipeGestureRecognizer</em>)recognizer{
+//    if(content.frame.origin.x != 0)
+//        [self hideMenu];
+}
+-(void)handleSwipeRight:(UISwipeGestureRecognizer</em>)recognizer{
+//    if(content.frame.origin.x == 0)
+//        [self showMenu];
+}
+#pragma mark - Touch events -
+float difference;
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
+CGPoint contentTouchPoint = [[touches anyObject] locationInView:content];
+difference = contentTouchPoint.x;
+}
+-(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
+CGPoint pointInView = [[touches anyObject] locationInView:self.view];
+float xTarget = pointInView.x - difference;
+if(xTarget &gt; menuTable.frame.size.width)
+xTarget = menuTable.frame.size.width;
+else if( xTarget &lt; 0)
+xTarget = 0;
+[UIView animateWithDuration:.25
+animations:^{
+[content setFrame:CGRectMake(xTarget, content.frame.origin.y, content.frame.size.width, content.frame.size.height)];
+}
+];
+}
+-(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
+CGPoint endPoint = [[touches anyObject] locationInView:self.view];
+float xTarget = endPoint.x - difference;
+if(xTarget &lt; (menuTable.frame.size.width/2))
+xTarget = 0;
+else
+xTarget = menuTable.frame.size.width;
+[UIView animateWithDuration:.25
+animations:^{
+[content setFrame:CGRectMake(xTarget, content.frame.origin.y, content.frame.size.width, content.frame.size.height)];
+}
+];
+}
+@end</p>
+<hr>
+<p><em>Originally posted on <a href="https://divcode.blogspot.com/2012/09/hidden-menu-part-2-following-finger.html">Blogspot</a></em></p>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-25 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/cv">CV</a></span> •
+      <span><a href="https://github.com/divanvisagie">GitHub</a></span> •
+      <span><a href="/pman">pman</a></span> •
+      <span><a href="/mdsql">mdsql</a></span> •
+      <span><a href="/fretboard">Fretboard</a></span> •
+      <span><a href="/weather">Weather</a></span>
+    </footer>
+
+    <script src="/js/mermaid.min.js"></script>
+    <script src="/js/katex.min.js"></script>
+    <script src="/js/katex-auto-render.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+          ]
+        });
+      });
+    </script>
+    <script src="/js/index.js"></script>
+  </body>
+</html>

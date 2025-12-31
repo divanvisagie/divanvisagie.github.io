@@ -1,0 +1,6 @@
+Missing Image Report
+====================
+
+Failed to download: image1.png
+Original URL: http://i.microsoft.com/visualstudio/_base_v1/images/chrome/visual_studio_logo.png
+

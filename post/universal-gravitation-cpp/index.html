@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Universal gravitation in C++ - Divan Visagie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="Universal gravitation in C++ - " />
+    <meta property="og:description" content="Universal gravitation in C++ - " />
+    <meta property="og:title" content="Universal gravitation in C++" />
+    <meta name="twitter:title" content="Universal gravitation in C++" />
+    <meta name="author" content="Divan Visagie" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta property="og:image" content="https://divanv.com / favicon.ico" />
+    <meta name="twitter:image" content="https://divanv.com / favicon.ico" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Divan Visagie" />
+
+    <meta name="generator" content="Custom" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/highlight.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/katex.min.css" />
+  </head>
+
+  <body>
+    <nav>
+      <div>
+        <h1>
+          <a href="/">Divan <span class="full">Visagie</span></a><a class="home-tilde" href="/">/~</a>
+        </h1>
+
+        <div class="links">
+          <h2>
+            <a href="/post">Posts</a>
+          </h2>
+          <h2>
+            <a href="/about">About</a>
+          </h2>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content"><div class="post-content"><h1 class="title">Universal gravitation in C++</h1>
+<h2 class="subtitle"></h2>
+<span class="date">2012-07-15</span>
+<span class="updated">Updated 2025-12-31 · <a href="https://github.com/divanvisagie/blog/blob/8c48a1b0fa5cb8eccf4db11137dd4a1294159a89/content/post/universal-gravitation-cpp/index.md" target="_blank" rel="noopener">8c48a1b</a></span>
+<p>With all the cool science thats been going around I decided that it would be fun to take some of the things I remember from High School physics and turn it into code. I decided to write a class that calculates the force between two objects using <a href="http://en.wikipedia.org/wiki/Newton's_law_of_universal_gravitation">Universal Gravitation</a>:</p>
+<p>$$F = G \frac{m_1 m_2}{r^2}$$</p>
+<p>We start by creating a body with the properties of an object in space, I used x,y,z coordinates because I intend on using 3d rendering some time in the future, also, I will use these coordinates to calculate the distance between the centers of the two objects later. We will also declare a constructor and a function to calculate the force between the current instance object and a passed object.</p>
+<p>This is the end result, MassObject.h:</p>
+<pre><code class="language-cpp">#ifndef MassObject_h
+#define MassObject_h
+
+class MassObject{
+public:
+    float x,y,z;
+    /*get the gravitational pull between this
+    object and another object*/
+    float gravitationalForce(MassObject otherObject);
+    MassObject(float x,float y,float z ,float mass);
+private:
+    /*mass is private because external objects should not
+    be able to modify an objects mass*/
+    float mass; //mass in kg
+};
+
+#endif
+</code></pre>
+<p>Now for the implementation, the constructor is pretty straight forward, so I don't feel the need to explain myself there. The part we are focused on is the calculation of the force between the two objects. For the calculation we require the distance between the objects, this can be obtained using the theorem of Pythagoras on the current object and the object passed to the gravitationalForce() function.</p>
+<p>Usually we would use sqrt() to find the square root to get the hypotenuse. However if we take a look at the formula for universal gravitation we see that it requires the distance squared, it would be a waste of CPU time to calculate the square root of something only to square it again, so instead we will calculate for r squared, this will also let us avoid having to #include cmath.h.</p>
+<p>MassObject.cpp:</p>
+<pre><code class="language-cpp">#include &quot;MassObject.h&quot;
+
+const float G  = 6.67300E-11;
+
+MassObject::MassObject(float x,float y,float z,float mass){
+    this-&gt;x = x;
+    this-&gt;y = y;
+    this-&gt;z = z;
+    this-&gt;mass = mass;
+}
+
+float MassObject::gravitationalForce(MassObject otherObject){
+    /*F = G m1*m2 / r^2
+    G = gravitational constant | G = 6.67300 × 10^−11
+    m1 = mass 1 (kg)
+    m2 = mass 2 (kg)
+    r = distance between the centers of the masses*/
+
+    //find the distance between the x y and z pairs
+    float x_dist = this-&gt;x - otherObject.x;
+    float y_dist = this-&gt;y - otherObject.y;
+    float z_dist = this-&gt;z - otherObject.z;
+
+    //calculate the distance between the two objects r^2 = x^2 + y^2 + z^2
+    float r_Squared = ((x_dist*x_dist) + (y_dist*y_dist) + (z_dist*z_dist));
+
+    return G * (((this-&gt;mass) * otherObject.mass) / r_Squared); //return force in newtons
+}
+</code></pre>
+<p>So there is our MassObject class for calculating the force between two bodies, but we should test it to see if everything is working alright. The best way to do this, is to do the &quot;Earth Test&quot;. We know that gravity on earth is roughly 9.8N, so if we did our calculation for an object with the weight of 1kg on the surface of the earth the result should be roughly 9.8. Keep in mind that the mass of the earth is roughly 5.9722e24Kg and its radius roughly 6378.1e3 m. Lets test this in our main function to see if the calculations work properly.</p>
+<p>To keep things as compact as possible, I stuck both the earth and the 1Kg object into an array of MassObjects.</p>
+<p>main.cpp:</p>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &quot;MassObject.h&quot;
+
+int main(int argc, const char * argv[])
+{
+    MassObject *mo[] = {
+        new MassObject(0.0f, 0.0f, 0.0f, 5.9722e+24f),
+        new MassObject(6378.1e3f, 0.0f, 0.0f, 1.0f)
+    };
+
+    float F = mo[0]-&gt;gravitationalForce(*mo[1]);
+    std::cout &lt;&lt; &quot;Force: &quot; &lt;&lt; F &lt;&lt; std::endl;
+
+    return 0;
+}
+</code></pre>
+<p>I get the following output:</p>
+<p><strong>Force: 9.79654</strong></p>
+<p>And I think thats close enough to 9.8 to call it a success.</p>
+<hr>
+<p><em>Originally posted on <a href="https://divcode.blogspot.com/2012/07/universal-gravitation-in-c.html">Blogspot</a></em></p>
+</div>
+</div>
+
+    <footer>
+      Divan Visagie • Copyright 2019-25 •
+      <a href="mailto:me@divanv.com">me@divanv.com</a> •
+      <span><a href="/cv">CV</a></span> •
+      <span><a href="https://github.com/divanvisagie">GitHub</a></span> •
+      <span><a href="/pman">pman</a></span> •
+      <span><a href="/mdsql">mdsql</a></span> •
+      <span><a href="/fretboard">Fretboard</a></span> •
+      <span><a href="/weather">Weather</a></span>
+    </footer>
+
+    <script src="/js/mermaid.min.js"></script>
+    <script src="/js/katex.min.js"></script>
+    <script src="/js/katex-auto-render.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+          ]
+        });
+      });
+    </script>
+    <script src="/js/index.js"></script>
+  </body>
+</html>
