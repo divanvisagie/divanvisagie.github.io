@@ -31,7 +31,7 @@
 }
 
 :root {
-  --accent-color: #ff6600;
+  --accent-color: #e05a00;
   --toolbar-background: #ffffff;
   --toolbar-foreground: #111111;
   --toolbar-foreground-hover: #000000;
@@ -56,16 +56,16 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --toolbar-background: #000000;
-    --code-background: #000000;
-    --background-color: #000000;
-    --text-color: #ededed;
+    --toolbar-background: #0b0b0b;
+    --code-background: #0f0f0f;
+    --background-color: #0b0b0b;
+    --text-color: #d8d8d8;
     --title-color: #ffffff;
-    --subtitle-color: #c5c5c5;
-    --footer-background:#000000;
-    --link-color: #6f9dff;
-    --link-color-visited: #a88ce6;
-    --toolbar-foreground: #f3f3f3;
+    --subtitle-color: #a8a8a8;
+    --footer-background:#0b0b0b;
+    --link-color: #7fa6ff;
+    --link-color-visited: #b199e8;
+    --toolbar-foreground: #e6e6e6;
     --toolbar-foreground-hover: #ffffff;
     --syntax-text: #eaeaea;
     --syntax-comment: #969896;
